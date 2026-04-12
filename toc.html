@@ -143,7 +143,7 @@
 
 <div id="error-msg">
   <p>Could not load the table of contents.</p>
-  <p style="margin-top:0.5rem">Make sure <code>/data/toc.csv</code> exists and the page is served from a web server.</p>
+  <p style="margin-top:0.5rem">Make sure <code>/shloka-slideshow/data/toc.csv</code> exists and the page is served from a web server.</p>
 </div>
 
 <script>
@@ -155,7 +155,7 @@
   }
 
   /* ── Load TOC ────────────────────────────────────────────── */
-  fetch('/data/toc.csv')
+  fetch('/shloka-slideshow/data/toc.csv')
     .then(function(r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.text();
