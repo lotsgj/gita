@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,18 +81,29 @@
     .row-main { grid-template-columns: 1fr; gap: 3vw; }
     .panel-large { flex: none; min-height: 42vw; padding: 4vw 6vw; }
     .panel-small { flex: none; min-height: 28vw; padding: 3vw 5vw; }
-    #mobile-nav { display: flex !important; }
     .row-footer .hints { display: none; }
+    /* audio floater: move up so mobile floaters don't overlap */
+    #audio-floater { bottom: 18vw; }
+    /* mobile floaters */
+    #mob-jump, #mob-fs { display: flex !important; }
   }
 
-  #mobile-nav {
-    display: none; justify-content: center; gap: 12px; padding-bottom: 0.5rem;
+  #mobile-nav { display: none; }
+
+  /* ── Mobile floater buttons ──────────────────────────── */
+  .mob-floater {
+    display: none;
+    position: fixed; bottom: 3vmin; z-index: 30;
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.10);
   }
-  #mobile-nav button {
-    padding: 8px 28px; font-size: 15px; border-radius: 8px;
-    border: 0.5px solid #ccc; background: #fff; color: #444;
-    cursor: pointer; font-family: system-ui, sans-serif;
-  }
+  .mob-floater svg { width: 18px; height: 18px; fill: #444; }
+  #mob-jump { left: 3vmin; }
+  #mob-fs   { right: 3vmin; }
 
   #goto-overlay {
     display: none; position: fixed; inset: 0;
@@ -203,10 +215,6 @@
       <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
       <div class="hints">← → navigate · G jump · P play · F / Esc fullscreen</div>
     </div>
-    <div id="mobile-nav">
-      <button onclick="go(-1)">← Prev</button>
-      <button onclick="go(1)">Next →</button>
-    </div>
   </div>
   <!-- Audio floater -->
   <div id="audio-floater">
@@ -218,6 +226,14 @@
     <div id="audio-progress"><div id="audio-progress-fill"></div></div>
   </div>
   <audio id="bg-audio" preload="none"></audio>
+
+  <!-- Mobile floaters -->
+  <div class="mob-floater" id="mob-jump" onclick="openGoto()" title="Jump to shloka">
+    <svg viewBox="0 0 24 24"><path d="M9 5v2h6.59L4 18.59 5.41 20 17 8.41V15h2V5z"/></svg>
+  </div>
+  <div class="mob-floater" id="mob-fs" onclick="toggleFullscreen()" title="Fullscreen">
+    <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+  </div>
 
   <div id="goto-overlay">
     <div id="goto-box">
@@ -462,6 +478,26 @@
     var f = e.dataTransfer.files[0]; if (!f) return;
     var r = new FileReader(); r.onload = function(ev){ parse(ev.target.result); }; r.readAsText(f);
   });
+
+  /* ── Touch swipe (mobile) ──────────────────────────── */
+  (function() {
+    var startX = 0, startY = 0, threshold = 50;
+    var viewer = document.getElementById('viewer');
+    viewer.addEventListener('touchstart', function(e) {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    viewer.addEventListener('touchend', function(e) {
+      if (!rows.length) return;
+      var dx = e.changedTouches[0].clientX - startX;
+      var dy = e.changedTouches[0].clientY - startY;
+      // Only trigger if horizontal swipe dominates
+      if (Math.abs(dx) > threshold && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        if (dx < 0) go(1);   // swipe left  → next
+        else        go(-1);  // swipe right → prev
+      }
+    }, { passive: true });
+  })();
 
   var resizeTimer;
   window.addEventListener('resize', function(){ clearTimeout(resizeTimer); resizeTimer = setTimeout(fitAll, 80); });
