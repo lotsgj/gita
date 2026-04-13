@@ -52,71 +52,7 @@ button.tb.save.active:hover { background: #4a6fc0; }
 /* Active dl: green when there are saved-but-not-downloaded changes */
 button.tb.dl.active  { background: #3a8c5c; color: #fff; border-color: #2e7a4e; cursor: pointer; }
 button.tb.dl.active:hover  { background: #2e7a4e; }
-/* Active sync: amber when savedChanges */
-button.tb.sync.active { background: #b45309; color: #fff; border-color: #92400e; cursor: pointer; }
-button.tb.sync.active:hover { background: #92400e; }
 .hint-label { font-size: 10px; color: #bbb; letter-spacing: 0.03em; }
-
-/* Active convert: purple */
-button.tb.convert.active { background: #7c3aed; color: #fff; border-color: #6d28d9; cursor: pointer; }
-button.tb.convert.active:hover { background: #6d28d9; }
-button.tb.convert.spinning { background: #7c3aed; color: #fff; border-color: #6d28d9; cursor: wait; opacity: 0.8; }
-
-/* Lang selector inline */
-#lang-select {
-  font-size: 12px; border-radius: 7px; border: 0.5px solid #ddd;
-  padding: 4px 8px; background: #fafafa; color: #555;
-  cursor: pointer; outline: none; font-family: system-ui, sans-serif;
-}
-#lang-select:focus { border-color: #7c3aed; }
-
-/* Convert progress bar */
-#convert-bar {
-  display: none; flex-shrink: 0; height: 2px;
-  background: rgba(0,0,0,0.06);
-}
-#convert-bar.show { display: block; }
-#convert-fill { height: 100%; background: #7c3aed; width: 0%; transition: width 0.2s ease; }
-
-/* Scope modal */
-#scope-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.38); align-items: center;
-  justify-content: center; z-index: 200;
-}
-#scope-overlay.show { display: flex; }
-#scope-box {
-  background: #fff; border-radius: 14px; border: 0.5px solid #ddd;
-  padding: 1.75rem 2rem; width: 92%; max-width: 360px;
-  font-family: system-ui, sans-serif;
-}
-#scope-box h3 { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 0.3rem; }
-#scope-box .scope-sub { font-size: 12px; color: #aaa; margin-bottom: 1.2rem; }
-.scope-option {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 0.7rem 0.9rem; border-radius: 9px; cursor: pointer;
-  border: 0.5px solid #eee; margin-bottom: 8px;
-  transition: border-color 0.12s, background 0.12s;
-}
-.scope-option:hover { background: #faf7ff; border-color: #c4b5fd; }
-.scope-option.selected { background: #f5f0ff; border-color: #7c3aed; }
-.scope-option input[type=radio] { margin-top: 2px; accent-color: #7c3aed; }
-.scope-option-label { font-size: 13px; font-weight: 500; color: #222; }
-.scope-option-desc  { font-size: 11px; color: #aaa; margin-top: 1px; }
-.scope-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.2rem; }
-.scope-btns button { padding: 7px 16px; border-radius: 8px; font-size: 13px;
-  cursor: pointer; border: 0.5px solid #ccc; background: #f5f5f5; color: #333; }
-.scope-btns button:hover { background: #eee; }
-.scope-btns button.primary { background: #7c3aed; color: #fff; border-color: #6d28d9; }
-.scope-btns button.primary:hover { background: #6d28d9; }
-#convert-status-bar {
-  display: none; padding: 4px 2vmin;
-  font-size: 11px; color: #7c3aed; font-family: system-ui, sans-serif;
-  background: #faf7ff; border-top: 0.5px solid #ede9fe; flex-shrink: 0;
-}
-#convert-status-bar.show { display: block; }
-#convert-status-bar.err  { color: #c84040; background: #fff5f5; border-color: #fecaca; }
-#convert-status-bar.ok   { color: #3a8c5c; background: #f0fdf4; border-color: #bbf7d0; }
 
 /* Progress */
 #prog-bar { height: 2px; background: rgba(0,0,0,0.08); flex-shrink: 0; }
@@ -240,49 +176,6 @@ button.tb.convert.spinning { background: #7c3aed; color: #fff; border-color: #6d
 #audio-play-btn:hover { background: #3a2a18; }
 #audio-play-btn svg { width: 12px; height: 12px; fill: #fff; }
 
-/* ── GitHub sync modals ────────────────────────────────── */
-.gh-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.4); align-items: center;
-  justify-content: center; z-index: 200;
-}
-.gh-overlay.show { display: flex; }
-.gh-box {
-  background: #fff; border-radius: 14px; border: 0.5px solid #ddd;
-  padding: 1.75rem 2rem; width: 92%; max-width: 400px;
-  font-family: system-ui, sans-serif;
-}
-.gh-box h3 { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 0.25rem; }
-.gh-box .gh-sub { font-size: 12px; color: #aaa; margin-bottom: 1.25rem; }
-.gh-field { margin-bottom: 0.9rem; }
-.gh-field label { display: block; font-size: 11px; font-weight: 600; color: #888;
-  letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
-.gh-field input {
-  width: 100%; padding: 7px 10px; border-radius: 8px;
-  border: 0.5px solid #ddd; font-size: 13px; color: #222;
-  background: #fafafa; outline: none; font-family: system-ui, sans-serif;
-}
-.gh-field input:focus { border-color: #5a7fd4; background: #fff; }
-.gh-field .gh-hint { font-size: 10px; color: #bbb; margin-top: 3px; }
-.gh-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; flex-wrap: wrap; }
-.gh-btns button {
-  padding: 7px 16px; border-radius: 8px; font-size: 13px;
-  cursor: pointer; border: 0.5px solid #ccc; background: #f5f5f5; color: #333;
-}
-.gh-btns button:hover { background: #eee; }
-.gh-btns button.primary { background: #b45309; color: #fff; border-color: #92400e; }
-.gh-btns button.primary:hover { background: #92400e; }
-.gh-btns button.primary:disabled { opacity: 0.45; cursor: not-allowed; }
-.gh-btns button.danger { background: #e05252; color: #fff; border-color: #c84040; }
-.gh-confirm-msg {
-  font-size: 13px; color: #444; line-height: 1.6;
-  background: #fdf8f0; border: 0.5px solid #f0d9a0;
-  border-radius: 8px; padding: 0.75rem 1rem; margin: 0.75rem 0;
-}
-.gh-status { font-size: 12px; margin-top: 0.75rem; min-height: 18px; text-align: center; }
-.gh-status.ok  { color: #3a8c5c; }
-.gh-status.err { color: #c84040; }
-
 /* Mobile: stack panels */
 @media (max-width: 640px) {
   #slide-wrap { padding: 3vw; overflow-y: auto; }
@@ -323,31 +216,11 @@ button.tb.convert.spinning { background: #7c3aed; color: #fff; border-color: #6d
       <span class="counter" id="counter">—</span>
       <button class="tb" onclick="navigate(1)">→</button>
     </div>
-    <span style="width:1px;height:18px;background:#eee;flex-shrink:0;"></span>
-    <select id="lang-select" title="Target language">
-      <option value="en">English</option>
-      <option value="kn">ಕನ್ನಡ — Kannada</option>
-      <option value="hi">हिन्दी — Hindi</option>
-      <option value="te">తెలుగు — Telugu</option>
-      <option value="ta">தமிழ் — Tamil</option>
-      <option value="ml">മലയാളം — Malayalam</option>
-    </select>
-    <input type="password" id="anthropic-key" placeholder="sk-ant-… API key"
-      title="Anthropic API key — stored in session only"
-      style="width:130px;padding:4px 8px;font-size:12px;border-radius:7px;
-             border:0.5px solid #ddd;background:#fafafa;color:#333;outline:none;
-             font-family:system-ui,sans-serif;"
-      oninput="onApiKeyChange()">
-    <button class="tb convert" id="btn-convert" onclick="openScopeModal()">✦ Convert</button>
-    <span style="width:1px;height:18px;background:#eee;flex-shrink:0;"></span>
     <span class="unsaved-dot" id="unsaved-dot" title="Unsaved changes"></span>
     <button class="tb save" id="btn-save" onclick="saveRow()">Save</button>
     <button class="tb dl"   id="btn-dl" onclick="downloadCSV()">Download CSV</button>
-    <button class="tb sync" id="btn-sync" onclick="openSyncModal()">⇅ Sync</button>
   </div>
   <div id="prog-bar"><div id="prog-fill"></div></div>
-  <div id="convert-bar"><div id="convert-fill"></div></div>
-  <div id="convert-status-bar"></div>
 
   <div id="slide-wrap">
     <div class="layout">
@@ -400,80 +273,6 @@ button.tb.convert.spinning { background: #7c3aed; color: #fff; border-color: #6d
 
 </div>
 
-<!-- Scope chooser modal -->
-<div id="scope-overlay">
-  <div id="scope-box">
-    <h3>✦ Convert language</h3>
-    <p class="scope-sub" id="scope-sub">Transliterate, translate and word-by-word will be rewritten using AI.</p>
-    <div class="scope-option selected" id="scope-opt-current" onclick="selectScope('current')">
-      <input type="radio" name="scope" value="current" checked>
-      <div>
-        <div class="scope-option-label">This shloka only</div>
-        <div class="scope-option-desc">Convert the currently visible shloka</div>
-      </div>
-    </div>
-    <div class="scope-option" id="scope-opt-all" onclick="selectScope('all')">
-      <input type="radio" name="scope" value="all">
-      <div>
-        <div class="scope-option-label">All shlokas in chapter</div>
-        <div class="scope-option-desc" id="scope-all-desc">Convert all rows one by one</div>
-      </div>
-    </div>
-    <div class="scope-btns">
-      <button onclick="closeScopeModal()">Cancel</button>
-      <button class="primary" onclick="startConvert()">Convert →</button>
-    </div>
-  </div>
-</div>
-
-<!-- GitHub settings modal -->
-<div class="gh-overlay" id="gh-modal">
-  <div class="gh-box">
-    <h3>⇅ Sync to GitHub</h3>
-    <p class="gh-sub">Your token is stored only in this browser session.</p>
-    <div class="gh-field">
-      <label>GitHub Owner / Org</label>
-      <input type="text" id="gh-owner" placeholder="e.g. lotsgj" autocomplete="off">
-    </div>
-    <div class="gh-field">
-      <label>Repository</label>
-      <input type="text" id="gh-repo" placeholder="e.g. shloka-slideshow" autocomplete="off">
-    </div>
-    <div class="gh-field">
-      <label>File path in repo</label>
-      <input type="text" id="gh-path" placeholder="e.g. data/gita/chapters/BG-7.csv" autocomplete="off">
-      <div class="gh-hint">Path relative to repo root. Auto-filled from loaded URL when possible.</div>
-    </div>
-    <div class="gh-field">
-      <label>Branch</label>
-      <input type="text" id="gh-branch" value="main" autocomplete="off">
-    </div>
-    <div class="gh-field">
-      <label>Personal Access Token</label>
-      <input type="password" id="gh-token" placeholder="ghp_…" autocomplete="off">
-      <div class="gh-hint">Needs Contents: write permission.</div>
-    </div>
-    <div id="gh-settings-status" class="gh-status"></div>
-    <div class="gh-btns">
-      <button onclick="closeGhModal()">Cancel</button>
-      <button class="primary" id="gh-next-btn" onclick="openConfirmModal()">Review &amp; Sync →</button>
-    </div>
-  </div>
-</div>
-
-<!-- GitHub confirm modal -->
-<div class="gh-overlay" id="gh-confirm-modal">
-  <div class="gh-box">
-    <h3>Confirm sync</h3>
-    <div class="gh-confirm-msg" id="gh-confirm-msg"></div>
-    <div id="gh-sync-status" class="gh-status"></div>
-    <div class="gh-btns">
-      <button onclick="closeConfirmModal()">Cancel</button>
-      <button class="danger" id="gh-sync-btn" onclick="doSync()">Push to GitHub</button>
-    </div>
-  </div>
-</div>
-
 <!-- Unsaved modal -->
 <div id="modal-overlay">
   <div id="modal-box">
@@ -492,35 +291,16 @@ var rows = [], idx = 0, dirty = false, savedChanges = false, pendingIdx = -1, fi
 
 /* ── File loading ───────────────────────────────────────────── */
 function fetchAndLoad(url) {
-  // Convert GitHub blob URL to raw
   url = url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-  // Visual feedback on the Load URL button
-  var btn = document.querySelector('#drop-zone button');
-  var inp = document.getElementById('csv-url-input');
-  if (btn) { btn.textContent = 'Loading…'; btn.disabled = true; }
-  if (inp) inp.style.opacity = '0.5';
   fetch(url)
-    .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status + ' — ' + url);
-      return r.text();
-    })
-    .then(function(text) {
-      fileName = url.split('/').pop() || 'remote.csv';
-      loadCSV(text);
-    })
-    .catch(function(err) {
-      alert('Could not load URL:\n' + err.message);
-    })
-    .finally(function() {
-      if (btn) { btn.textContent = 'Load URL'; btn.disabled = false; }
-      if (inp) inp.style.opacity = '';
-    });
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(function(text) { fileName = url.split('/').pop() || 'remote.csv'; loadCSV(text); })
+    .catch(function(err) { alert('Could not load URL:\n' + err.message); });
 }
 
 function loadFromURL() {
   var url = document.getElementById('csv-url-input').value.trim();
-  if (!url) { document.getElementById('csv-url-input').focus(); return; }
-  fetchAndLoad(url);
+  if (url) fetchAndLoad(url);
 }
 
 document.getElementById('csv-url-input').addEventListener('keydown', function(e) {
@@ -549,10 +329,7 @@ function loadCSV(text) {
     var p = l.split('#');
     return { title: p[0]||'', shloka: p[1]||'', translit: p[2]||'', transl: p[3]||'', wbw: p[4]||'', audio: p[5]||'' };
   }).filter(function(r){ return r.title||r.shloka; });
-  if (!rows.length) {
-    alert('No valid rows found in the CSV.\nMake sure fields are # delimited and at least one row has a title or shloka.');
-    return;
-  }
+  if (!rows.length) return;
   idx = 0; dirty = false; savedChanges = false;
   document.getElementById('drop-zone').style.display = 'none';
   var ed = document.getElementById('editor'); ed.style.display = 'flex';
@@ -625,19 +402,11 @@ window.addEventListener('resize', function(){ clearTimeout(resizeTimer); resizeT
 
 /* ── Dirty state ────────────────────────────────────────────── */
 function updateButtons() {
-  var saveBtn    = document.getElementById('btn-save');
-  var dlBtn      = document.getElementById('btn-dl');
-  var syncBtn    = document.getElementById('btn-sync');
-  var convertBtn = document.getElementById('btn-convert');
-  saveBtn.className    = 'tb save'    + (dirty ? ' active' : '');
-  dlBtn.className      = 'tb dl'      + (savedChanges ? ' active' : '');
-  syncBtn.className    = 'tb sync'    + (savedChanges ? ' active' : '');
-  var apiKey = (document.getElementById('anthropic-key').value || '').trim();
-  var langActive = rows.length > 0 && document.getElementById('lang-select').value !== 'en' && apiKey.length > 10;
-  convertBtn.className = 'tb convert' + (langActive && !converting ? ' active' : '');
+  var saveBtn = document.getElementById('btn-save');
+  var dlBtn   = document.getElementById('btn-dl');
+  saveBtn.className = 'tb save' + (dirty ? ' active' : '');
+  dlBtn.className   = 'tb dl'   + (savedChanges ? ' active' : '');
 }
-document.getElementById('lang-select').addEventListener('change', updateButtons);
-function onApiKeyChange() { updateButtons(); }
 function setDirty(val) {
   dirty = val;
   document.getElementById('unsaved-dot').className = 'unsaved-dot' + (val ? ' show' : '');
@@ -743,308 +512,6 @@ function downloadCSV() {
   a.download = fileName.replace(/\.csv$/i,'') + '_edited.csv';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setSavedChanges(false);
-}
-
-/* ── GitHub Sync ────────────────────────────────────────────── */
-var ghSettings = { owner:'', repo:'', path:'', branch:'main', token:'' };
-
-function buildCSVContent() {
-  if (dirty) saveRow();
-  var lines = ['title#shloka_in_sanskrit#transliteration_en#translation_en#word_by_word_en'];
-  rows.forEach(function(r){
-    lines.push([r.title, r.shloka, r.translit, r.transl, r.wbw, r.audio||''].join('#'));
-  });
-  return lines.join('\n');
-}
-
-function guessPathFromURL() {
-  // Try to extract repo path from the loaded URL (GitHub Pages or raw URL)
-  // e.g. https://lotsgj.github.io/shloka-slideshow/data/gita/chapters/BG-7.csv
-  // or   https://raw.githubusercontent.com/lotsgj/shloka-slideshow/main/data/...
-  var params = new URLSearchParams(window.location.search);
-  var url = params.get('url') || params.get('csv') || params.get('src') || '';
-  if (!url) return {};
-  // raw.githubusercontent.com/owner/repo/branch/path
-  var rawM = url.match(/raw\.githubusercontent\.com\/([^\/]+)\/([^\/]+)\/([^\/]+)\/(.+)/);
-  if (rawM) return { owner: rawM[1], repo: rawM[2], branch: rawM[3], path: rawM[4] };
-  // owner.github.io/repo/path
-  var pagesM = url.match(/\/\/([^\.]+)\.github\.io\/([^\/]+)\/(.+)/);
-  if (pagesM) return { owner: pagesM[1], repo: pagesM[2], path: pagesM[3] };
-  return {};
-}
-
-function openSyncModal() {
-  if (!savedChanges && !dirty) return;
-  // Pre-fill from URL if fields are empty
-  var guessed = guessPathFromURL();
-  var o = document.getElementById('gh-owner');
-  var r = document.getElementById('gh-repo');
-  var p = document.getElementById('gh-path');
-  var b = document.getElementById('gh-branch');
-  var t = document.getElementById('gh-token');
-  if (!o.value && guessed.owner)  o.value = guessed.owner;
-  if (!r.value && guessed.repo)   r.value = guessed.repo;
-  if (!p.value && guessed.path)   p.value = guessed.path;
-  if (!b.value && guessed.branch) b.value = guessed.branch;
-  // Restore saved session values
-  if (!o.value) o.value = ghSettings.owner;
-  if (!r.value) r.value = ghSettings.repo;
-  if (!p.value) p.value = ghSettings.path;
-  if (!b.value) b.value = ghSettings.branch;
-  if (!t.value) t.value = ghSettings.token;
-  document.getElementById('gh-settings-status').textContent = '';
-  document.getElementById('gh-modal').classList.add('show');
-}
-function closeGhModal() { document.getElementById('gh-modal').classList.remove('show'); }
-
-function openConfirmModal() {
-  var owner  = document.getElementById('gh-owner').value.trim();
-  var repo   = document.getElementById('gh-repo').value.trim();
-  var path   = document.getElementById('gh-path').value.trim();
-  var branch = document.getElementById('gh-branch').value.trim() || 'main';
-  var token  = document.getElementById('gh-token').value.trim();
-  if (!owner || !repo || !path || !token) {
-    document.getElementById('gh-settings-status').textContent = 'Please fill in all fields.';
-    document.getElementById('gh-settings-status').className = 'gh-status err';
-    return;
-  }
-  // Save to session
-  ghSettings = { owner:owner, repo:repo, path:path, branch:branch, token:token };
-  closeGhModal();
-  var msg = 'Push <strong>' + rows.length + ' rows</strong> to:<br><br>' +
-    '<code style="font-size:12px;word-break:break-all">' +
-    'github.com/' + owner + '/' + repo + '/blob/' + branch + '/' + path + '</code><br><br>' +
-    'This will <strong>overwrite</strong> the file on GitHub.';
-  document.getElementById('gh-confirm-msg').innerHTML = msg;
-  document.getElementById('gh-sync-status').textContent = '';
-  document.getElementById('gh-sync-btn').disabled = false;
-  document.getElementById('gh-confirm-modal').classList.add('show');
-}
-function closeConfirmModal() { document.getElementById('gh-confirm-modal').classList.remove('show'); }
-
-async function doSync() {
-  var s = ghSettings;
-  var syncBtn = document.getElementById('gh-sync-btn');
-  var statusEl = document.getElementById('gh-sync-status');
-  syncBtn.disabled = true;
-  statusEl.className = 'gh-status';
-  statusEl.textContent = 'Fetching current file SHA…';
-
-  var apiBase = 'https://api.github.com/repos/' + s.owner + '/' + s.repo + '/contents/' + s.path;
-  var headers = {
-    'Authorization': 'Bearer ' + s.token,
-    'Accept': 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28'
-  };
-
-  var sha = null;
-  try {
-    var getResp = await fetch(apiBase + '?ref=' + encodeURIComponent(s.branch), { headers: headers });
-    if (getResp.ok) {
-      var meta = await getResp.json();
-      sha = meta.sha;
-    } else if (getResp.status !== 404) {
-      throw new Error('Could not fetch file: HTTP ' + getResp.status);
-    }
-  } catch(e) {
-    statusEl.className = 'gh-status err';
-    statusEl.textContent = '✗ ' + e.message;
-    syncBtn.disabled = false;
-    return;
-  }
-
-  statusEl.textContent = 'Pushing file…';
-  var csvContent = buildCSVContent();
-  var encoded = btoa(unescape(encodeURIComponent('\uFEFF' + csvContent)));
-  var body = {
-    message: 'Update ' + s.path + ' via Shloka Editor',
-    content: encoded,
-    branch:  s.branch
-  };
-  if (sha) body.sha = sha;
-
-  try {
-    var putResp = await fetch(apiBase, {
-      method: 'PUT',
-      headers: Object.assign({ 'Content-Type': 'application/json' }, headers),
-      body: JSON.stringify(body)
-    });
-    if (!putResp.ok) {
-      var errJson = await putResp.json().catch(function(){ return {}; });
-      throw new Error(errJson.message || 'HTTP ' + putResp.status);
-    }
-    statusEl.className = 'gh-status ok';
-    statusEl.textContent = '✓ Synced successfully to GitHub!';
-    setSavedChanges(false);
-    setTimeout(closeConfirmModal, 1800);
-  } catch(e) {
-    statusEl.className = 'gh-status err';
-    statusEl.textContent = '✗ ' + e.message;
-    syncBtn.disabled = false;
-  }
-}
-
-/* ── AI Language Conversion ─────────────────────────────────── */
-var converting = false;
-var convertScope = 'current';
-
-var LANG_NAMES = {
-  en: 'English', kn: 'Kannada', hi: 'Hindi',
-  te: 'Telugu',  ta: 'Tamil',   ml: 'Malayalam'
-};
-
-var LANG_INSTRUCTIONS = {
-  kn: 'Kannada (ಕನ್ನಡ)',
-  hi: 'Hindi (हिन्दी)',
-  te: 'Telugu (తెలుగు)',
-  ta: 'Tamil (தமிழ்)',
-  ml: 'Malayalam (മലയാളം)'
-};
-
-function selectScope(val) {
-  convertScope = val;
-  document.getElementById('scope-opt-current').className =
-    'scope-option' + (val === 'current' ? ' selected' : '');
-  document.getElementById('scope-opt-all').className =
-    'scope-option' + (val === 'all' ? ' selected' : '');
-  document.querySelector('#scope-opt-current input').checked = (val === 'current');
-  document.querySelector('#scope-opt-all input').checked    = (val === 'all');
-}
-
-function openScopeModal() {
-  if (!rows.length || converting) return;
-  var lang = document.getElementById('lang-select').value;
-  if (lang === 'en') return;
-  document.getElementById('scope-sub').textContent =
-    'Convert to ' + LANG_NAMES[lang] + ': transliteration, translation and word-by-word will be rewritten by AI.';
-  document.getElementById('scope-all-desc').textContent =
-    'Convert all ' + rows.length + ' shlokas one by one';
-  selectScope('current');
-  document.getElementById('scope-overlay').classList.add('show');
-}
-function closeScopeModal() { document.getElementById('scope-overlay').classList.remove('show'); }
-
-function setConvertStatus(msg, cls) {
-  var el = document.getElementById('convert-status-bar');
-  el.textContent = msg;
-  el.className = 'show' + (cls ? ' ' + cls : '');
-}
-function hideConvertStatus() {
-  document.getElementById('convert-status-bar').className = '';
-}
-
-async function convertOneRow(rowIdx, lang, apiKey) {
-  var r = rows[rowIdx];
-  var langLabel = LANG_INSTRUCTIONS[lang];
-
-  var prompt = [
-    'You are a Sanskrit scripture translator. Given this Bhagavad Gita shloka data in English,',
-    'produce ONLY a JSON object with exactly three keys: transliteration, translation, word_by_word.',
-    '',
-    'Rules:',
-    '- transliteration: romanised Sanskrit written phonetically in ' + langLabel + ' script',
-    '- translation: natural fluent translation of the meaning into ' + langLabel,
-    '- word_by_word: each word\u2014meaning entry translated into ' + langLabel + ', keeping word\u2014meaning; word\u2014meaning format with semicolons',
-    '- Preserve all literal \\n line breaks exactly as they appear',
-    '- Return ONLY valid JSON. No markdown fences, no preamble, nothing else.',
-    '',
-    'Input:',
-    'title: ' + r.title,
-    'sanskrit: ' + r.shloka,
-    'english_transliteration: ' + r.translit,
-    'english_translation: ' + r.transl,
-    'english_word_by_word: ' + r.wbw,
-    '',
-    'Output JSON:'
-  ].join('\n');
-
-  var resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-calls': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-  if (!resp.ok) throw new Error('API error: HTTP ' + resp.status);
-  var data = await resp.json();
-  var text = (data.content || []).map(function(b){ return b.text || ''; }).join('');
-  // Strip markdown fences if present
-  text = text.replace(/^```[a-zA-Z]*\n?/,'').replace(/\n?```$/,'').trim();
-  var parsed = JSON.parse(text);
-  if (!parsed.transliteration || !parsed.translation || !parsed.word_by_word)
-    throw new Error('Incomplete JSON from AI');
-  return parsed;
-}
-
-async function startConvert() {
-  closeScopeModal();
-  var lang = document.getElementById('lang-select').value;
-  if (lang === 'en' || !rows.length) return;
-  var apiKey = (document.getElementById('anthropic-key').value || '').trim();
-  if (!apiKey) {
-    setConvertStatus('Please enter your Anthropic API key next to the Convert button.', 'err');
-    return;
-  }
-
-  var scope = convertScope;
-  var targets = scope === 'all'
-    ? rows.map(function(_, i){ return i; })
-    : [idx];
-
-  converting = true;
-  updateButtons();
-  document.getElementById('convert-bar').className = 'show';
-  document.getElementById('convert-fill').style.width = '0%';
-
-  var done = 0, failed = 0;
-  for (var t = 0; t < targets.length; t++) {
-    var ri = targets[t];
-    setConvertStatus(
-      'Converting ' + (t + 1) + ' / ' + targets.length + ' — ' + rows[ri].title + '…'
-    );
-    document.getElementById('convert-fill').style.width =
-      Math.round(t / targets.length * 100) + '%';
-    try {
-      var result = await convertOneRow(ri, lang, apiKey);
-      rows[ri].translit = result.transliteration;
-      rows[ri].transl   = result.translation;
-      rows[ri].wbw      = result.word_by_word;
-      done++;
-      // Re-render live if it's the current row
-      if (ri === idx) renderRow();
-    } catch(e) {
-      failed++;
-      console.warn('Row', ri, e.message);
-    }
-    // Small pause to avoid rate limiting
-    await new Promise(function(res){ setTimeout(res, 200); });
-  }
-
-  document.getElementById('convert-fill').style.width = '100%';
-  converting = false;
-  updateButtons();
-
-  // Mark all converted rows dirty
-  setSavedChanges(false);
-  setDirty(true);
-
-  var msg = '✓ Converted ' + done + ' of ' + targets.length +
-    ' shlokas to ' + LANG_NAMES[lang];
-  if (failed) msg += ' (' + failed + ' failed — check console)';
-  setConvertStatus(msg, failed ? 'err' : 'ok');
-
-  setTimeout(function() {
-    document.getElementById('convert-bar').className = '';
-    document.getElementById('convert-fill').style.width = '0%';
-    if (!failed) setTimeout(hideConvertStatus, 2500);
-  }, 600);
 }
 
 /* ── Auto-load from ?url= / ?csv= / ?src= address parameter ── */
