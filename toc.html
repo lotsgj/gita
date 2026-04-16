@@ -12,45 +12,53 @@
   header {
     background: #fff; border-bottom: 0.5px solid #ddd;
     padding: 1.25rem 2rem;
-    display: flex; align-items: baseline; gap: 1rem;
+    display: flex; align-items: center; gap: 1rem;
   }
   header h1 { font-size: 18px; font-weight: 600; color: #222; font-family: Georgia, serif; }
   header .sub { font-size: 12px; color: #bbb; }
   header .edit-badge {
-    margin-left: auto; font-size: 11px; font-weight: 600;
+    font-size: 11px; font-weight: 600;
     color: #8a5cf6; background: #f3eeff;
     border: 0.5px solid #c4b5fd;
     border-radius: 20px; padding: 3px 10px;
     letter-spacing: 0.04em;
   }
 
+  /* ── Language selector ──────────────────────────────── */
+  #lang-wrap {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 8px;
+  }
+  #lang-select {
+    font-size: 13px; border-radius: 8px;
+    border: 0.5px solid #ddd; padding: 5px 10px;
+    background: #fafafa; color: #444;
+    cursor: pointer; outline: none;
+    font-family: system-ui, sans-serif;
+  }
+  #lang-select:focus { border-color: #c8b88a; }
+  #lang-status {
+    font-size: 11px; color: #aaa;
+    font-family: system-ui, sans-serif;
+    white-space: nowrap;
+  }
+
   #grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
-    padding: 2rem;
-    max-width: 1100px;
-    margin: 0 auto;
+    gap: 16px; padding: 2rem;
+    max-width: 1100px; margin: 0 auto;
   }
 
-  /* Card wrapper — relative so pencil can be positioned */
-  .card-wrap {
-    position: relative;
-  }
+  .card-wrap { position: relative; }
 
   .card {
-    background: #fff;
-    border: 0.5px solid #ddd;
-    border-radius: 14px;
-    padding: 1.4rem 1.5rem 1.25rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    background: #fff; border: 0.5px solid #ddd;
+    border-radius: 14px; padding: 1.4rem 1.5rem 1.25rem;
+    cursor: pointer; text-decoration: none;
+    display: flex; flex-direction: column; gap: 8px;
     transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
   }
   .card:hover {
     border-color: #c8c0b0;
@@ -58,11 +66,7 @@
     transform: translateY(-2px);
   }
   .card:active { transform: translateY(0); box-shadow: none; }
-
-  /* In edit mode shift card right to make room for pencil */
-  body.edit-mode .card {
-    border-color: #e0d8f0;
-  }
+  body.edit-mode .card { border-color: #e0d8f0; }
 
   .card-num {
     font-size: 11px; font-weight: 600; color: #c8b88a;
@@ -78,38 +82,27 @@
     transition: color 0.15s, right 0.15s;
   }
   .card:hover .card-arrow { color: #8a7a55; right: 1rem; }
-
-  /* Accent strip */
   .card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+    content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
     background: linear-gradient(to bottom, #d4b896, #c8a870);
     border-radius: 14px 0 0 14px;
     opacity: 0; transition: opacity 0.15s;
   }
   .card:hover::before { opacity: 1; }
 
-  /* Pencil edit button — hidden by default, shown in edit mode */
   .edit-btn {
-    display: none;
-    position: absolute;
-    top: 50%; right: -14px;
-    transform: translateY(-50%);
-    z-index: 10;
-    width: 32px; height: 32px; border-radius: 50%;
-    background: #8a5cf6;
-    border: 2px solid #fff;
+    display: none; position: absolute;
+    top: 50%; right: -14px; transform: translateY(-50%);
+    z-index: 10; width: 32px; height: 32px; border-radius: 50%;
+    background: #8a5cf6; border: 2px solid #fff;
     box-shadow: 0 2px 8px rgba(138,92,246,0.35);
     align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.15s;
+    cursor: pointer; transition: background 0.15s, transform 0.15s;
     text-decoration: none;
   }
   .edit-btn:hover { background: #7c3aed; transform: translateY(-50%) scale(1.12); }
   .edit-btn svg { width: 14px; height: 14px; fill: #fff; }
-
   body.edit-mode .edit-btn { display: flex; }
-  /* Give card wraps a bit of right margin in edit mode so pencil is visible */
   body.edit-mode .card-wrap { margin-right: 14px; }
 
   #error-msg {
@@ -124,7 +117,8 @@
 
   @media (max-width: 480px) {
     #grid { grid-template-columns: 1fr; padding: 1rem; gap: 10px; }
-    header { padding: 1rem 1.25rem; }
+    header { padding: 1rem 1.25rem; flex-wrap: wrap; }
+    #lang-wrap { margin-left: 0; width: 100%; }
     body.edit-mode .card-wrap { margin-right: 18px; }
     .edit-btn { width: 36px; height: 36px; right: -18px; }
     .edit-btn svg { width: 16px; height: 16px; }
@@ -137,86 +131,140 @@
   <h1>Bhagavad Gita</h1>
   <span class="sub">Select a chapter to begin</span>
   <span class="edit-badge" id="edit-badge" style="display:none">✏ Edit mode</span>
+  <div id="lang-wrap">
+    <span id="lang-status"></span>
+    <select id="lang-select" onchange="onLangChange()">
+      <option value="en">🌐 English</option>
+      <option value="kn">ಕನ್ನಡ — Kannada</option>
+      <option value="hi">हिन्दी — Hindi</option>
+      <option value="te">తెలుగు — Telugu</option>
+      <option value="ta">தமிழ் — Tamil</option>
+      <option value="ml">മലയാളം — Malayalam</option>
+    </select>
+  </div>
 </header>
 
 <div id="grid"></div>
-
 <div id="error-msg">
   <p>Could not load the table of contents.</p>
-  <p style="margin-top:0.5rem">Make sure <code>/gita/data/toc.csv</code> exists and the page is served from a web server.</p>
+  <p style="margin-top:0.5rem">Make sure <code>/data/toc.csv</code> exists and the page is served from a web server.</p>
 </div>
 
 <script>
-  /* ── Edit mode: activated by ?edit=true ─────────────────── */
+  /* ── Edit mode ───────────────────────────────────────────── */
   var editMode = new URLSearchParams(window.location.search).get('edit') === 'true';
   if (editMode) {
     document.body.classList.add('edit-mode');
     document.getElementById('edit-badge').style.display = '';
   }
 
-  /* ── Load TOC ────────────────────────────────────────────── */
-  fetch('/gita/data/toc.csv')
-    .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.text();
-    })
-    .then(function(text) {
-      var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-      var start = lines[0].toLowerCase().indexOf('number') !== -1 ||
-                  lines[0].toLowerCase().indexOf('title')  !== -1 ? 1 : 0;
-      var grid = document.getElementById('grid');
+  /* ── Language config ─────────────────────────────────────── */
+  var LANG_CODES = { en: 'en', kn: 'kn', hi: 'hi', te: 'te', ta: 'ta', ml: 'ml' };
 
-      lines.slice(start).forEach(function(line) {
-        var parts = line.split('#');
-        var num   = (parts[0] || '').trim();
-        var title = (parts[1] || '').trim();
-        var url   = (parts[2] || '').trim();
-        if (!title || !url) return;
+  function tocPath(lang) {
+    return lang === 'en' ? '/data/toc.csv' : '/data/toc.' + lang + '.csv';
+  }
 
-        var viewerURL = 'shloka_slideshow.html?url=' + encodeURIComponent(url);
-        var editorURL = 'shloka_slideshow_editor.html?url='    + encodeURIComponent(url);
+  function savedLang() {
+    return localStorage.getItem('toc_lang') || 'en';
+  }
 
-        /* Card wrapper */
-        var wrap = document.createElement('div');
-        wrap.className = 'card-wrap';
+  function setStatus(msg) {
+    document.getElementById('lang-status').textContent = msg;
+  }
 
-        /* Viewer card */
-        var a = document.createElement('a');
-        a.className = 'card';
-        a.href = viewerURL;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.innerHTML =
-          (num ? '<div class="card-num">Chapter ' + num + '</div>' : '') +
-          '<div class="card-title">' + escHtml(title) + '</div>' +
-          '<div class="card-arrow">→</div>';
+  /* ── Render grid from CSV text ───────────────────────────── */
+  function renderGrid(text) {
+    var grid = document.getElementById('grid');
+    grid.innerHTML = '';
 
-        /* Pencil edit button */
-        var editBtn = document.createElement('a');
-        editBtn.className = 'edit-btn';
-        editBtn.href = editorURL;
-        editBtn.target = '_blank';
-        editBtn.rel = 'noopener';
-        editBtn.title = 'Edit ' + title;
-        editBtn.innerHTML =
-          '<svg viewBox="0 0 24 24">' +
-          '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>' +
-          '<path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>' +
-          '</svg>';
+    var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+    var start = /^(number|title)/i.test(lines[0]) ? 1 : 0;
 
-        /* Stop card click from firing when pencil is clicked */
-        editBtn.addEventListener('click', function(e) { e.stopPropagation(); });
+    lines.slice(start).forEach(function(line) {
+      var parts = line.split('#');
+      var num   = (parts[0] || '').trim();
+      var title = (parts[1] || '').trim();
+      var url   = (parts[2] || '').trim();
+      if (!title || !url) return;
 
-        wrap.appendChild(a);
-        wrap.appendChild(editBtn);
-        grid.appendChild(wrap);
-      });
+      var viewerURL = 'shloka_slideshow.html?url=' + encodeURIComponent(url);
+      var editorURL = 'shloka_editor.html?url='    + encodeURIComponent(url);
 
-      if (!grid.children.length) throw new Error('No rows found');
-    })
-    .catch(function() {
-      document.getElementById('error-msg').style.display = 'block';
+      var wrap = document.createElement('div');
+      wrap.className = 'card-wrap';
+
+      var a = document.createElement('a');
+      a.className = 'card';
+      a.href = viewerURL;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.innerHTML =
+        (num ? '<div class="card-num">Chapter ' + num + '</div>' : '') +
+        '<div class="card-title">' + escHtml(title) + '</div>' +
+        '<div class="card-arrow">→</div>';
+
+      var editBtn = document.createElement('a');
+      editBtn.className = 'edit-btn';
+      editBtn.href = editorURL;
+      editBtn.target = '_blank';
+      editBtn.rel = 'noopener';
+      editBtn.title = 'Edit ' + title;
+      editBtn.innerHTML =
+        '<svg viewBox="0 0 24 24">' +
+        '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>' +
+        '<path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>' +
+        '</svg>';
+      editBtn.addEventListener('click', function(e){ e.stopPropagation(); });
+
+      wrap.appendChild(a);
+      wrap.appendChild(editBtn);
+      grid.appendChild(wrap);
     });
+
+    if (!grid.children.length) throw new Error('No rows found in CSV');
+  }
+
+  /* ── Load a language CSV ─────────────────────────────────── */
+  function loadLang(lang, isUserAction) {
+    setStatus(isUserAction ? 'Loading…' : '');
+    fetch(tocPath(lang))
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function(text) {
+        renderGrid(text);
+        localStorage.setItem('toc_lang', lang);
+        document.getElementById('lang-select').value = lang;
+        document.getElementById('error-msg').style.display = 'none';
+        setStatus('');
+      })
+      .catch(function(err) {
+        if (lang !== 'en') {
+          // Revert to English
+          setStatus('Not available — showing English');
+          document.getElementById('lang-select').value = savedLang() === lang ? 'en' : savedLang();
+          loadLang('en', false);
+        } else {
+          document.getElementById('error-msg').style.display = 'block';
+          setStatus('');
+        }
+      });
+  }
+
+  /* ── Language dropdown change ────────────────────────────── */
+  function onLangChange() {
+    var lang = document.getElementById('lang-select').value;
+    loadLang(lang, true);
+  }
+
+  /* ── Init ────────────────────────────────────────────────── */
+  (function() {
+    var lang = savedLang();
+    document.getElementById('lang-select').value = lang;
+    loadLang(lang, false);
+  })();
 
   function escHtml(s) {
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
