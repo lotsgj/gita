@@ -149,10 +149,21 @@
   .top-menu-label { flex: 1; }
   .menu-shortcut { color: var(--muted); font-size: 11px; font-weight: 600; }
   .top-menu-divider { height: 1px; margin: 6px 8px; background: var(--line); }
-  #renderer-root { min-height: 0; }
+  #renderer-root { min-height: 0; touch-action: pan-y pinch-zoom; }
 
-  .controlbar { border-radius: 17px; padding: 7px 14px; justify-content: center; }
+  .controlbar {
+    border-radius: 17px; padding: 7px 14px;
+    display: grid; grid-template-columns: 42px minmax(0, 680px) 42px;
+    justify-content: center; gap: 12px;
+  }
   .audio-player { width: min(680px, 100%); display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .footer-action {
+    width: 42px; height: 42px; padding: 0; border: 0; border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; color: var(--muted); cursor: pointer;
+  }
+  .footer-action:hover, .footer-action:focus-visible { background: rgba(62,52,40,.07); color: var(--ink); outline: none; }
+  .footer-action svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .play-button { width: 42px; height: 42px; background: var(--indigo); color: white; }
   .play-button:hover { background: #182c49; }
   .play-button:disabled { opacity: .35; cursor: default; }
@@ -162,6 +173,11 @@
   }
   .audio-seek:disabled { opacity: .35; cursor: default; }
   .audio-time { min-width: 88px; color: var(--muted); font-size: 10px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  html.immersive #app { min-height: 100dvh; padding: 0; }
+  html.immersive .shell { max-width: none; min-height: 100dvh; }
+  html.immersive .topbar { border-radius: 0 0 15px 15px; }
+  html.immersive .controlbar { border-radius: 15px 15px 0 0; }
 
   .overlay {
     position: fixed; inset: 0; z-index: 50; padding: 20px;
@@ -225,12 +241,36 @@
     .shell { min-height: calc(100vh - 18px); height: auto; grid-template-rows: 54px 12px auto; gap: 4px; padding-bottom: 64px; }
     .topbar { padding-left: 13px; }
     .chapter-heading { font-size: 12px; }
-    .controlbar { position: fixed; left: 9px; right: 9px; bottom: 7px; z-index: 20; padding: 6px 10px; }
+    .controlbar {
+      position: fixed; left: 9px; right: 9px; bottom: 7px; z-index: 20;
+      padding: 6px 8px; grid-template-columns: 38px minmax(0, 1fr) 38px; gap: 7px;
+    }
     .audio-player { gap: 8px; }
     .play-button { width: 38px; height: 38px; flex: 0 0 38px; }
-    .audio-time { min-width: 76px; font-size: 9px; }
+    .audio-seek { min-width: 40px; }
+    .audio-time { min-width: 68px; font-size: 9px; }
+    .footer-action { width: 38px; height: 38px; }
     .chapter-list { grid-template-columns: repeat(2, 1fr); }
   }
+
+  html.mobile-layout #app { height: auto; min-height: 100vh; padding: 9px; }
+  html.mobile-layout .shell { min-height: calc(100vh - 18px); height: auto; grid-template-rows: 54px 12px auto; gap: 4px; padding-bottom: 64px; }
+  html.mobile-layout .topbar { padding-left: 13px; }
+  html.mobile-layout .chapter-context { gap: 6px; }
+  html.mobile-layout .chapter-icon { width: 27px; height: 27px; flex-basis: 27px; }
+  html.mobile-layout .chapter-heading { font-size: 12px; }
+  html.mobile-layout .controlbar {
+    position: fixed; left: 9px; right: 9px; bottom: 7px; z-index: 20;
+    padding: 6px 8px; grid-template-columns: 38px minmax(0, 1fr) 38px; gap: 7px;
+  }
+  html.mobile-layout .audio-player { gap: 8px; }
+  html.mobile-layout .play-button { width: 38px; height: 38px; flex: 0 0 38px; }
+  html.mobile-layout .audio-seek { min-width: 40px; }
+  html.mobile-layout .audio-time { min-width: 68px; font-size: 9px; }
+  html.mobile-layout .footer-action { width: 38px; height: 38px; }
+  html.mobile-layout .chapter-list { grid-template-columns: repeat(2, 1fr); }
+  html.mobile-layout.immersive #app { padding: 0; }
+  html.mobile-layout.immersive .controlbar { left: 0; right: 0; bottom: 0; }
 
   @media (max-width: 390px) {
     .sid-badge { font-size: 24px; }

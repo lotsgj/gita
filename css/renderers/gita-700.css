@@ -35,3 +35,10 @@
   .gita-700-panel-word { height: clamp(245px, 47vh, 430px); }
   .gita-700-panel-content { padding: 10px 22px 16px; }
 }
+
+html.mobile-layout .gita-700-panels { height: auto; grid-template-columns: 1fr; grid-template-rows: none; gap: 9px; }
+html.mobile-layout .gita-700-panel { height: clamp(230px, 42vh, 390px); }
+html.mobile-layout .gita-700-panel-transliteration { height: clamp(190px, 34vh, 315px); }
+html.mobile-layout .gita-700-panel-meaning { height: clamp(215px, 39vh, 360px); }
+html.mobile-layout .gita-700-panel-word { height: clamp(245px, 47vh, 430px); }
+html.mobile-layout .gita-700-panel-content { padding: 10px 22px 16px; }

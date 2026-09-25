@@ -155,6 +155,7 @@ class AudioPlayer {
       this.time.textContent = 'Audio unavailable';
       this.playButton.disabled = true;
       this.seek.disabled = true;
+      this.updatePlayState();
     });
   }
 
@@ -171,7 +172,7 @@ class AudioPlayer {
 
   toggle() {
     if (!this.audio.getAttribute('src')) return;
-    if (this.audio.paused) this.audio.play().catch(() => {});
+    if (this.audio.paused) this.audio.play().catch(() => this.updatePlayState());
     else this.audio.pause();
   }
 
@@ -183,8 +184,11 @@ class AudioPlayer {
   }
 
   updatePlayState() {
-    this.playIcon.hidden = !this.audio.paused;
-    this.pauseIcon.hidden = this.audio.paused;
+    const playing = !this.audio.paused && !this.audio.ended;
+    this.playIcon.toggleAttribute('hidden', playing);
+    this.pauseIcon.toggleAttribute('hidden', !playing);
+    this.playButton.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
+    this.playButton.title = (playing ? 'Pause audio' : 'Play audio') + ' (P or Space)';
   }
 
   formatTime(seconds) {
@@ -505,6 +509,8 @@ const audioPlayer = new AudioPlayer({
   time: document.getElementById('audio-time')
 });
 
+const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
+
 function showOnly(id) {
   ['chooser', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
     document.getElementById(name).hidden = name !== id;
@@ -631,8 +637,8 @@ function render(options = {}) {
   audioPlayer.setSource(audioSource(row));
   const chapterName = chapterNameFor(row.cid, state.language);
   document.getElementById('chapter-title').textContent = row.cid === 'D'
-    ? 'D-Dhyana'
-    : 'Chapter ' + row.cid + (chapterName ? ' — ' + chapterName : '');
+    ? 'D — Dhyana'
+    : row.cid + (chapterName ? ' — ' + chapterName : '');
   const chapterIcon = document.getElementById('chapter-icon');
   const iconPath = chapterIconFor(row.cid);
   chapterIcon.hidden = !iconPath;
@@ -666,6 +672,31 @@ function navigate(offset) {
   state.index = next;
   render();
   if (matchMedia('(max-width: 760px)').matches) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function swipeIsBlocked(target) {
+  return state.editor.active
+    || !document.getElementById('top-menu').hidden
+    || Boolean(document.querySelector('.overlay:not([hidden])'))
+    || Boolean(target.closest('button, input, select, textarea, a, [contenteditable="true"], .controlbar, .edit-toolbar, .download-reminder'));
+}
+
+function beginSwipe(event) {
+  swipe.active = event.touches.length === 1 && !swipeIsBlocked(event.target);
+  if (!swipe.active) return;
+  swipe.x = event.touches[0].clientX;
+  swipe.y = event.touches[0].clientY;
+  swipe.startedAt = Date.now();
+}
+
+function finishSwipe(event) {
+  if (!swipe.active || event.changedTouches.length !== 1) return;
+  swipe.active = false;
+  const deltaX = event.changedTouches[0].clientX - swipe.x;
+  const deltaY = event.changedTouches[0].clientY - swipe.y;
+  if (Date.now() - swipe.startedAt > 1200) return;
+  if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
+  navigate(deltaX < 0 ? 1 : -1);
 }
 
 function setLanguage(language) {
@@ -827,10 +858,36 @@ function updateChapterSelection() {
   });
 }
 
+function updateDeviceLayout() {
+  const mobile = matchMedia('(hover: none) and (pointer: coarse)').matches || matchMedia('(max-width: 760px)').matches;
+  document.documentElement.classList.toggle('mobile-layout', mobile);
+  if (!mobile && document.documentElement.classList.contains('immersive')) {
+    document.documentElement.classList.remove('immersive');
+  }
+  syncFullscreenUi();
+}
+
+function syncFullscreenUi() {
+  const active = Boolean(document.fullscreenElement) || document.documentElement.classList.contains('immersive');
+  document.querySelector('#fullscreen-button .top-menu-label').textContent = active ? 'Exit fullscreen' : 'Fullscreen';
+  const button = document.getElementById('footer-fullscreen-button');
+  button.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Enter fullscreen');
+  button.title = (active ? 'Exit fullscreen' : 'Fullscreen') + ' (F)';
+  button.querySelector('.fullscreen-enter-icon').toggleAttribute('hidden', active);
+  button.querySelector('.fullscreen-exit-icon').toggleAttribute('hidden', !active);
+}
+
 function toggleFullscreen() {
   setMenuOpen(false);
-  if (document.fullscreenElement) document.exitFullscreen();
-  else document.documentElement.requestFullscreen().catch(() => {});
+  if (document.documentElement.classList.contains('mobile-layout')) {
+    document.documentElement.classList.toggle('immersive');
+    syncFullscreenUi();
+    requestAnimationFrame(() => state.renderer?.fitText());
+  } else if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
 }
 
 function bindEvents() {
@@ -846,9 +903,11 @@ function bindEvents() {
     }
   });
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
+  updateDeviceLayout();
   document.getElementById('menu-button').addEventListener('click', (event) => { event.stopPropagation(); toggleMenu(); });
   document.getElementById('chapter-trigger').addEventListener('click', () => openOverlay('chapters-overlay'));
   document.getElementById('goto-button').addEventListener('click', () => openOverlay('goto-overlay'));
+  document.getElementById('footer-goto-button').addEventListener('click', () => openOverlay('goto-overlay'));
   document.getElementById('chapters-button').addEventListener('click', () => openOverlay('chapters-overlay'));
   document.getElementById('help-button').addEventListener('click', () => openOverlay('help-overlay'));
   document.getElementById('language-button').addEventListener('click', () => openOverlay('language-overlay'));
@@ -861,6 +920,8 @@ function bindEvents() {
     document.getElementById('download-reminder').hidden = true;
   });
   document.getElementById('fullscreen-button').addEventListener('click', toggleFullscreen);
+  document.getElementById('footer-fullscreen-button').addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', syncFullscreenUi);
   document.getElementById('language-options').addEventListener('click', (event) => {
     const option = event.target.closest('.language-option');
     if (option) chooseLanguage(option.dataset.language);
@@ -876,7 +937,14 @@ function bindEvents() {
     const button = event.target.closest('.chapter-button');
     selectChapterButton(button);
   });
-  window.addEventListener('resize', () => state.renderer && state.renderer.fitText());
+  const rendererRoot = document.getElementById('renderer-root');
+  rendererRoot.addEventListener('touchstart', beginSwipe, { passive: true });
+  rendererRoot.addEventListener('touchend', finishSwipe, { passive: true });
+  rendererRoot.addEventListener('touchcancel', () => { swipe.active = false; }, { passive: true });
+  window.addEventListener('resize', () => {
+    updateDeviceLayout();
+    if (state.renderer) state.renderer.fitText();
+  });
   document.addEventListener('keydown', (event) => {
     if (!state.dataset) return;
     const active = document.activeElement;
@@ -885,9 +953,14 @@ function bindEvents() {
       event.preventDefault(); state.editor.save(); return;
     }
     if (event.key === 'Escape') {
-      if (state.editor.active) { event.preventDefault(); state.editor.cancel(); }
-      else if (closeOverlays()) event.preventDefault();
+      if (closeOverlays()) event.preventDefault();
       else if (!document.getElementById('top-menu').hidden) { setMenuOpen(false); event.preventDefault(); }
+      else if (state.editor.active) { event.preventDefault(); state.editor.cancel(); }
+      else if (document.documentElement.classList.contains('immersive')) {
+        document.documentElement.classList.remove('immersive');
+        syncFullscreenUi();
+        event.preventDefault();
+      }
       return;
     }
     const menu = document.getElementById('top-menu');

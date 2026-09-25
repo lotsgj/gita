@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4efe5">
 <title>Verse Player</title>
-<link rel="stylesheet" href="css/player.css?v=15">
-<link rel="stylesheet" href="css/editor.css?v=15">
-<link rel="stylesheet" href="css/renderers/gita-700.css?v=15">
+<link rel="stylesheet" href="css/player.css?v=19">
+<link rel="stylesheet" href="css/editor.css?v=19">
+<link rel="stylesheet" href="css/renderers/gita-700.css?v=19">
 
 </head>
 <body>
@@ -79,6 +79,9 @@
     <section id="renderer-root" aria-live="polite"></section>
 
     <footer class="controlbar">
+      <button class="footer-action" id="footer-goto-button" type="button" aria-label="Go to shloka" title="Go to shloka (G)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      </button>
       <div class="audio-player">
         <button class="play-button" id="play-button" type="button" aria-label="Play audio" title="Play / pause (P or Space)">
           <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -87,6 +90,10 @@
         <input class="audio-seek" id="audio-seek" type="range" min="0" max="0" step="0.1" value="0" disabled aria-label="Audio position">
         <span class="audio-time" id="audio-time">00:00 / 00:00</span>
       </div>
+      <button class="footer-action" id="footer-fullscreen-button" type="button" aria-label="Enter fullscreen" title="Fullscreen (F)">
+        <svg class="fullscreen-enter-icon" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+        <svg class="fullscreen-exit-icon" viewBox="0 0 24 24" hidden><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>
+      </button>
     </footer>
   </div>
   <audio id="audio" preload="metadata"></audio>
@@ -149,6 +156,6 @@
   </section>
 </div>
 
-<script src="js/verse-player.bundle.js?v=15"></script>
+<script src="js/verse-player.bundle.js?v=19"></script>
 </body>
 </html>

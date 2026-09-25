@@ -30,6 +30,7 @@ export class AudioPlayer {
       this.time.textContent = 'Audio unavailable';
       this.playButton.disabled = true;
       this.seek.disabled = true;
+      this.updatePlayState();
     });
   }
 
@@ -46,7 +47,7 @@ export class AudioPlayer {
 
   toggle() {
     if (!this.audio.getAttribute('src')) return;
-    if (this.audio.paused) this.audio.play().catch(() => {});
+    if (this.audio.paused) this.audio.play().catch(() => this.updatePlayState());
     else this.audio.pause();
   }
 
@@ -58,8 +59,11 @@ export class AudioPlayer {
   }
 
   updatePlayState() {
-    this.playIcon.hidden = !this.audio.paused;
-    this.pauseIcon.hidden = this.audio.paused;
+    const playing = !this.audio.paused && !this.audio.ended;
+    this.playIcon.toggleAttribute('hidden', playing);
+    this.pauseIcon.toggleAttribute('hidden', !playing);
+    this.playButton.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
+    this.playButton.title = (playing ? 'Pause audio' : 'Play audio') + ' (P or Space)';
   }
 
   formatTime(seconds) {
