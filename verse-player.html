@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4efe5">
+<title>Verse Player</title>
+<link rel="stylesheet" href="css/player.css?v=15">
+<link rel="stylesheet" href="css/editor.css?v=15">
+<link rel="stylesheet" href="css/renderers/gita-700.css?v=15">
+
+</head>
+<body>
+<main id="chooser" class="chooser" hidden>
+  <section class="chooser-card">
+    <div class="status-mark">ॐ</div>
+    <h1>Choose an experience</h1>
+    <p>Read, reflect, and listen at your own pace.</p>
+    <div class="experience-list">
+      <a class="experience-link" id="gita-700-link" href="?play=gita-700"><span>Gita 700<br><small>Four-panel study experience</small></span><span>→</span></a>
+      <span class="experience-link disabled"><span>Gita Yoga<br><small>Experience to be designed</small></span><small>Coming later</small></span>
+      <span class="experience-link disabled"><span>Gita Sara<br><small>Experience to be designed</small></span><small>Coming later</small></span>
+    </div>
+  </section>
+</main>
+
+<main id="loading" class="loading" hidden>
+  <section class="status-card"><div class="status-mark">ॐ</div><h1>Opening the Gita</h1><p>Preparing the verses…</p></section>
+</main>
+
+<main id="error" class="error" hidden>
+  <section class="status-card"><div class="status-mark">ॐ</div><h1>Unable to open the player</h1><p id="error-message"></p></section>
+</main>
+
+<main id="data-chooser" class="chooser" hidden>
+  <section class="chooser-card">
+    <div class="status-mark">ॐ</div>
+    <h1>Select the Gita master data</h1>
+    <p>The browser could not load <strong>data/master.csv</strong> automatically. Choose the file to continue.</p>
+    <div class="file-actions">
+      <label class="file-button" for="master-file-input">Choose master.csv</label>
+      <input id="master-file-input" type="file" accept=".csv,text/csv" hidden>
+      <button class="retry-button" id="retry-data-button" type="button">Try automatic loading again</button>
+    </div>
+    <div class="file-error" id="file-error" role="alert"></div>
+    <p class="file-note">The selected file stays in this browser session. It is not uploaded or modified.</p>
+  </section>
+</main>
+
+<main id="app" hidden>
+  <div class="shell">
+    <header class="topbar">
+      <button class="chapter-context" id="chapter-trigger" type="button" aria-label="Choose chapter" title="Choose chapter (C)">
+        <img class="chapter-icon" id="chapter-icon" alt="" hidden>
+        <div class="chapter-heading" id="chapter-title"></div>
+      </button>
+      <div class="shloka-position">
+        <div class="sid-badge" id="sid-label"></div>
+      </div>
+      <div class="top-menu-wrap">
+        <button class="icon-button menu-toggle" id="menu-button" type="button" aria-label="Open menu" aria-expanded="false" title="Menu (M)">
+          <svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/></svg>
+        </button>
+        <div class="top-menu-panel" id="top-menu" hidden>
+          <button class="top-menu-item" id="chapters-button" type="button"><span class="top-menu-label">Chapters</span><span class="menu-shortcut">C</span></button>
+          <button class="top-menu-item" id="goto-button" type="button"><span class="top-menu-label">Go to shloka</span><span class="menu-shortcut">G</span></button>
+          <button class="top-menu-item" id="language-button" type="button"><span class="top-menu-label">Language (Eng)</span><span class="menu-shortcut">L</span></button>
+          <button class="top-menu-item" id="fullscreen-button" type="button"><span class="top-menu-label">Fullscreen</span><span class="menu-shortcut">F</span></button>
+          <div class="top-menu-divider"></div>
+          <button class="top-menu-item" id="edit-button" type="button"><span class="top-menu-label">Edit this shloka</span><span class="menu-shortcut">E</span></button>
+          <button class="top-menu-item" id="home-button" type="button"><span class="top-menu-label">Home</span><span class="menu-shortcut">A</span></button>
+          <button class="top-menu-item" id="help-button" type="button"><span class="top-menu-label">Help</span><span class="menu-shortcut">H</span></button>
+        </div>
+      </div>
+    </header>
+
+    <div class="record-position" id="position-label" aria-label="Current shloka position"></div>
+
+    <section id="renderer-root" aria-live="polite"></section>
+
+    <footer class="controlbar">
+      <div class="audio-player">
+        <button class="play-button" id="play-button" type="button" aria-label="Play audio" title="Play / pause (P or Space)">
+          <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pause-icon" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
+        </button>
+        <input class="audio-seek" id="audio-seek" type="range" min="0" max="0" step="0.1" value="0" disabled aria-label="Audio position">
+        <span class="audio-time" id="audio-time">00:00 / 00:00</span>
+      </div>
+    </footer>
+  </div>
+  <audio id="audio" preload="metadata"></audio>
+</main>
+
+<aside class="download-reminder" id="download-reminder" hidden aria-label="Edited master download">
+  <button class="download-reminder-action" id="download-reminder-action" type="button">↓ Download edited master.csv</button>
+  <button class="download-reminder-close" id="download-reminder-close" type="button" aria-label="Dismiss download reminder">×</button>
+</aside>
+
+<div class="overlay" id="goto-overlay" hidden>
+  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="goto-title">
+    <header class="dialog-head"><h2 id="goto-title">Go to a shloka</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body">
+      <form id="goto-form">
+        <input class="goto-input" id="goto-input" autocomplete="off" spellcheck="false" placeholder="6.7" aria-label="Shloka ID">
+        <p class="dialog-note">Enter a stable shloka ID, such as 6.B, 6.7, or 6.E.</p>
+        <div class="dialog-error" id="goto-error"></div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="chapters-overlay" hidden>
+  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="chapters-title">
+    <header class="dialog-head"><h2 id="chapters-title">Chapters</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body"><div class="chapter-list" id="chapter-list"></div></div>
+  </section>
+</div>
+
+<div class="overlay" id="language-overlay" hidden>
+  <section class="dialog language-dialog" role="dialog" aria-modal="true" aria-labelledby="language-title">
+    <header class="dialog-head"><h2 id="language-title">Choose language</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body language-options" id="language-options">
+      <button class="language-option" type="button" data-language="en">English</button>
+      <button class="language-option" type="button" data-language="kn">ಕನ್ನಡ</button>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="help-overlay" hidden>
+  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <header class="dialog-head"><h2 id="help-title">Keyboard shortcuts</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body">
+      <div class="shortcut-list">
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>←</kbd></div><div class="shortcut-description">Previous shloka</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>→</kbd></div><div class="shortcut-description">Next shloka</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>G</kbd></div><div class="shortcut-description">Go to a shloka</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>C</kbd></div><div class="shortcut-description">Open chapters</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>L</kbd></div><div class="shortcut-description">Choose language</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>A</kbd></div><div class="shortcut-description">Return to Home</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>P</kbd><kbd>Space</kbd></div><div class="shortcut-description">Play or pause audio</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>F</kbd></div><div class="shortcut-description">Enter or exit fullscreen</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>H</kbd></div><div class="shortcut-description">Open this help</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>M</kbd></div><div class="shortcut-description">Open or close menu</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>E</kbd></div><div class="shortcut-description">Enter or leave edit mode</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>Esc</kbd></div><div class="shortcut-description">Close a dialog or exit fullscreen</div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="js/verse-player.bundle.js?v=15"></script>
+</body>
+</html>

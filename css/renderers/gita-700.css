@@ -1,0 +1,37 @@
+.gita-700-panels {
+  height: 100%; min-height: 0; display: grid; grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1.35fr) minmax(0, 1fr); gap: 12px;
+}
+.gita-700-panel {
+  min-height: 0; position: relative; overflow: hidden;
+  display: grid; grid-template-rows: minmax(0, 1fr);
+  border: 1px solid var(--line); border-radius: var(--panel-radius);
+  box-shadow: var(--shadow);
+}
+.gita-700-panel-shloka { background: #fbf6ea; }
+.gita-700-panel-transliteration { background: #f6efe4; }
+.gita-700-panel-meaning { background: #f2f4f3; }
+.gita-700-panel-word { background: #eaefee; }
+.gita-700-panel-content {
+  z-index: 1; min-width: 0; min-height: 0; padding: 18px clamp(20px, 4vw, 68px);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; text-align: center;
+}
+.gita-700-text { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
+[data-field="shloka_sa"] {
+  font-family: "Noto Serif Devanagari", "Kohinoor Devanagari", Georgia, serif;
+  color: #33261e; line-height: 1.65; font-weight: 550;
+}
+[data-role="transliteration"] { color: #684c39; line-height: 1.65; font-family: Georgia, "Times New Roman", serif; }
+[data-role="meaning"] { color: #26384a; line-height: 1.58; font-family: Georgia, "Times New Roman", serif; }
+[data-role="word"] { color: #45565d; line-height: 1.55; text-align: left; }
+.gita-700-text.empty { color: #a59d91 !important; font-style: italic; font-family: inherit !important; }
+
+@media (max-width: 760px) {
+  .gita-700-panels { height: auto; grid-template-columns: 1fr; grid-template-rows: none; gap: 9px; }
+  .gita-700-panel { height: clamp(230px, 42vh, 390px); }
+  .gita-700-panel-transliteration { height: clamp(190px, 34vh, 315px); }
+  .gita-700-panel-meaning { height: clamp(215px, 39vh, 360px); }
+  .gita-700-panel-word { height: clamp(245px, 47vh, 430px); }
+  .gita-700-panel-content { padding: 10px 22px 16px; }
+}
