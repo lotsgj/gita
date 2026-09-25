@@ -24,7 +24,7 @@ const params = new URLSearchParams(location.search);
 let play = params.get('play');
 let requestedSid = params.get('sid');
 let requestedLanguage = params.get('lang');
-const playerVersion = params.get('v') || '';
+const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
 
 const profileStore = new ProfileStore();
 const profileUI = new ProfileUI({
@@ -153,12 +153,12 @@ async function initializeProfiles() {
 
 async function checkPlayerVersion() {
   try {
-    const response = await fetch('data/player-version.txt?check=' + Date.now(), { cache: 'no-store' });
+    const response = await fetch('data/app-version.json?check=' + Date.now(), { cache: 'no-store' });
     if (!response.ok) return true;
-    const latest = (await response.text()).trim();
-    if (latest && playerVersion !== latest) {
+    const latest = await response.json();
+    if (latest.version && appVersion !== latest.version) {
       const refreshed = new URL(location.href);
-      refreshed.searchParams.set('v', latest);
+      refreshed.searchParams.set('v', latest.version);
       location.replace(refreshed.href);
       return false;
     }
@@ -187,7 +187,7 @@ async function startRequestedExperience() {
 
   showOnly('loading');
   try {
-    const masterUrl = MASTER_URL + (playerVersion ? '?v=' + encodeURIComponent(playerVersion) : '');
+    const masterUrl = MASTER_URL + '?v=' + encodeURIComponent(appVersion);
     await startPlayer(await loadMaster(masterUrl), experience);
   } catch (error) {
     showDataChooser(error.message);

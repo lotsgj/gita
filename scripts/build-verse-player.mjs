@@ -29,4 +29,4 @@ const banner = [
   "'use strict';"
 ].join('\n');
 
-await writeFile('js/verse-player.bundle.js', banner + '\n\n' + parts.join('\n\n') + '\n\n})();\n');
+await writeFile('js/player.bundle.js', banner + '\n\n' + parts.join('\n\n') + '\n\n})();\n');
