@@ -1,11 +1,12 @@
 export class AudioPlayer {
-  constructor({ audio, playButton, playIcon, pauseIcon, seek, time }) {
+  constructor({ audio, playButton, playIcon, pauseIcon, seek, time, onError = () => {} }) {
     this.audio = audio;
     this.playButton = playButton;
     this.playIcon = playIcon;
     this.pauseIcon = pauseIcon;
     this.seek = seek;
     this.time = time;
+    this.onError = onError;
     this.bind();
   }
 
@@ -31,6 +32,7 @@ export class AudioPlayer {
       this.playButton.disabled = true;
       this.seek.disabled = true;
       this.updatePlayState();
+      this.onError();
     });
   }
 

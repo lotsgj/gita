@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 const sources = [
   'js/profile-store.js',
   'js/profile-ui.js',
+  'js/pwa.js',
   'js/master-data.js',
   'js/audio-player.js',
   'js/renderers/gita-700.js',

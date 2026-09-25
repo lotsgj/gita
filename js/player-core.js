@@ -1,6 +1,7 @@
 import { MASTER_URL, loadMaster, readMasterFile, value } from './master-data.js';
 import { ProfileStore } from './profile-store.js';
 import { ProfileUI } from './profile-ui.js';
+import { PwaManager } from './pwa.js';
 import { AudioPlayer } from './audio-player.js';
 import { InlineEditor } from './editor.js';
 import { getExperience } from './renderers/registry.js';
@@ -28,6 +29,7 @@ let requestedLanguage = params.get('lang');
 const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
 
 const profileStore = new ProfileStore();
+const pwa = new PwaManager({ appVersion });
 const profileUI = new ProfileUI({
   store: profileStore,
   onSelected: selectProfile,
@@ -41,7 +43,8 @@ const audioPlayer = new AudioPlayer({
   playIcon: document.getElementById('play-icon'),
   pauseIcon: document.getElementById('pause-icon'),
   seek: document.getElementById('audio-seek'),
-  time: document.getElementById('audio-time')
+  time: document.getElementById('audio-time'),
+  onError: () => pwa.showStatus(navigator.onLine ? 'Audio is currently unavailable.' : 'This audio is not available offline yet.')
 });
 
 const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
@@ -159,7 +162,7 @@ async function checkPlayerVersion() {
     const latest = await response.json();
     state.appMetadata = latest;
     document.getElementById('about-version').textContent = latest.version || appVersion;
-    if (latest.version && appVersion !== latest.version) {
+    if (latest.version && appVersion !== latest.version && !navigator.serviceWorker?.controller) {
       const refreshed = new URL(location.href);
       refreshed.searchParams.set('v', latest.version);
       location.replace(refreshed.href);
@@ -709,4 +712,5 @@ function bindEvents() {
 }
 
 bindEvents();
+pwa.start();
 checkPlayerVersion().then((current) => { if (current) initializeProfiles(); });

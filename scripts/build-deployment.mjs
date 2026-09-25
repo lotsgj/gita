@@ -73,8 +73,15 @@ if (deployedHtml === sourceHtml || deployedHtml.includes('?v=dev') || deployedHt
 }
 
 await writeFile(path.join(output, 'player.html'), deployedHtml);
+await cp(path.join(root, 'index.html'), path.join(output, 'index.html'));
 await cp(path.join(root, 'CNAME'), path.join(output, 'CNAME'));
+await cp(path.join(root, 'manifest.webmanifest'), path.join(output, 'manifest.webmanifest'));
+await cp(path.join(root, 'offline.html'), path.join(output, 'offline.html'));
+const serviceWorkerSource = await readFile(path.join(root, 'service-worker.js'), 'utf8');
+if (!serviceWorkerSource.includes('__GITAVERSE_VERSION__')) throw new Error('service-worker.js is missing its build version marker.');
+await writeFile(path.join(output, 'service-worker.js'), serviceWorkerSource.replaceAll('__GITAVERSE_VERSION__', version));
 await copyDirectory(path.join(root, 'css'), path.join(output, 'css'), (relative) => !relative.endsWith('.DS_Store'));
+await copyDirectory(path.join(root, 'assets'), path.join(output, 'assets'), (relative) => !relative.endsWith('.DS_Store'));
 await cp(path.join(root, 'js/player.bundle.js'), path.join(output, 'js/player.bundle.js'));
 await copyDirectory(path.join(root, 'data'), path.join(output, 'data'), (relative) => {
   return !relative.endsWith('.DS_Store') && relative !== 'app-version.json';
@@ -94,7 +101,20 @@ for (const absolute of await walk(output)) {
   };
 }
 
-const assetManifest = { version, generatedAt: builtAt, assets };
+const precache = Object.keys(assets).filter((relative) => {
+  return relative === 'player.html'
+    || relative === 'index.html'
+    || relative === 'offline.html'
+    || relative === 'manifest.webmanifest'
+    || relative === 'data/master.csv'
+    || relative === 'data/app-version.json'
+    || relative === 'js/player.bundle.js'
+    || relative.startsWith('css/')
+    || relative.startsWith('assets/icons/')
+    || relative.startsWith('data/images/')
+    || relative.startsWith('data/gita-700/icons/');
+});
+const assetManifest = { version, generatedAt: builtAt, assets, precache };
 await writeFile(path.join(output, 'asset-manifest.json'), JSON.stringify(assetManifest, null, 2) + '\n');
 
-console.log(`Built Gitaverse ${version} in dist/ (${Object.keys(assets).length} managed assets; audio excluded from the cache manifest).`);
+console.log(`Built Gitaverse ${version} in dist/ (${Object.keys(assets).length} managed assets; ${precache.length} precached; audio cached on demand).`);

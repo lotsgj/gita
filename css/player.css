@@ -124,6 +124,7 @@
     text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 4px;
   }
   .about-link:hover, .about-link:focus-visible { color: var(--saffron); text-decoration-color: currentColor; outline: none; }
+  .landing-links { display: flex; align-items: center; justify-content: center; gap: 4px; }
   .profile-pill {
     max-width: 170px; min-height: 36px; border: 1px solid var(--line); border-radius: 999px;
     padding: 3px 10px 3px 4px; display: inline-flex; align-items: center; gap: 7px;
@@ -254,6 +255,19 @@
   .top-menu-label { flex: 1; }
   .menu-shortcut { color: var(--muted); font-size: 11px; font-weight: 600; }
   .top-menu-divider { height: 1px; margin: 6px 8px; background: var(--line); }
+  .pwa-notice {
+    position: fixed; z-index: 90; left: 50%; bottom: max(20px, env(safe-area-inset-bottom));
+    transform: translateX(-50%); width: min(520px, calc(100vw - 28px)); min-height: 52px;
+    display: flex; align-items: center; gap: 12px; padding: 9px 10px 9px 16px;
+    border: 1px solid rgba(201,149,63,.48); border-radius: 15px;
+    background: #fffdf9; color: var(--ink); box-shadow: 0 16px 48px rgba(35,29,22,.22);
+    font-size: 12px;
+  }
+  .pwa-notice > span { flex: 1; line-height: 1.4; }
+  .pwa-notice button { min-height: 34px; border-radius: 999px; cursor: pointer; }
+  #pwa-update-action { border: 1px solid var(--indigo); padding: 0 13px; background: var(--indigo); color: white; }
+  .pwa-notice-close { width: 34px; border: 0; background: transparent; color: var(--muted); font-size: 20px; }
+  .pwa-status-notice { width: auto; max-width: calc(100vw - 28px); min-height: 44px; padding-right: 16px; }
   #renderer-root { min-height: 0; touch-action: pan-y pinch-zoom; }
 
   .controlbar {
