@@ -59,6 +59,7 @@ const builtAt = new Date().toISOString();
 
 run(process.execPath, ['scripts/build-verse-player.mjs']);
 run(process.execPath, ['--check', 'js/player.bundle.js']);
+run(process.execPath, ['scripts/test-event-bus.mjs']);
 run('python3', ['scripts/validate_master.py', 'data/master.csv']);
 
 await rm(output, { recursive: true, force: true });

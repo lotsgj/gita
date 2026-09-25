@@ -7,9 +7,10 @@
 
 // Source: js/profile-store.js
 const PROFILE_DB_NAME = 'gitaverse-profiles';
-const PROFILE_DB_VERSION = 1;
+const PROFILE_DB_VERSION = 2;
 const PROFILE_STORE = 'profiles';
 const SETTINGS_STORE = 'settings';
+const RESUME_STORE = 'resumePoints';
 
 function requestResult(request) {
   return new Promise((resolve, reject) => {
@@ -36,6 +37,9 @@ function openProfileDatabase() {
       }
       if (!database.objectStoreNames.contains(SETTINGS_STORE)) {
         database.createObjectStore(SETTINGS_STORE, { keyPath: 'key' });
+      }
+      if (!database.objectStoreNames.contains(RESUME_STORE)) {
+        database.createObjectStore(RESUME_STORE, { keyPath: 'pid' });
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -102,12 +106,40 @@ class ProfileStore {
 
   async remove(pid) {
     await this.open();
-    const transaction = this.database.transaction([PROFILE_STORE, SETTINGS_STORE], 'readwrite');
+    const transaction = this.database.transaction([PROFILE_STORE, SETTINGS_STORE, RESUME_STORE], 'readwrite');
     transaction.objectStore(PROFILE_STORE).delete(Number(pid));
     const settings = transaction.objectStore(SETTINGS_STORE);
     const defaultPid = await requestResult(settings.get('defaultPid'));
     if (defaultPid && Number(defaultPid.value) === Number(pid)) settings.delete('defaultPid');
+    transaction.objectStore(RESUME_STORE).delete(Number(pid));
     await transactionDone(transaction);
+  }
+
+  async getResume(pid) {
+    await this.open();
+    if (!Number.isInteger(Number(pid))) return null;
+    const transaction = this.database.transaction(RESUME_STORE, 'readonly');
+    return (await requestResult(transaction.objectStore(RESUME_STORE).get(Number(pid)))) || null;
+  }
+
+  async saveResume(resume) {
+    await this.open();
+    if (!Number.isInteger(Number(resume.pid))) throw new Error('A resume point requires a profile ID.');
+    const record = {
+      pid: Number(resume.pid),
+      view: resume.view === 'experience' ? 'experience' : 'home',
+      language: resume.language === 'kn' ? 'kn' : 'en',
+      savedAt: resume.savedAt || new Date().toISOString()
+    };
+    if (record.view === 'experience') {
+      record.experience = String(resume.experience || '');
+      record.sid = String(resume.sid || '');
+      if (!record.experience || !record.sid) throw new Error('An experience resume point requires an experience and SID.');
+    }
+    const transaction = this.database.transaction(RESUME_STORE, 'readwrite');
+    transaction.objectStore(RESUME_STORE).put(record);
+    await transactionDone(transaction);
+    return record;
   }
 
   async defaultPid() {
@@ -314,6 +346,166 @@ class ProfileUI {
         return this.onChanged(null, { deletedPid: profile.pid, remaining });
       }
     });
+  }
+}
+
+// Source: js/events/event-schema.js
+const EVENT_SCHEMA_VERSION = 1;
+
+const EVENT_NAMES = new Set([
+  'app_opened',
+  'profile_created',
+  'profile_selected',
+  'profile_updated',
+  'profile_switched',
+  'experience_selected',
+  'location_changed',
+  'language_changed',
+  'home_opened',
+  'data_load_failed',
+  'profile_storage_failed'
+]);
+
+function validateEventInput(name, input = {}) {
+  if (!EVENT_NAMES.has(name)) throw new Error('Unknown Gitaverse event: ' + name);
+  if (input.context != null && (typeof input.context !== 'object' || Array.isArray(input.context))) {
+    throw new Error('Event context must be an object.');
+  }
+  if (input.details != null && (typeof input.details !== 'object' || Array.isArray(input.details))) {
+    throw new Error('Event details must be an object.');
+  }
+  if (name === 'location_changed') {
+    if (!input.context?.experience || !input.context?.sid) {
+      throw new Error('location_changed requires experience and sid.');
+    }
+  }
+  if ((name === 'location_changed' || name === 'home_opened') && !Number.isInteger(Number(input.profileId))) {
+    throw new Error(name + ' requires a profile ID.');
+  }
+}
+
+function deepFreeze(value) {
+  if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  Object.values(value).forEach(deepFreeze);
+  return Object.freeze(value);
+}
+
+// Source: js/events/event-bus.js
+function randomId() {
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') return globalThis.crypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  globalThis.crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+class EventBus {
+  constructor({ appVersion = 'dev', contextProvider = () => ({}), onAdapterError = () => {} } = {}) {
+    this.appVersion = appVersion;
+    this.contextProvider = contextProvider;
+    this.onAdapterError = onAdapterError;
+    this.sessionId = randomId();
+    this.adapters = new Map();
+  }
+
+  subscribe(adapter) {
+    if (!adapter?.id || typeof adapter.handle !== 'function') throw new Error('An event adapter requires an ID and handle function.');
+    if (this.adapters.has(adapter.id)) throw new Error('Event adapter already registered: ' + adapter.id);
+    this.adapters.set(adapter.id, adapter);
+    return () => this.adapters.delete(adapter.id);
+  }
+
+  emit(name, input = {}) {
+    validateEventInput(name, input);
+    const event = deepFreeze({
+      schemaVersion: EVENT_SCHEMA_VERSION,
+      eventId: randomId(),
+      event: name,
+      occurredAt: new Date().toISOString(),
+      sessionId: this.sessionId,
+      profileId: input.profileId == null ? null : Number(input.profileId),
+      anonymousProfileId: input.anonymousProfileId || null,
+      context: {
+        appVersion: this.appVersion,
+        ...this.contextProvider(),
+        ...(input.context || {})
+      },
+      details: { ...(input.details || {}) }
+    });
+
+    this.adapters.forEach((adapter) => {
+      if (adapter.accepts && !adapter.accepts(event)) return;
+      try {
+        Promise.resolve(adapter.handle(event)).catch((error) => this.reportAdapterError(adapter, error, event));
+      } catch (error) {
+        this.reportAdapterError(adapter, error, event);
+      }
+    });
+    return event;
+  }
+
+  reportAdapterError(adapter, error, event) {
+    try { this.onAdapterError({ adapter: adapter.id, error, event }); } catch (_) {}
+  }
+}
+
+// Source: js/events/resume-adapter.js
+class ResumeAdapter {
+  constructor({ store }) {
+    this.id = 'resume';
+    this.store = store;
+  }
+
+  accepts(event) {
+    return event.event === 'location_changed' || event.event === 'home_opened';
+  }
+
+  handle(event) {
+    const base = {
+      pid: event.profileId,
+      language: event.context.language === 'kn' ? 'kn' : 'en',
+      savedAt: event.occurredAt
+    };
+    if (event.event === 'home_opened') {
+      return this.store.saveResume({ ...base, view: 'home' });
+    }
+    return this.store.saveResume({
+      ...base,
+      view: 'experience',
+      experience: event.context.experience,
+      sid: event.context.sid
+    });
+  }
+}
+
+// Source: js/events/clarity-adapter.js
+class ClarityAdapter {
+  constructor() {
+    this.id = 'clarity';
+    this.enabled = false;
+  }
+
+  accepts() {
+    return this.enabled;
+  }
+
+  handle() {
+    // Enabled in the dedicated Clarity integration pass.
+  }
+}
+
+// Source: js/events/sentry-adapter.js
+class SentryAdapter {
+  constructor() {
+    this.id = 'sentry';
+    this.enabled = false;
+  }
+
+  accepts() {
+    return this.enabled;
+  }
+
+  handle() {
+    // Enabled in the dedicated Sentry integration pass.
   }
 }
 
@@ -887,6 +1079,7 @@ const state = {
   activeProfile: null,
   profileSelectionMode: 'initial',
   profileReturnView: 'chooser',
+  locationSource: null,
   appMetadata: { version: 'dev' }
 };
 
@@ -894,9 +1087,20 @@ const params = new URLSearchParams(location.search);
 let play = params.get('play');
 let requestedSid = params.get('sid');
 let requestedLanguage = params.get('lang');
+const explicitLocationRequested = params.has('play') || params.has('sid') || params.has('lang');
 const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
 
 const profileStore = new ProfileStore();
+const eventBus = new EventBus({
+  appVersion,
+  contextProvider: () => ({
+    online: navigator.onLine,
+    displayMode: matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser'
+  })
+});
+eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
+eventBus.subscribe(new ClarityAdapter());
+eventBus.subscribe(new SentryAdapter());
 const pwa = new PwaManager({ appVersion });
 const profileUI = new ProfileUI({
   store: profileStore,
@@ -916,6 +1120,15 @@ const audioPlayer = new AudioPlayer({
 });
 
 const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
+
+function emitEvent(name, { context = {}, details = {}, profile = state.activeProfile } = {}) {
+  return eventBus.emit(name, {
+    profileId: profile?.pid ?? null,
+    anonymousProfileId: profile?.analyticsProfileId || null,
+    context,
+    details
+  });
+}
 
 function showOnly(id) {
   ['profile-setup', 'profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
@@ -941,16 +1154,14 @@ async function activateProfile(profile) {
 
 async function selectProfile(profile) {
   await activateProfile(profile);
-  if (state.profileSelectionMode === 'initial') {
-    startRequestedExperience();
-  } else {
-    goToExperienceSelection(profile);
-  }
+  emitEvent(state.profileSelectionMode === 'initial' ? 'profile_selected' : 'profile_switched');
+  await openProfileLocation(profile, { honorExplicit: state.profileSelectionMode === 'initial' });
 }
 
 async function createProfile(profile) {
   await activateProfile(profile);
-  goToExperienceSelection(profile);
+  emitEvent('profile_created');
+  goToExperienceSelection(profile, { source: 'profile_created' });
 }
 
 async function handleProfileChange(profile, options = {}) {
@@ -963,6 +1174,7 @@ async function handleProfileChange(profile, options = {}) {
   }
   if (!profile) return;
   await activateProfile(profile);
+  emitEvent('profile_updated');
   if (state.profileReturnView === 'profile-selection') {
     await profileUI.showSelection({ switching: true });
     return showOnly('profile-selection');
@@ -974,7 +1186,7 @@ async function handleProfileChange(profile, options = {}) {
   }
 }
 
-function goToExperienceSelection(profile = state.activeProfile) {
+function goToExperienceSelection(profile = state.activeProfile, { source = 'home', track = true } = {}) {
   play = null;
   requestedSid = null;
   requestedLanguage = profile?.language || 'en';
@@ -985,7 +1197,30 @@ function goToExperienceSelection(profile = state.activeProfile) {
   else home.searchParams.delete('lang');
   if (profile) home.searchParams.set('pid', profile.pid);
   history.replaceState(null, '', home);
+  if (track && profile) {
+    emitEvent('home_opened', {
+      profile,
+      context: { language: requestedLanguage },
+      details: { source }
+    });
+  }
   startRequestedExperience();
+}
+
+async function openProfileLocation(profile, { honorExplicit = false } = {}) {
+  if (honorExplicit && explicitLocationRequested) {
+    state.locationSource = 'deep_link';
+    return startRequestedExperience();
+  }
+  const resume = await profileStore.getResume(profile.pid);
+  requestedLanguage = resume?.language || profile.language;
+  if (resume?.view === 'experience') {
+    play = resume.experience;
+    requestedSid = resume.sid;
+    state.locationSource = 'resume';
+    return startRequestedExperience();
+  }
+  goToExperienceSelection(profile, { source: resume ? 'resume' : 'profile_selected', track: !resume });
 }
 
 async function openProfileForm(profile = null) {
@@ -1007,6 +1242,7 @@ async function openProfileSelection({ switching = true } = {}) {
 async function initializeProfiles() {
   try {
     await profileStore.open();
+    emitEvent('app_opened', { profile: null });
     const profiles = await profileStore.list();
     if (!profiles.length) return openProfileForm();
     const requestedPid = Number(params.get('pid'));
@@ -1017,8 +1253,10 @@ async function initializeProfiles() {
     }
     if (!profile) return openProfileSelection({ switching: false });
     await activateProfile(profile);
-    startRequestedExperience();
+    emitEvent('profile_selected');
+    await openProfileLocation(profile, { honorExplicit: true });
   } catch (error) {
+    try { emitEvent('profile_storage_failed', { details: { operation: 'initialize' } }); } catch (_) {}
     showError('Local profile storage is unavailable. Gitaverse requires browser storage to keep profiles on this device. ' + (error.message || ''));
   }
 }
@@ -1056,6 +1294,10 @@ async function startRequestedExperience() {
 
   const experience = getExperience(play);
   if (!experience || !experience.available) {
+    if (state.locationSource === 'resume') {
+      state.locationSource = null;
+      return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
+    }
     return showError('The requested experience is not available yet. Use ?play=gita-700.');
   }
 
@@ -1064,6 +1306,10 @@ async function startRequestedExperience() {
     const masterUrl = MASTER_URL + '?v=' + encodeURIComponent(appVersion);
     await startPlayer(await loadMaster(masterUrl), experience);
   } catch (error) {
+    emitEvent('data_load_failed', {
+      context: { experience: play, language: requestedLanguage || state.activeProfile.language },
+      details: { source: 'automatic' }
+    });
     showDataChooser(error.message);
   }
 }
@@ -1073,10 +1319,14 @@ async function startPlayer(dataset, experience) {
   if (state.renderer) state.renderer.destroy();
   state.dataset = dataset;
   state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
+  const requestedIndex = requestedSid ? findSid(requestedSid) : -1;
+  if (state.locationSource === 'resume' && requestedSid && requestedIndex < 0) {
+    state.locationSource = null;
+    return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
+  }
   state.renderer = await experience.load();
   state.renderer.mount(document.getElementById('renderer-root'));
 
-  const requestedIndex = requestedSid ? findSid(requestedSid) : -1;
   const defaultIndex = findSid('1.B');
   state.index = requestedIndex >= 0 ? requestedIndex : (defaultIndex >= 0 ? defaultIndex : 0);
 
@@ -1084,7 +1334,7 @@ async function startPlayer(dataset, experience) {
     dataset: state.dataset,
     renderer: state.renderer,
     currentRow,
-    rerender: render,
+    rerender: (options = {}) => render({ ...options, trackLocation: false }),
     onStateChange: ({ active, savedChanges, pendingDownload, savedRevision }) => {
       document.querySelector('#edit-button .top-menu-label').textContent = active ? 'Leave edit mode' : 'Edit this shloka';
       if (savedRevision > state.lastSavedRevision) {
@@ -1101,7 +1351,7 @@ async function startPlayer(dataset, experience) {
   bindEvents();
   buildChapterList();
   showOnly('app');
-  render();
+  render({ source: state.locationSource || (requestedSid ? 'deep_link' : 'experience_selection') });
 }
 
 function showDataChooser(message) {
@@ -1169,6 +1419,19 @@ function render(options = {}) {
   if (options.keepEditing && state.editor.active) state.renderer.setEditing(true);
   updateUrl();
   updateChapterSelection();
+  if (options.trackLocation !== false) {
+    const source = options.source || state.locationSource || 'render';
+    state.locationSource = null;
+    emitEvent('location_changed', {
+      context: {
+        experience: play,
+        sid: row.sid,
+        chapter: row.cid,
+        language: state.language
+      },
+      details: { source }
+    });
+  }
 }
 
 function updateUrl() {
@@ -1180,12 +1443,12 @@ function updateUrl() {
   history.replaceState(null, '', next);
 }
 
-function navigate(offset) {
+function navigate(offset, source = offset > 0 ? 'next' : 'previous') {
   if (!state.editor.canNavigate()) return;
   const next = state.index + offset;
   if (next < 0 || next >= state.dataset.rows.length) return;
   state.index = next;
-  render();
+  render({ source });
   if (matchMedia('(max-width: 760px)').matches) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1211,7 +1474,7 @@ function finishSwipe(event) {
   const deltaY = event.changedTouches[0].clientY - swipe.y;
   if (Date.now() - swipe.startedAt > 1200) return;
   if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
-  navigate(deltaX < 0 ? 1 : -1);
+  navigate(deltaX < 0 ? 1 : -1, 'swipe');
 }
 
 function setLanguage(language) {
@@ -1223,7 +1486,11 @@ function setLanguage(language) {
     state.activeProfile = profile;
     profileUI.renderPills(profile);
   }).catch(() => {});
-  render();
+  emitEvent('language_changed', {
+    context: { experience: play, sid: currentRow().sid, chapter: currentRow().cid, language: state.language },
+    details: { source: 'language_menu' }
+  });
+  render({ source: 'language_change' });
 }
 
 function openOverlay(id) {
@@ -1291,7 +1558,7 @@ function selectChapterButton(button) {
   if (!button || !state.editor.canNavigate()) return;
   state.index = Number(button.dataset.index);
   closeOverlays({ restoreFocus: false });
-  render();
+  render({ source: 'chapter' });
   document.getElementById('chapter-trigger').focus();
 }
 
@@ -1327,7 +1594,7 @@ function goToSid(sid) {
   if (found < 0) return false;
   state.index = found;
   closeOverlays();
-  render();
+  render({ source: 'goto' });
   return true;
 }
 

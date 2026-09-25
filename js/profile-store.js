@@ -1,7 +1,8 @@
 const PROFILE_DB_NAME = 'gitaverse-profiles';
-const PROFILE_DB_VERSION = 1;
+const PROFILE_DB_VERSION = 2;
 const PROFILE_STORE = 'profiles';
 const SETTINGS_STORE = 'settings';
+const RESUME_STORE = 'resumePoints';
 
 function requestResult(request) {
   return new Promise((resolve, reject) => {
@@ -28,6 +29,9 @@ function openProfileDatabase() {
       }
       if (!database.objectStoreNames.contains(SETTINGS_STORE)) {
         database.createObjectStore(SETTINGS_STORE, { keyPath: 'key' });
+      }
+      if (!database.objectStoreNames.contains(RESUME_STORE)) {
+        database.createObjectStore(RESUME_STORE, { keyPath: 'pid' });
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -94,12 +98,40 @@ export class ProfileStore {
 
   async remove(pid) {
     await this.open();
-    const transaction = this.database.transaction([PROFILE_STORE, SETTINGS_STORE], 'readwrite');
+    const transaction = this.database.transaction([PROFILE_STORE, SETTINGS_STORE, RESUME_STORE], 'readwrite');
     transaction.objectStore(PROFILE_STORE).delete(Number(pid));
     const settings = transaction.objectStore(SETTINGS_STORE);
     const defaultPid = await requestResult(settings.get('defaultPid'));
     if (defaultPid && Number(defaultPid.value) === Number(pid)) settings.delete('defaultPid');
+    transaction.objectStore(RESUME_STORE).delete(Number(pid));
     await transactionDone(transaction);
+  }
+
+  async getResume(pid) {
+    await this.open();
+    if (!Number.isInteger(Number(pid))) return null;
+    const transaction = this.database.transaction(RESUME_STORE, 'readonly');
+    return (await requestResult(transaction.objectStore(RESUME_STORE).get(Number(pid)))) || null;
+  }
+
+  async saveResume(resume) {
+    await this.open();
+    if (!Number.isInteger(Number(resume.pid))) throw new Error('A resume point requires a profile ID.');
+    const record = {
+      pid: Number(resume.pid),
+      view: resume.view === 'experience' ? 'experience' : 'home',
+      language: resume.language === 'kn' ? 'kn' : 'en',
+      savedAt: resume.savedAt || new Date().toISOString()
+    };
+    if (record.view === 'experience') {
+      record.experience = String(resume.experience || '');
+      record.sid = String(resume.sid || '');
+      if (!record.experience || !record.sid) throw new Error('An experience resume point requires an experience and SID.');
+    }
+    const transaction = this.database.transaction(RESUME_STORE, 'readwrite');
+    transaction.objectStore(RESUME_STORE).put(record);
+    await transactionDone(transaction);
+    return record;
   }
 
   async defaultPid() {

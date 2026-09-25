@@ -1,0 +1,9 @@
+{
+  "name": "gitaverse",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:events": "node scripts/test-event-bus.mjs",
+    "build": "node scripts/build-deployment.mjs"
+  }
+}

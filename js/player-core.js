@@ -1,6 +1,10 @@
 import { MASTER_URL, loadMaster, readMasterFile, value } from './master-data.js';
 import { ProfileStore } from './profile-store.js';
 import { ProfileUI } from './profile-ui.js';
+import { EventBus } from './events/event-bus.js';
+import { ResumeAdapter } from './events/resume-adapter.js';
+import { ClarityAdapter } from './events/clarity-adapter.js';
+import { SentryAdapter } from './events/sentry-adapter.js';
 import { PwaManager } from './pwa.js';
 import { AudioPlayer } from './audio-player.js';
 import { InlineEditor } from './editor.js';
@@ -19,6 +23,7 @@ const state = {
   activeProfile: null,
   profileSelectionMode: 'initial',
   profileReturnView: 'chooser',
+  locationSource: null,
   appMetadata: { version: 'dev' }
 };
 
@@ -26,9 +31,20 @@ const params = new URLSearchParams(location.search);
 let play = params.get('play');
 let requestedSid = params.get('sid');
 let requestedLanguage = params.get('lang');
+const explicitLocationRequested = params.has('play') || params.has('sid') || params.has('lang');
 const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
 
 const profileStore = new ProfileStore();
+const eventBus = new EventBus({
+  appVersion,
+  contextProvider: () => ({
+    online: navigator.onLine,
+    displayMode: matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser'
+  })
+});
+eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
+eventBus.subscribe(new ClarityAdapter());
+eventBus.subscribe(new SentryAdapter());
 const pwa = new PwaManager({ appVersion });
 const profileUI = new ProfileUI({
   store: profileStore,
@@ -48,6 +64,15 @@ const audioPlayer = new AudioPlayer({
 });
 
 const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
+
+function emitEvent(name, { context = {}, details = {}, profile = state.activeProfile } = {}) {
+  return eventBus.emit(name, {
+    profileId: profile?.pid ?? null,
+    anonymousProfileId: profile?.analyticsProfileId || null,
+    context,
+    details
+  });
+}
 
 function showOnly(id) {
   ['profile-setup', 'profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
@@ -73,16 +98,14 @@ async function activateProfile(profile) {
 
 async function selectProfile(profile) {
   await activateProfile(profile);
-  if (state.profileSelectionMode === 'initial') {
-    startRequestedExperience();
-  } else {
-    goToExperienceSelection(profile);
-  }
+  emitEvent(state.profileSelectionMode === 'initial' ? 'profile_selected' : 'profile_switched');
+  await openProfileLocation(profile, { honorExplicit: state.profileSelectionMode === 'initial' });
 }
 
 async function createProfile(profile) {
   await activateProfile(profile);
-  goToExperienceSelection(profile);
+  emitEvent('profile_created');
+  goToExperienceSelection(profile, { source: 'profile_created' });
 }
 
 async function handleProfileChange(profile, options = {}) {
@@ -95,6 +118,7 @@ async function handleProfileChange(profile, options = {}) {
   }
   if (!profile) return;
   await activateProfile(profile);
+  emitEvent('profile_updated');
   if (state.profileReturnView === 'profile-selection') {
     await profileUI.showSelection({ switching: true });
     return showOnly('profile-selection');
@@ -106,7 +130,7 @@ async function handleProfileChange(profile, options = {}) {
   }
 }
 
-function goToExperienceSelection(profile = state.activeProfile) {
+function goToExperienceSelection(profile = state.activeProfile, { source = 'home', track = true } = {}) {
   play = null;
   requestedSid = null;
   requestedLanguage = profile?.language || 'en';
@@ -117,7 +141,30 @@ function goToExperienceSelection(profile = state.activeProfile) {
   else home.searchParams.delete('lang');
   if (profile) home.searchParams.set('pid', profile.pid);
   history.replaceState(null, '', home);
+  if (track && profile) {
+    emitEvent('home_opened', {
+      profile,
+      context: { language: requestedLanguage },
+      details: { source }
+    });
+  }
   startRequestedExperience();
+}
+
+async function openProfileLocation(profile, { honorExplicit = false } = {}) {
+  if (honorExplicit && explicitLocationRequested) {
+    state.locationSource = 'deep_link';
+    return startRequestedExperience();
+  }
+  const resume = await profileStore.getResume(profile.pid);
+  requestedLanguage = resume?.language || profile.language;
+  if (resume?.view === 'experience') {
+    play = resume.experience;
+    requestedSid = resume.sid;
+    state.locationSource = 'resume';
+    return startRequestedExperience();
+  }
+  goToExperienceSelection(profile, { source: resume ? 'resume' : 'profile_selected', track: !resume });
 }
 
 async function openProfileForm(profile = null) {
@@ -139,6 +186,7 @@ async function openProfileSelection({ switching = true } = {}) {
 async function initializeProfiles() {
   try {
     await profileStore.open();
+    emitEvent('app_opened', { profile: null });
     const profiles = await profileStore.list();
     if (!profiles.length) return openProfileForm();
     const requestedPid = Number(params.get('pid'));
@@ -149,8 +197,10 @@ async function initializeProfiles() {
     }
     if (!profile) return openProfileSelection({ switching: false });
     await activateProfile(profile);
-    startRequestedExperience();
+    emitEvent('profile_selected');
+    await openProfileLocation(profile, { honorExplicit: true });
   } catch (error) {
+    try { emitEvent('profile_storage_failed', { details: { operation: 'initialize' } }); } catch (_) {}
     showError('Local profile storage is unavailable. Gitaverse requires browser storage to keep profiles on this device. ' + (error.message || ''));
   }
 }
@@ -188,6 +238,10 @@ async function startRequestedExperience() {
 
   const experience = getExperience(play);
   if (!experience || !experience.available) {
+    if (state.locationSource === 'resume') {
+      state.locationSource = null;
+      return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
+    }
     return showError('The requested experience is not available yet. Use ?play=gita-700.');
   }
 
@@ -196,6 +250,10 @@ async function startRequestedExperience() {
     const masterUrl = MASTER_URL + '?v=' + encodeURIComponent(appVersion);
     await startPlayer(await loadMaster(masterUrl), experience);
   } catch (error) {
+    emitEvent('data_load_failed', {
+      context: { experience: play, language: requestedLanguage || state.activeProfile.language },
+      details: { source: 'automatic' }
+    });
     showDataChooser(error.message);
   }
 }
@@ -205,10 +263,14 @@ async function startPlayer(dataset, experience) {
   if (state.renderer) state.renderer.destroy();
   state.dataset = dataset;
   state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
+  const requestedIndex = requestedSid ? findSid(requestedSid) : -1;
+  if (state.locationSource === 'resume' && requestedSid && requestedIndex < 0) {
+    state.locationSource = null;
+    return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
+  }
   state.renderer = await experience.load();
   state.renderer.mount(document.getElementById('renderer-root'));
 
-  const requestedIndex = requestedSid ? findSid(requestedSid) : -1;
   const defaultIndex = findSid('1.B');
   state.index = requestedIndex >= 0 ? requestedIndex : (defaultIndex >= 0 ? defaultIndex : 0);
 
@@ -216,7 +278,7 @@ async function startPlayer(dataset, experience) {
     dataset: state.dataset,
     renderer: state.renderer,
     currentRow,
-    rerender: render,
+    rerender: (options = {}) => render({ ...options, trackLocation: false }),
     onStateChange: ({ active, savedChanges, pendingDownload, savedRevision }) => {
       document.querySelector('#edit-button .top-menu-label').textContent = active ? 'Leave edit mode' : 'Edit this shloka';
       if (savedRevision > state.lastSavedRevision) {
@@ -233,7 +295,7 @@ async function startPlayer(dataset, experience) {
   bindEvents();
   buildChapterList();
   showOnly('app');
-  render();
+  render({ source: state.locationSource || (requestedSid ? 'deep_link' : 'experience_selection') });
 }
 
 function showDataChooser(message) {
@@ -301,6 +363,19 @@ function render(options = {}) {
   if (options.keepEditing && state.editor.active) state.renderer.setEditing(true);
   updateUrl();
   updateChapterSelection();
+  if (options.trackLocation !== false) {
+    const source = options.source || state.locationSource || 'render';
+    state.locationSource = null;
+    emitEvent('location_changed', {
+      context: {
+        experience: play,
+        sid: row.sid,
+        chapter: row.cid,
+        language: state.language
+      },
+      details: { source }
+    });
+  }
 }
 
 function updateUrl() {
@@ -312,12 +387,12 @@ function updateUrl() {
   history.replaceState(null, '', next);
 }
 
-function navigate(offset) {
+function navigate(offset, source = offset > 0 ? 'next' : 'previous') {
   if (!state.editor.canNavigate()) return;
   const next = state.index + offset;
   if (next < 0 || next >= state.dataset.rows.length) return;
   state.index = next;
-  render();
+  render({ source });
   if (matchMedia('(max-width: 760px)').matches) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -343,7 +418,7 @@ function finishSwipe(event) {
   const deltaY = event.changedTouches[0].clientY - swipe.y;
   if (Date.now() - swipe.startedAt > 1200) return;
   if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
-  navigate(deltaX < 0 ? 1 : -1);
+  navigate(deltaX < 0 ? 1 : -1, 'swipe');
 }
 
 function setLanguage(language) {
@@ -355,7 +430,11 @@ function setLanguage(language) {
     state.activeProfile = profile;
     profileUI.renderPills(profile);
   }).catch(() => {});
-  render();
+  emitEvent('language_changed', {
+    context: { experience: play, sid: currentRow().sid, chapter: currentRow().cid, language: state.language },
+    details: { source: 'language_menu' }
+  });
+  render({ source: 'language_change' });
 }
 
 function openOverlay(id) {
@@ -423,7 +502,7 @@ function selectChapterButton(button) {
   if (!button || !state.editor.canNavigate()) return;
   state.index = Number(button.dataset.index);
   closeOverlays({ restoreFocus: false });
-  render();
+  render({ source: 'chapter' });
   document.getElementById('chapter-trigger').focus();
 }
 
@@ -459,7 +538,7 @@ function goToSid(sid) {
   if (found < 0) return false;
   state.index = found;
   closeOverlays();
-  render();
+  render({ source: 'goto' });
   return true;
 }
 
