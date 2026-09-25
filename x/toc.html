@@ -234,6 +234,10 @@
     return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
   }
 
+  function projectURL(url) {
+    return /^data\//i.test(url) ? '../' + url : url;
+  }
+
   function showApp() {
     document.getElementById('drop-zone').style.display = 'none';
     document.getElementById('app').style.display = 'block';
@@ -291,7 +295,7 @@
 
   /* ── Fetch and render from URL ──────────────────────────── */
   function fetchAndRender(url, onSuccess, onFail) {
-    url = fixGithubURL(url);
+    url = projectURL(fixGithubURL(url));
     fetch(url)
       .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
       .then(function(text){ renderGrid(text); if (onSuccess) onSuccess(); })
@@ -311,12 +315,13 @@
   /* ── Load English from URL (and remember it) ────────────── */
   function loadSourceURL(url, lang) {
     lang = lang || 'en';
-    var target = langURL(fixGithubURL(url), lang);
+    var normalized = projectURL(fixGithubURL(url));
+    var target = langURL(normalized, lang);
     setStatus('Loading…');
     fetch(target)
       .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
       .then(function(text){
-        sourceURL = fixGithubURL(url);           // always store the English base URL
+        sourceURL = normalized;                 // always store the English base URL
         localStorage.setItem('toc_source_url', sourceURL);
         applyText(text, lang);
       })

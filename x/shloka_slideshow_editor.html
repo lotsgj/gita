@@ -614,6 +614,7 @@ var rows = [], idx = 0, dirty = false, savedChanges = false, pendingIdx = -1, fi
 function fetchAndLoad(url) {
   // Convert GitHub blob URL to raw
   url = url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+  if (/^data\//i.test(url)) url = '../' + url;
   // Visual feedback on the Load URL button
   var btn = document.querySelector('#drop-zone button');
   var inp = document.getElementById('csv-url-input');

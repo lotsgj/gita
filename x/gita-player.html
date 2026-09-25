@@ -393,7 +393,7 @@
 (function () {
   'use strict';
 
-  var MASTER_URL = 'data/master.csv';
+  var MASTER_URL = '../data/master.csv';
   var state = { rows: [], index: 0, language: 'en', headers: [], headerMap: {} };
   var params = new URLSearchParams(location.search);
   var play = params.get('play');
@@ -420,7 +420,7 @@
   });
 
   function checkPlayerVersion() {
-    var versionUrl = 'data/player-version.txt?check=' + Date.now();
+    var versionUrl = '../data/player-version.txt?check=' + Date.now();
     return fetch(versionUrl, { cache: 'no-store' })
       .then(function (response) {
         if (!response.ok) throw new Error('Version check failed');
@@ -660,11 +660,11 @@
 
   function audioSource(row) {
     var explicit = value(row, ['audio_gita_700']);
-    if (explicit) return new URL(explicit, location.href).href;
+    if (explicit) return new URL(/^data\//i.test(explicit) ? '../' + explicit : explicit, location.href).href;
     if (/^\d+$/.test(row.cid) && /^\d+$/.test(row.snum)) {
       var chapter = String(row.cid).padStart(2, '0');
       var shloka = String(row.snum).padStart(3, '0');
-      return new URL('data/gita-700/audio/sn/chapter-' + chapter + '/' + chapter + '-' + shloka + '.mp3', location.href).href;
+      return new URL('../data/gita-700/audio/sn/chapter-' + chapter + '/' + chapter + '-' + shloka + '.mp3', location.href).href;
     }
     return '';
   }

@@ -389,7 +389,8 @@ function updateDeviceLayout() {
 }
 
 function syncFullscreenUi() {
-  const active = Boolean(document.fullscreenElement) || document.documentElement.classList.contains('immersive');
+  const active = Boolean(document.fullscreenElement || document.webkitFullscreenElement)
+    || document.documentElement.classList.contains('immersive');
   document.querySelector('#fullscreen-button .top-menu-label').textContent = active ? 'Exit fullscreen' : 'Fullscreen';
   const button = document.getElementById('footer-fullscreen-button');
   button.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Enter fullscreen');
@@ -398,17 +399,40 @@ function syncFullscreenUi() {
   button.querySelector('.fullscreen-exit-icon').toggleAttribute('hidden', !active);
 }
 
-function toggleFullscreen() {
+function handleFullscreenChange() {
+  syncFullscreenUi();
+  requestAnimationFrame(() => state.renderer?.fitText());
+}
+
+async function toggleFullscreen() {
   setMenuOpen(false);
-  if (document.documentElement.classList.contains('mobile-layout')) {
-    document.documentElement.classList.toggle('immersive');
+  const root = document.documentElement;
+  const activeNative = document.fullscreenElement || document.webkitFullscreenElement;
+  if (activeNative) {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (exit) await Promise.resolve(exit.call(document)).catch(() => {});
+    handleFullscreenChange();
+    return;
+  }
+  if (root.classList.contains('immersive')) {
+    root.classList.remove('immersive');
     syncFullscreenUi();
     requestAnimationFrame(() => state.renderer?.fitText());
-  } else if (document.fullscreenElement) {
-    document.exitFullscreen();
-  } else {
-    document.documentElement.requestFullscreen().catch(() => {});
+    return;
   }
+  const request = root.requestFullscreen || root.webkitRequestFullscreen;
+  if (request) {
+    try {
+      await Promise.resolve(request.call(root));
+      handleFullscreenChange();
+      return;
+    } catch (_) {
+      // Fall through to the application-managed fallback.
+    }
+  }
+  root.classList.add('immersive');
+  syncFullscreenUi();
+  requestAnimationFrame(() => state.renderer?.fitText());
 }
 
 function bindEvents() {
@@ -442,7 +466,8 @@ function bindEvents() {
   });
   document.getElementById('fullscreen-button').addEventListener('click', toggleFullscreen);
   document.getElementById('footer-fullscreen-button').addEventListener('click', toggleFullscreen);
-  document.addEventListener('fullscreenchange', syncFullscreenUi);
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
   document.getElementById('language-options').addEventListener('click', (event) => {
     const option = event.target.closest('.language-option');
     if (option) chooseLanguage(option.dataset.language);
