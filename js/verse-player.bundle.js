@@ -5,6 +5,318 @@
 (() => {
 'use strict';
 
+// Source: js/profile-store.js
+const PROFILE_DB_NAME = 'gitaverse-profiles';
+const PROFILE_DB_VERSION = 1;
+const PROFILE_STORE = 'profiles';
+const SETTINGS_STORE = 'settings';
+
+function requestResult(request) {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('The profile database could not be opened.'));
+  });
+}
+
+function transactionDone(transaction) {
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error || new Error('The profile change could not be saved.'));
+    transaction.onabort = () => reject(transaction.error || new Error('The profile change was cancelled.'));
+  });
+}
+
+function openProfileDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(PROFILE_DB_NAME, PROFILE_DB_VERSION);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains(PROFILE_STORE)) {
+        database.createObjectStore(PROFILE_STORE, { keyPath: 'pid', autoIncrement: true });
+      }
+      if (!database.objectStoreNames.contains(SETTINGS_STORE)) {
+        database.createObjectStore(SETTINGS_STORE, { keyPath: 'key' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('Local profile storage is unavailable.'));
+  });
+}
+
+function randomAnalyticsId() {
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') return globalThis.crypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  globalThis.crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+class ProfileStore {
+  constructor() {
+    this.database = null;
+  }
+
+  async open() {
+    if (!this.database) this.database = await openProfileDatabase();
+    return this;
+  }
+
+  async list() {
+    await this.open();
+    const transaction = this.database.transaction(PROFILE_STORE, 'readonly');
+    const profiles = await requestResult(transaction.objectStore(PROFILE_STORE).getAll());
+    return profiles.sort((left, right) => left.pid - right.pid);
+  }
+
+  async get(pid) {
+    await this.open();
+    if (!Number.isInteger(Number(pid))) return null;
+    const transaction = this.database.transaction(PROFILE_STORE, 'readonly');
+    return (await requestResult(transaction.objectStore(PROFILE_STORE).get(Number(pid)))) || null;
+  }
+
+  async save(input) {
+    await this.open();
+    const name = String(input.name || '').trim();
+    if (!name) throw new Error('Enter a profile name.');
+    const now = new Date().toISOString();
+    const existing = input.pid ? await this.get(input.pid) : null;
+    const profile = {
+      ...(existing || {}),
+      name,
+      dob: input.dob,
+      gender: input.gender || '',
+      language: input.language === 'kn' ? 'kn' : 'en',
+      photo: input.photo || '',
+      analyticsConsent: Boolean(input.analyticsConsent),
+      analyticsProfileId: existing?.analyticsProfileId || randomAnalyticsId(),
+      createdAt: existing?.createdAt || now,
+      updatedAt: now
+    };
+    if (existing) profile.pid = existing.pid;
+    const transaction = this.database.transaction(PROFILE_STORE, 'readwrite');
+    const request = transaction.objectStore(PROFILE_STORE).put(profile);
+    const pid = await requestResult(request);
+    await transactionDone(transaction);
+    return this.get(pid);
+  }
+
+  async remove(pid) {
+    await this.open();
+    const transaction = this.database.transaction([PROFILE_STORE, SETTINGS_STORE], 'readwrite');
+    transaction.objectStore(PROFILE_STORE).delete(Number(pid));
+    const settings = transaction.objectStore(SETTINGS_STORE);
+    const defaultPid = await requestResult(settings.get('defaultPid'));
+    if (defaultPid && Number(defaultPid.value) === Number(pid)) settings.delete('defaultPid');
+    await transactionDone(transaction);
+  }
+
+  async defaultPid() {
+    await this.open();
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readonly');
+    const setting = await requestResult(transaction.objectStore(SETTINGS_STORE).get('defaultPid'));
+    return setting ? Number(setting.value) : null;
+  }
+
+  async setDefaultPid(pid) {
+    await this.open();
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readwrite');
+    const store = transaction.objectStore(SETTINGS_STORE);
+    if (pid == null) store.delete('defaultPid');
+    else store.put({ key: 'defaultPid', value: Number(pid) });
+    await transactionDone(transaction);
+  }
+}
+
+async function resizeProfilePhoto(file) {
+  if (!file) return '';
+  if (!file.type.startsWith('image/')) throw new Error('Choose an image file for the profile photo.');
+  const source = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('The selected photo could not be read.'));
+    reader.readAsDataURL(file);
+  });
+  const image = await new Promise((resolve, reject) => {
+    const element = new Image();
+    element.onload = () => resolve(element);
+    element.onerror = () => reject(new Error('The selected photo is not a supported image.'));
+    element.src = source;
+  });
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext('2d');
+  const scale = Math.max(size / image.width, size / image.height);
+  const width = image.width * scale;
+  const height = image.height * scale;
+  context.drawImage(image, (size - width) / 2, (size - height) / 2, width, height);
+  return canvas.toDataURL('image/jpeg', .82);
+}
+
+// Source: js/profile-ui.js
+class ProfileUI {
+  constructor({ store, onSelected, onCreated, onChanged }) {
+    this.store = store;
+    this.onSelected = onSelected;
+    this.onCreated = onCreated;
+    this.onChanged = onChanged;
+    this.editingPid = null;
+    this.photo = '';
+    this.bind();
+  }
+
+  initials(profile) {
+    return profile.name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'ॐ';
+  }
+
+  avatar(profile, className = 'profile-avatar') {
+    if (profile.photo) {
+      const image = document.createElement('img');
+      image.className = className;
+      image.src = profile.photo;
+      image.alt = '';
+      return image;
+    }
+    const fallback = document.createElement('span');
+    fallback.className = className + ' profile-initials';
+    fallback.textContent = this.initials(profile);
+    return fallback;
+  }
+
+  async showSelection({ switching = false } = {}) {
+    const profiles = await this.store.list();
+    const defaultPid = await this.store.defaultPid();
+    const list = document.getElementById('profile-list');
+    list.textContent = '';
+    profiles.forEach((profile) => {
+      const card = document.createElement('article');
+      card.className = 'profile-card';
+      const select = document.createElement('button');
+      select.type = 'button';
+      select.className = 'profile-select';
+      select.dataset.pid = profile.pid;
+      select.appendChild(this.avatar(profile, 'profile-card-avatar'));
+      const copy = document.createElement('span');
+      copy.className = 'profile-card-copy';
+      const name = document.createElement('strong');
+      name.textContent = profile.name;
+      const language = document.createElement('small');
+      language.textContent = profile.language === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      copy.append(name, language);
+      select.appendChild(copy);
+      if (profile.pid === defaultPid) {
+        const badge = document.createElement('span');
+        badge.className = 'default-badge';
+        badge.textContent = 'Default';
+        select.appendChild(badge);
+      }
+      const actions = document.createElement('div');
+      actions.className = 'profile-card-actions';
+      actions.innerHTML = `<button type="button" data-profile-action="edit" data-pid="${profile.pid}">Edit</button><button type="button" data-profile-action="default" data-pid="${profile.pid}">${profile.pid === defaultPid ? 'Unset default' : 'Make default'}</button><button type="button" data-profile-action="delete" data-pid="${profile.pid}">Delete</button>`;
+      card.append(select, actions);
+      list.appendChild(card);
+    });
+    document.getElementById('profile-selection-title').textContent = switching ? 'Switch profile' : 'Who is using Gitaverse?';
+    document.getElementById('profile-selection-back').hidden = !switching;
+  }
+
+  async showForm(profile = null) {
+    this.editingPid = profile?.pid || null;
+    this.photo = profile?.photo || '';
+    document.getElementById('profile-form-title').textContent = profile ? 'Edit profile' : 'Create your profile';
+    document.getElementById('profile-form-intro').textContent = profile
+      ? 'Keep this profile’s local preferences up to date.'
+      : 'Profiles keep each person’s language and experience separate on this device.';
+    document.getElementById('profile-name').value = profile?.name || '';
+    document.getElementById('profile-dob').value = profile?.dob || '';
+    document.getElementById('profile-gender').value = profile?.gender || '';
+    document.getElementById('profile-language').value = profile?.language || 'en';
+    document.getElementById('profile-default').checked = profile ? (await this.store.defaultPid()) === profile.pid : true;
+    document.getElementById('profile-form-cancel').hidden = !profile;
+    document.getElementById('profile-form-error').textContent = '';
+    this.renderPhotoPreview(profile);
+  }
+
+  renderPhotoPreview(profile = null) {
+    const preview = document.getElementById('profile-photo-preview');
+    preview.textContent = '';
+    preview.appendChild(this.avatar({ name: document.getElementById('profile-name').value || profile?.name || '', photo: this.photo }, 'profile-photo-avatar'));
+    document.getElementById('profile-photo-remove').hidden = !this.photo;
+  }
+
+  async renderPills(profile) {
+    document.querySelectorAll('[data-profile-pill]').forEach((button) => {
+      button.textContent = '';
+      button.appendChild(this.avatar(profile, 'profile-pill-avatar'));
+      const name = document.createElement('span');
+      name.textContent = profile.name;
+      button.appendChild(name);
+      button.dataset.pid = profile.pid;
+      button.setAttribute('aria-label', 'Profile: ' + profile.name + '. Open profile options.');
+    });
+  }
+
+  bind() {
+    document.getElementById('profile-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const error = document.getElementById('profile-form-error');
+      error.textContent = '';
+      try {
+        const dob = document.getElementById('profile-dob').value;
+        if (!dob || new Date(dob + 'T00:00:00') > new Date()) throw new Error('Enter a valid date of birth.');
+        const profile = await this.store.save({
+          pid: this.editingPid,
+          name: document.getElementById('profile-name').value,
+          dob,
+          gender: document.getElementById('profile-gender').value,
+          language: document.getElementById('profile-language').value,
+          photo: this.photo,
+          analyticsConsent: true
+        });
+        if (document.getElementById('profile-default').checked) await this.store.setDefaultPid(profile.pid);
+        else if ((await this.store.defaultPid()) === profile.pid) await this.store.setDefaultPid(null);
+        if (this.editingPid) await this.onChanged(profile);
+        else await this.onCreated(profile);
+      } catch (failure) {
+        error.textContent = failure.message || 'The profile could not be saved.';
+      }
+    });
+    document.getElementById('profile-name').addEventListener('input', () => this.renderPhotoPreview());
+    document.getElementById('profile-photo').addEventListener('change', async (event) => {
+      const error = document.getElementById('profile-form-error');
+      try {
+        this.photo = await resizeProfilePhoto(event.target.files?.[0]);
+        this.renderPhotoPreview();
+      } catch (failure) { error.textContent = failure.message; }
+    });
+    document.getElementById('profile-photo-remove').addEventListener('click', () => {
+      this.photo = '';
+      document.getElementById('profile-photo').value = '';
+      this.renderPhotoPreview();
+    });
+    document.getElementById('profile-list').addEventListener('click', async (event) => {
+      const select = event.target.closest('.profile-select');
+      if (select) return this.onSelected(await this.store.get(select.dataset.pid));
+      const action = event.target.closest('[data-profile-action]');
+      if (!action) return;
+      const profile = await this.store.get(action.dataset.pid);
+      if (action.dataset.profileAction === 'edit') return this.onChanged(profile, { edit: true });
+      if (action.dataset.profileAction === 'default') {
+        const current = await this.store.defaultPid();
+        await this.store.setDefaultPid(current === profile.pid ? null : profile.pid);
+        return this.showSelection({ switching: true });
+      }
+      if (action.dataset.profileAction === 'delete' && window.confirm('Delete the profile “' + profile.name + '” from this device?')) {
+        await this.store.remove(profile.pid);
+        const remaining = await this.store.list();
+        if (!remaining.length) return this.onChanged(null, { setup: true });
+        return this.onChanged(null, { deletedPid: profile.pid, remaining });
+      }
+    });
+  }
+}
+
 // Source: js/master-data.js
 const MASTER_URL = 'data/master.csv';
 
@@ -491,14 +803,25 @@ const state = {
   eventsBound: false,
   overlayOpener: null,
   downloadReminderDismissed: false,
-  lastSavedRevision: 0
+  lastSavedRevision: 0,
+  activeProfile: null,
+  profileSelectionMode: 'initial',
+  profileReturnView: 'chooser'
 };
 
 const params = new URLSearchParams(location.search);
-const play = params.get('play');
-const requestedSid = params.get('sid');
-const requestedLanguage = params.get('lang');
+let play = params.get('play');
+let requestedSid = params.get('sid');
+let requestedLanguage = params.get('lang');
 const playerVersion = params.get('v') || '';
+
+const profileStore = new ProfileStore();
+const profileUI = new ProfileUI({
+  store: profileStore,
+  onSelected: selectProfile,
+  onCreated: createProfile,
+  onChanged: handleProfileChange
+});
 
 const audioPlayer = new AudioPlayer({
   audio: document.getElementById('audio'),
@@ -512,9 +835,109 @@ const audioPlayer = new AudioPlayer({
 const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
 
 function showOnly(id) {
-  ['chooser', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
+  ['profile-setup', 'profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
     document.getElementById(name).hidden = name !== id;
   });
+}
+
+function visibleView() {
+  return ['profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'chooser';
+}
+
+function updateProfileUrl(profile) {
+  const next = new URL(location.href);
+  next.searchParams.set('pid', profile.pid);
+  history.replaceState(null, '', next);
+}
+
+async function activateProfile(profile) {
+  state.activeProfile = profile;
+  updateProfileUrl(profile);
+  await profileUI.renderPills(profile);
+}
+
+async function selectProfile(profile) {
+  await activateProfile(profile);
+  if (state.profileSelectionMode === 'initial') {
+    startRequestedExperience();
+  } else {
+    goToExperienceSelection(profile);
+  }
+}
+
+async function createProfile(profile) {
+  await activateProfile(profile);
+  goToExperienceSelection(profile);
+}
+
+async function handleProfileChange(profile, options = {}) {
+  if (options.edit) return openProfileForm(profile);
+  if (options.setup) return openProfileForm();
+  if (options.deletedPid) {
+    if (state.activeProfile?.pid === options.deletedPid) await activateProfile(options.remaining[0]);
+    await profileUI.showSelection({ switching: true });
+    return showOnly('profile-selection');
+  }
+  if (!profile) return;
+  await activateProfile(profile);
+  if (state.profileReturnView === 'profile-selection') {
+    await profileUI.showSelection({ switching: true });
+    return showOnly('profile-selection');
+  }
+  showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
+  if (state.dataset && state.profileReturnView === 'app') {
+    state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.language;
+    render();
+  }
+}
+
+function goToExperienceSelection(profile = state.activeProfile) {
+  play = null;
+  requestedSid = null;
+  requestedLanguage = profile?.language || 'en';
+  const home = new URL(location.href);
+  home.searchParams.delete('play');
+  home.searchParams.delete('sid');
+  if (requestedLanguage === 'kn') home.searchParams.set('lang', 'kn');
+  else home.searchParams.delete('lang');
+  if (profile) home.searchParams.set('pid', profile.pid);
+  history.replaceState(null, '', home);
+  startRequestedExperience();
+}
+
+async function openProfileForm(profile = null) {
+  state.profileReturnView = visibleView();
+  closeOverlays({ restoreFocus: false });
+  await profileUI.showForm(profile);
+  document.getElementById('profile-dob').max = new Date().toISOString().slice(0, 10);
+  showOnly('profile-setup');
+}
+
+async function openProfileSelection({ switching = true } = {}) {
+  state.profileReturnView = visibleView();
+  state.profileSelectionMode = switching ? 'switch' : 'initial';
+  closeOverlays({ restoreFocus: false });
+  await profileUI.showSelection({ switching });
+  showOnly('profile-selection');
+}
+
+async function initializeProfiles() {
+  try {
+    await profileStore.open();
+    const profiles = await profileStore.list();
+    if (!profiles.length) return openProfileForm();
+    const requestedPid = Number(params.get('pid'));
+    let profile = Number.isInteger(requestedPid) && requestedPid > 0 ? await profileStore.get(requestedPid) : null;
+    if (!profile) {
+      const defaultPid = await profileStore.defaultPid();
+      profile = defaultPid ? await profileStore.get(defaultPid) : null;
+    }
+    if (!profile) return openProfileSelection({ switching: false });
+    await activateProfile(profile);
+    startRequestedExperience();
+  } catch (error) {
+    showError('Local profile storage is unavailable. Gitaverse requires browser storage to keep profiles on this device. ' + (error.message || ''));
+  }
 }
 
 async function checkPlayerVersion() {
@@ -536,7 +959,14 @@ async function checkPlayerVersion() {
 
 async function startRequestedExperience() {
   const chooserLink = document.getElementById('gita-700-link');
-  chooserLink.href = '?play=gita-700' + (playerVersion ? '&v=' + encodeURIComponent(playerVersion) : '');
+  const chooserUrl = new URL(location.href);
+  chooserUrl.searchParams.set('play', 'gita-700');
+  chooserUrl.searchParams.delete('sid');
+  chooserUrl.searchParams.set('pid', state.activeProfile.pid);
+  const chooserLanguage = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
+  if (chooserLanguage === 'kn') chooserUrl.searchParams.set('lang', 'kn');
+  else chooserUrl.searchParams.delete('lang');
+  chooserLink.href = chooserUrl.href;
   if (!play) return showOnly('chooser');
 
   const experience = getExperience(play);
@@ -557,7 +987,7 @@ async function startPlayer(dataset, experience) {
   if (state.editor) state.editor.destroy();
   if (state.renderer) state.renderer.destroy();
   state.dataset = dataset;
-  state.language = requestedLanguage === 'kn' ? 'kn' : 'en';
+  state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
   state.renderer = await experience.load();
   state.renderer.mount(document.getElementById('renderer-root'));
 
@@ -702,11 +1132,17 @@ function finishSwipe(event) {
 function setLanguage(language) {
   if (!state.editor.canNavigate()) return;
   state.language = language === 'kn' ? 'kn' : 'en';
+  requestedLanguage = state.language;
+  state.activeProfile.language = state.language;
+  profileStore.save(state.activeProfile).then((profile) => {
+    state.activeProfile = profile;
+    profileUI.renderPills(profile);
+  }).catch(() => {});
   render();
 }
 
 function openOverlay(id) {
-  if (state.editor.active) return;
+  if (state.editor?.active) return;
   state.overlayOpener = document.getElementById('top-menu').contains(document.activeElement)
     ? document.getElementById('menu-button')
     : document.activeElement;
@@ -732,7 +1168,7 @@ function openOverlay(id) {
 
 function closeOverlays({ restoreFocus = true } = {}) {
   let closed = false;
-  ['goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay'].forEach((id) => {
+  ['goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay', 'profile-menu-overlay'].forEach((id) => {
     const overlay = document.getElementById(id);
     if (!overlay.hidden) { overlay.hidden = true; closed = true; }
   });
@@ -797,11 +1233,7 @@ function goHome() {
   setMenuOpen(false);
   if (!state.editor.canNavigate()) return;
   if (state.editor.pendingDownload && !window.confirm('Changes have not been downloaded. Are you sure you want to return Home?')) return;
-  const home = new URL(location.href);
-  home.searchParams.delete('play');
-  home.searchParams.delete('sid');
-  home.searchParams.delete('lang');
-  location.href = home.href;
+  goToExperienceSelection();
 }
 
 function goToSid(sid) {
@@ -936,6 +1368,17 @@ function bindEvents() {
   document.getElementById('help-button').addEventListener('click', () => openOverlay('help-overlay'));
   document.getElementById('language-button').addEventListener('click', () => openOverlay('language-overlay'));
   document.getElementById('home-button').addEventListener('click', goHome);
+  document.querySelectorAll('[data-profile-pill]').forEach((button) => button.addEventListener('click', () => openOverlay('profile-menu-overlay')));
+  document.getElementById('switch-profile-button').addEventListener('click', () => openProfileSelection());
+  document.getElementById('manage-profiles-button').addEventListener('click', () => openProfileSelection());
+  document.getElementById('edit-profile-button').addEventListener('click', () => openProfileForm(state.activeProfile));
+  document.getElementById('add-profile-button').addEventListener('click', () => openProfileForm());
+  document.getElementById('profile-selection-back').addEventListener('click', () => {
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
+  });
+  document.getElementById('profile-form-cancel').addEventListener('click', () => {
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'chooser'));
+  });
   document.getElementById('edit-button').addEventListener('click', () => { setMenuOpen(false); state.editor.toggle(); });
   document.getElementById('download-reminder-action').addEventListener('click', () => state.editor.download());
   document.getElementById('download-reminder-close').addEventListener('click', () => {
@@ -971,6 +1414,10 @@ function bindEvents() {
     if (state.renderer) state.renderer.fitText();
   });
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && closeOverlays()) {
+      event.preventDefault();
+      return;
+    }
     if (!state.dataset) return;
     const active = document.activeElement;
     const typing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
@@ -1043,6 +1490,6 @@ function bindEvents() {
 }
 
 bindEvents();
-checkPlayerVersion().then((current) => { if (current) startRequestedExperience(); });
+checkPlayerVersion().then((current) => { if (current) initializeProfiles(); });
 
 })();

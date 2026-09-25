@@ -1,4 +1,6 @@
 import { MASTER_URL, loadMaster, readMasterFile, value } from './master-data.js';
+import { ProfileStore } from './profile-store.js';
+import { ProfileUI } from './profile-ui.js';
 import { AudioPlayer } from './audio-player.js';
 import { InlineEditor } from './editor.js';
 import { getExperience } from './renderers/registry.js';
@@ -12,14 +14,25 @@ const state = {
   eventsBound: false,
   overlayOpener: null,
   downloadReminderDismissed: false,
-  lastSavedRevision: 0
+  lastSavedRevision: 0,
+  activeProfile: null,
+  profileSelectionMode: 'initial',
+  profileReturnView: 'chooser'
 };
 
 const params = new URLSearchParams(location.search);
-const play = params.get('play');
-const requestedSid = params.get('sid');
-const requestedLanguage = params.get('lang');
+let play = params.get('play');
+let requestedSid = params.get('sid');
+let requestedLanguage = params.get('lang');
 const playerVersion = params.get('v') || '';
+
+const profileStore = new ProfileStore();
+const profileUI = new ProfileUI({
+  store: profileStore,
+  onSelected: selectProfile,
+  onCreated: createProfile,
+  onChanged: handleProfileChange
+});
 
 const audioPlayer = new AudioPlayer({
   audio: document.getElementById('audio'),
@@ -33,9 +46,109 @@ const audioPlayer = new AudioPlayer({
 const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
 
 function showOnly(id) {
-  ['chooser', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
+  ['profile-setup', 'profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
     document.getElementById(name).hidden = name !== id;
   });
+}
+
+function visibleView() {
+  return ['profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'chooser';
+}
+
+function updateProfileUrl(profile) {
+  const next = new URL(location.href);
+  next.searchParams.set('pid', profile.pid);
+  history.replaceState(null, '', next);
+}
+
+async function activateProfile(profile) {
+  state.activeProfile = profile;
+  updateProfileUrl(profile);
+  await profileUI.renderPills(profile);
+}
+
+async function selectProfile(profile) {
+  await activateProfile(profile);
+  if (state.profileSelectionMode === 'initial') {
+    startRequestedExperience();
+  } else {
+    goToExperienceSelection(profile);
+  }
+}
+
+async function createProfile(profile) {
+  await activateProfile(profile);
+  goToExperienceSelection(profile);
+}
+
+async function handleProfileChange(profile, options = {}) {
+  if (options.edit) return openProfileForm(profile);
+  if (options.setup) return openProfileForm();
+  if (options.deletedPid) {
+    if (state.activeProfile?.pid === options.deletedPid) await activateProfile(options.remaining[0]);
+    await profileUI.showSelection({ switching: true });
+    return showOnly('profile-selection');
+  }
+  if (!profile) return;
+  await activateProfile(profile);
+  if (state.profileReturnView === 'profile-selection') {
+    await profileUI.showSelection({ switching: true });
+    return showOnly('profile-selection');
+  }
+  showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
+  if (state.dataset && state.profileReturnView === 'app') {
+    state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.language;
+    render();
+  }
+}
+
+function goToExperienceSelection(profile = state.activeProfile) {
+  play = null;
+  requestedSid = null;
+  requestedLanguage = profile?.language || 'en';
+  const home = new URL(location.href);
+  home.searchParams.delete('play');
+  home.searchParams.delete('sid');
+  if (requestedLanguage === 'kn') home.searchParams.set('lang', 'kn');
+  else home.searchParams.delete('lang');
+  if (profile) home.searchParams.set('pid', profile.pid);
+  history.replaceState(null, '', home);
+  startRequestedExperience();
+}
+
+async function openProfileForm(profile = null) {
+  state.profileReturnView = visibleView();
+  closeOverlays({ restoreFocus: false });
+  await profileUI.showForm(profile);
+  document.getElementById('profile-dob').max = new Date().toISOString().slice(0, 10);
+  showOnly('profile-setup');
+}
+
+async function openProfileSelection({ switching = true } = {}) {
+  state.profileReturnView = visibleView();
+  state.profileSelectionMode = switching ? 'switch' : 'initial';
+  closeOverlays({ restoreFocus: false });
+  await profileUI.showSelection({ switching });
+  showOnly('profile-selection');
+}
+
+async function initializeProfiles() {
+  try {
+    await profileStore.open();
+    const profiles = await profileStore.list();
+    if (!profiles.length) return openProfileForm();
+    const requestedPid = Number(params.get('pid'));
+    let profile = Number.isInteger(requestedPid) && requestedPid > 0 ? await profileStore.get(requestedPid) : null;
+    if (!profile) {
+      const defaultPid = await profileStore.defaultPid();
+      profile = defaultPid ? await profileStore.get(defaultPid) : null;
+    }
+    if (!profile) return openProfileSelection({ switching: false });
+    await activateProfile(profile);
+    startRequestedExperience();
+  } catch (error) {
+    showError('Local profile storage is unavailable. Gitaverse requires browser storage to keep profiles on this device. ' + (error.message || ''));
+  }
 }
 
 async function checkPlayerVersion() {
@@ -57,7 +170,14 @@ async function checkPlayerVersion() {
 
 async function startRequestedExperience() {
   const chooserLink = document.getElementById('gita-700-link');
-  chooserLink.href = '?play=gita-700' + (playerVersion ? '&v=' + encodeURIComponent(playerVersion) : '');
+  const chooserUrl = new URL(location.href);
+  chooserUrl.searchParams.set('play', 'gita-700');
+  chooserUrl.searchParams.delete('sid');
+  chooserUrl.searchParams.set('pid', state.activeProfile.pid);
+  const chooserLanguage = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
+  if (chooserLanguage === 'kn') chooserUrl.searchParams.set('lang', 'kn');
+  else chooserUrl.searchParams.delete('lang');
+  chooserLink.href = chooserUrl.href;
   if (!play) return showOnly('chooser');
 
   const experience = getExperience(play);
@@ -78,7 +198,7 @@ async function startPlayer(dataset, experience) {
   if (state.editor) state.editor.destroy();
   if (state.renderer) state.renderer.destroy();
   state.dataset = dataset;
-  state.language = requestedLanguage === 'kn' ? 'kn' : 'en';
+  state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
   state.renderer = await experience.load();
   state.renderer.mount(document.getElementById('renderer-root'));
 
@@ -223,11 +343,17 @@ function finishSwipe(event) {
 function setLanguage(language) {
   if (!state.editor.canNavigate()) return;
   state.language = language === 'kn' ? 'kn' : 'en';
+  requestedLanguage = state.language;
+  state.activeProfile.language = state.language;
+  profileStore.save(state.activeProfile).then((profile) => {
+    state.activeProfile = profile;
+    profileUI.renderPills(profile);
+  }).catch(() => {});
   render();
 }
 
 function openOverlay(id) {
-  if (state.editor.active) return;
+  if (state.editor?.active) return;
   state.overlayOpener = document.getElementById('top-menu').contains(document.activeElement)
     ? document.getElementById('menu-button')
     : document.activeElement;
@@ -253,7 +379,7 @@ function openOverlay(id) {
 
 function closeOverlays({ restoreFocus = true } = {}) {
   let closed = false;
-  ['goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay'].forEach((id) => {
+  ['goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay', 'profile-menu-overlay'].forEach((id) => {
     const overlay = document.getElementById(id);
     if (!overlay.hidden) { overlay.hidden = true; closed = true; }
   });
@@ -318,11 +444,7 @@ function goHome() {
   setMenuOpen(false);
   if (!state.editor.canNavigate()) return;
   if (state.editor.pendingDownload && !window.confirm('Changes have not been downloaded. Are you sure you want to return Home?')) return;
-  const home = new URL(location.href);
-  home.searchParams.delete('play');
-  home.searchParams.delete('sid');
-  home.searchParams.delete('lang');
-  location.href = home.href;
+  goToExperienceSelection();
 }
 
 function goToSid(sid) {
@@ -457,6 +579,17 @@ function bindEvents() {
   document.getElementById('help-button').addEventListener('click', () => openOverlay('help-overlay'));
   document.getElementById('language-button').addEventListener('click', () => openOverlay('language-overlay'));
   document.getElementById('home-button').addEventListener('click', goHome);
+  document.querySelectorAll('[data-profile-pill]').forEach((button) => button.addEventListener('click', () => openOverlay('profile-menu-overlay')));
+  document.getElementById('switch-profile-button').addEventListener('click', () => openProfileSelection());
+  document.getElementById('manage-profiles-button').addEventListener('click', () => openProfileSelection());
+  document.getElementById('edit-profile-button').addEventListener('click', () => openProfileForm(state.activeProfile));
+  document.getElementById('add-profile-button').addEventListener('click', () => openProfileForm());
+  document.getElementById('profile-selection-back').addEventListener('click', () => {
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
+  });
+  document.getElementById('profile-form-cancel').addEventListener('click', () => {
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'chooser'));
+  });
   document.getElementById('edit-button').addEventListener('click', () => { setMenuOpen(false); state.editor.toggle(); });
   document.getElementById('download-reminder-action').addEventListener('click', () => state.editor.download());
   document.getElementById('download-reminder-close').addEventListener('click', () => {
@@ -492,6 +625,10 @@ function bindEvents() {
     if (state.renderer) state.renderer.fitText();
   });
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && closeOverlays()) {
+      event.preventDefault();
+      return;
+    }
     if (!state.dataset) return;
     const active = document.activeElement;
     const typing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
@@ -564,4 +701,4 @@ function bindEvents() {
 }
 
 bindEvents();
-checkPlayerVersion().then((current) => { if (current) startRequestedExperience(); });
+checkPlayerVersion().then((current) => { if (current) initializeProfiles(); });
