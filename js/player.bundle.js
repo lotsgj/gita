@@ -806,7 +806,8 @@ const state = {
   lastSavedRevision: 0,
   activeProfile: null,
   profileSelectionMode: 'initial',
-  profileReturnView: 'chooser'
+  profileReturnView: 'chooser',
+  appMetadata: { version: 'dev' }
 };
 
 const params = new URLSearchParams(location.search);
@@ -945,6 +946,8 @@ async function checkPlayerVersion() {
     const response = await fetch('data/app-version.json?check=' + Date.now(), { cache: 'no-store' });
     if (!response.ok) return true;
     const latest = await response.json();
+    state.appMetadata = latest;
+    document.getElementById('about-version').textContent = latest.version || appVersion;
     if (latest.version && appVersion !== latest.version) {
       const refreshed = new URL(location.href);
       refreshed.searchParams.set('v', latest.version);
@@ -1168,7 +1171,7 @@ function openOverlay(id) {
 
 function closeOverlays({ restoreFocus = true } = {}) {
   let closed = false;
-  ['goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay', 'profile-menu-overlay'].forEach((id) => {
+  ['goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay', 'profile-menu-overlay', 'about-overlay'].forEach((id) => {
     const overlay = document.getElementById(id);
     if (!overlay.hidden) { overlay.hidden = true; closed = true; }
   });
@@ -1366,6 +1369,8 @@ function bindEvents() {
   document.getElementById('footer-goto-button').addEventListener('click', () => openOverlay('goto-overlay'));
   document.getElementById('chapters-button').addEventListener('click', () => openOverlay('chapters-overlay'));
   document.getElementById('help-button').addEventListener('click', () => openOverlay('help-overlay'));
+  document.getElementById('about-button').addEventListener('click', () => openOverlay('about-overlay'));
+  document.querySelectorAll('[data-about]').forEach((button) => button.addEventListener('click', () => openOverlay('about-overlay')));
   document.getElementById('language-button').addEventListener('click', () => openOverlay('language-overlay'));
   document.getElementById('home-button').addEventListener('click', goHome);
   document.querySelectorAll('[data-profile-pill]').forEach((button) => button.addEventListener('click', () => openOverlay('profile-menu-overlay')));
@@ -1446,6 +1451,8 @@ function bindEvents() {
         event.preventDefault(); openOverlay('language-overlay');
       } else if (menuKey === 'a') {
         event.preventDefault(); goHome();
+      } else if (menuKey === 'k') {
+        event.preventDefault(); openOverlay('about-overlay');
       } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
         event.preventDefault(); moveMenuFocus(event.key === 'ArrowDown' ? 1 : -1);
       } else if (event.key === 'Enter' && active.tagName !== 'SELECT') {
@@ -1484,6 +1491,7 @@ function bindEvents() {
     else if (key === 'a') { event.preventDefault(); goHome(); }
     else if (key === 'f') { event.preventDefault(); toggleFullscreen(); }
     else if (key === 'h') { event.preventDefault(); openOverlay('help-overlay'); }
+    else if (key === 'k') { event.preventDefault(); openOverlay('about-overlay'); }
     else if (key === 'm') { event.preventDefault(); toggleMenu(); }
     else if (key === 'e') { event.preventDefault(); state.editor.toggle(); }
   });

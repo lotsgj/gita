@@ -118,6 +118,12 @@
   .profile-card-actions button { border: 0; background: transparent; color: var(--muted); padding: 5px 8px; font-size: 10px; cursor: pointer; border-radius: 7px; }
   .profile-card-actions button:hover { background: var(--paper); color: var(--ink); }
   .add-profile-button { width: 100%; margin-top: 12px; }
+  .about-link {
+    display: block; margin: 18px auto -8px; padding: 6px 9px; border: 0;
+    background: transparent; color: var(--muted); font-size: 11px; cursor: pointer;
+    text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 4px;
+  }
+  .about-link:hover, .about-link:focus-visible { color: var(--saffron); text-decoration-color: currentColor; outline: none; }
   .profile-pill {
     max-width: 170px; min-height: 36px; border: 1px solid var(--line); border-radius: 999px;
     padding: 3px 10px 3px 4px; display: inline-flex; align-items: center; gap: 7px;
@@ -130,6 +136,37 @@
   .profile-menu-options button { min-height: 44px; border: 1px solid var(--line); border-radius: 11px; background: white; text-align: left; padding: 0 13px; cursor: pointer; }
   .profile-menu-options button:hover { background: var(--saffron-soft); }
   .profile-menu-dialog { width: min(360px, 100%); }
+  .about-dialog { position: relative; width: min(480px, 100%); display: block; overflow: visible; }
+  .about-close { position: absolute; z-index: 2; top: 12px; right: 12px; }
+  .about-body { padding: 34px 34px 29px; text-align: center; }
+  .about-body h2 { margin: 12px 0 10px; font: 500 27px Georgia, serif; }
+  .about-body > p { max-width: 390px; margin: 0 auto; color: var(--muted); font-size: 13px; line-height: 1.65; }
+  .about-flute {
+    position: relative; width: 78px; height: 78px; margin: 0 auto; display: grid; place-items: center;
+    border: 1px solid rgba(201,149,63,.54); border-radius: 50%;
+    background: radial-gradient(circle at 36% 30%, #fff8e8, #edc878 74%, #d39d42);
+    box-shadow: inset 0 0 0 4px rgba(255,255,255,.24), 0 12px 30px rgba(107,75,27,.16);
+  }
+  .about-flute img { width: 57px; height: 57px; transform-origin: 42% 62%; }
+  .about-note {
+    position: absolute; z-index: 3; right: 0; top: 7px; color: var(--indigo);
+    font: 700 17px/1 Georgia, serif; font-style: normal; opacity: 0; pointer-events: none;
+    text-shadow: 0 1px white, 0 0 6px rgba(255,255,255,.65);
+  }
+  .about-note-two { color: #3f746f; font-size: 15px; }
+  .about-note-three { color: #0d3445; font-size: 14px; }
+  #about-overlay:not([hidden]) .about-flute img, .about-flute:hover img { animation: about-flute-lilt .78s ease both; }
+  #about-overlay:not([hidden]) .about-note-one, .about-flute:hover .about-note-one { animation: about-note-one .78s ease-out both; }
+  #about-overlay:not([hidden]) .about-note-two, .about-flute:hover .about-note-two { animation: about-note-two .78s .09s ease-out both; }
+  #about-overlay:not([hidden]) .about-note-three, .about-flute:hover .about-note-three { animation: about-note-three .78s .17s ease-out both; }
+  @keyframes about-flute-lilt { 0%,100% { transform: translateY(0) rotate(0); } 42% { transform: translateY(-2px) rotate(-4deg); } }
+  @keyframes about-note-one { 0% { opacity:0; transform:translate(0,5px) scale(.55) rotate(-8deg); } 35% { opacity:1; } 100% { opacity:0; transform:translate(10px,-19px) scale(1.12) rotate(10deg); } }
+  @keyframes about-note-two { 0% { opacity:0; transform:translate(-1px,5px) scale(.5) rotate(5deg); } 35% { opacity:1; } 100% { opacity:0; transform:translate(18px,-12px) scale(1.06) rotate(18deg); } }
+  @keyframes about-note-three { 0% { opacity:0; transform:translate(0,4px) scale(.5); } 35% { opacity:.95; } 100% { opacity:0; transform:translate(5px,-27px) scale(1.02) rotate(-10deg); } }
+  .about-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 20px 0 17px; }
+  .about-links a { padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: white; color: var(--indigo); font-size: 11px; text-decoration: none; }
+  .about-links a:hover, .about-links a:focus-visible { border-color: rgba(183,93,42,.5); background: var(--saffron-soft); outline: none; }
+  .about-version { font-size: 10px !important; font-variant-numeric: tabular-nums; }
 
   #app { height: 100vh; height: 100dvh; padding: 16px; }
   .shell {
@@ -352,4 +389,6 @@
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    #about-overlay:not([hidden]) .about-flute img, .about-flute:hover img,
+    #about-overlay:not([hidden]) .about-note, .about-flute:hover .about-note { animation: none; }
   }

@@ -40,6 +40,7 @@
       <div class="form-error" id="profile-form-error" role="alert"></div>
       <div class="profile-form-actions"><button class="quiet-button" id="profile-form-cancel" type="button" hidden>Cancel</button><button class="primary-button" type="submit">Save profile</button></div>
     </form>
+    <button class="about-link" type="button" data-about>About Gitaverse</button>
   </section>
 </main>
 
@@ -48,6 +49,7 @@
     <div class="profile-selection-head"><div><div class="status-mark">ॐ</div><h1 id="profile-selection-title">Who is using Gitaverse?</h1><p>Choose a profile to continue.</p></div><button class="quiet-button" id="profile-selection-back" type="button" hidden>Back</button></div>
     <div class="profile-list" id="profile-list"></div>
     <button class="add-profile-button" id="add-profile-button" type="button">＋ Add another profile</button>
+    <button class="about-link" type="button" data-about>About Gitaverse</button>
   </section>
 </main>
 
@@ -62,6 +64,7 @@
       <span class="experience-link disabled"><span>Gita Yoga<br><small>Experience to be designed</small></span><small>Coming later</small></span>
       <span class="experience-link disabled"><span>Gita Sara<br><small>Experience to be designed</small></span><small>Coming later</small></span>
     </div>
+    <button class="about-link" type="button" data-about>About Gitaverse</button>
   </section>
 </main>
 
@@ -112,6 +115,8 @@
           <button class="top-menu-item" id="edit-button" type="button"><span class="top-menu-label">Edit this shloka</span><span class="menu-shortcut">E</span></button>
           <button class="top-menu-item" id="home-button" type="button"><span class="top-menu-label">Home</span><span class="menu-shortcut">A</span></button>
           <button class="top-menu-item" id="help-button" type="button"><span class="top-menu-label">Help</span><span class="menu-shortcut">H</span></button>
+          <div class="top-menu-divider"></div>
+          <button class="top-menu-item" id="about-button" type="button"><span class="top-menu-label">About Gitaverse</span><span class="menu-shortcut">K</span></button>
         </div>
       </div>
       <button class="profile-pill topbar-profile-pill" type="button" data-profile-pill></button>
@@ -192,6 +197,7 @@
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>P</kbd><kbd>Space</kbd></div><div class="shortcut-description">Play or pause audio</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>F</kbd></div><div class="shortcut-description">Enter or exit fullscreen</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>H</kbd></div><div class="shortcut-description">Open this help</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>K</kbd></div><div class="shortcut-description">Open About Gitaverse</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>M</kbd></div><div class="shortcut-description">Open or close menu</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>E</kbd></div><div class="shortcut-description">Enter or leave edit mode</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>Esc</kbd></div><div class="shortcut-description">Close a dialog or exit fullscreen</div></div>
@@ -207,6 +213,27 @@
       <button type="button" id="switch-profile-button">Switch profile</button>
       <button type="button" id="edit-profile-button">Edit profile</button>
       <button type="button" id="manage-profiles-button">Manage profiles</button>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="about-overlay" hidden>
+  <section class="dialog about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-title">
+    <button class="icon-button close-dialog about-close" type="button" aria-label="Close">×</button>
+    <div class="about-body">
+      <div class="about-flute" aria-hidden="true">
+        <img src="data/images/krishna-flute.svg" alt="">
+        <i class="about-note about-note-one">♪</i>
+        <i class="about-note about-note-two">♫</i>
+        <i class="about-note about-note-three">♩</i>
+      </div>
+      <h2 id="about-title">About Gitaverse</h2>
+      <p>Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.</p>
+      <div class="about-links">
+        <a href="https://gitajyoti.org/" target="_blank" rel="noopener">Gita Jyoti</a>
+        <a href="https://lightoftheself.org/" target="_blank" rel="noopener">Light of the Self Foundation</a>
+      </div>
+      <p class="about-version">Version <span id="about-version">dev</span></p>
     </div>
   </section>
 </div>
