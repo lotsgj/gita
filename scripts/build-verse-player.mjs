@@ -4,6 +4,7 @@ const sources = [
   'js/profile-store.js',
   'js/profile-ui.js',
   'js/events/event-schema.js',
+  'js/events/profile-analytics.js',
   'js/events/event-bus.js',
   'js/events/resume-adapter.js',
   'js/events/clarity-adapter.js',

@@ -3,6 +3,7 @@ import { EventBus } from '../js/events/event-bus.js';
 import { ResumeAdapter } from '../js/events/resume-adapter.js';
 import { ClarityAdapter } from '../js/events/clarity-adapter.js';
 import { SentryAdapter } from '../js/events/sentry-adapter.js';
+import { ageBand, profileAnalyticsContext } from '../js/events/profile-analytics.js';
 
 const resumes = new Map();
 const store = {
@@ -64,4 +65,37 @@ assert.deepEqual(resumes.get(7), {
 assert.throws(() => bus.emit('unknown_event'), /Unknown Gitaverse event/);
 assert.throws(() => bus.emit('location_changed', { profileId: 7, context: { experience: 'gita-700' } }), /requires experience and sid/);
 
-console.log('PASS: event schema, adapter isolation, disabled telemetry adapters, and bounded resume records are valid');
+assert.equal(ageBand('', new Date('2026-09-26T00:00:00Z')), 'missing');
+assert.equal(ageBand('not-a-date', new Date('2026-09-26T00:00:00Z')), 'missing');
+assert.equal(ageBand('2020-01-01', new Date('2026-09-26T00:00:00Z')), 'unknown');
+assert.equal(ageBand('2010-10-01', new Date('2026-09-26T00:00:00Z')), '13-17');
+assert.equal(ageBand('2001-09-26', new Date('2026-09-26T00:00:00Z')), '25-34');
+assert.deepEqual(profileAnalyticsContext({ dob: '1980-01-01', gender: 'self-described', language: 'kn' }, new Date('2026-09-26T00:00:00Z')), {
+  ageBand: '45-54', genderGroup: 'self_described', profileLanguage: 'kn'
+});
+
+const clarityCalls = [];
+const clarityScripts = [];
+const clarityTarget = {};
+const clarityDocument = {
+  head: { appendChild: (script) => clarityScripts.push(script) },
+  createElement: () => ({ dataset: {} }),
+  querySelector: () => null
+};
+const clarity = new ClarityAdapter({ projectId: 'test123', target: clarityTarget, documentRef: clarityDocument });
+clarity.handle({
+  event: 'verse_viewed',
+  context: { ageBand: '25-34', genderGroup: 'female', profileLanguage: 'kn', experience: 'gita-700', language: 'kn', appVersion: '1.test', displayMode: 'browser' },
+  details: {},
+  profileId: 99,
+  anonymousProfileId: 'must-not-be-sent'
+});
+clarityTarget.clarity.q.forEach((args) => clarityCalls.push(Array.from(args)));
+assert.equal(clarityScripts.length, 1);
+assert.equal(clarityScripts[0].src, 'https://www.clarity.ms/tag/test123');
+assert.deepEqual(clarityCalls.find((call) => call[1] === 'age_band'), ['set', 'age_band', '25-34']);
+assert.ok(clarityCalls.some((call) => call[0] === 'event' && call[1] === 'verse_viewed'));
+assert.equal(JSON.stringify(clarityCalls).includes('must-not-be-sent'), false);
+assert.equal(JSON.stringify(clarityCalls).includes('99'), false);
+
+console.log('PASS: event schema, adapter isolation, demographics, Clarity privacy allowlist, and bounded resume records are valid');

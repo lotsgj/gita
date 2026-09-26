@@ -5,6 +5,7 @@ import { EventBus } from './events/event-bus.js';
 import { ResumeAdapter } from './events/resume-adapter.js';
 import { ClarityAdapter } from './events/clarity-adapter.js';
 import { SentryAdapter } from './events/sentry-adapter.js';
+import { profileAnalyticsContext } from './events/profile-analytics.js';
 import { PwaManager } from './pwa.js';
 import { AudioPlayer } from './audio-player.js';
 import { InlineEditor } from './editor.js';
@@ -33,6 +34,7 @@ let requestedSid = params.get('sid');
 let requestedLanguage = params.get('lang');
 const explicitLocationRequested = params.has('play') || params.has('sid') || params.has('lang');
 const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
+const clarityProjectId = document.querySelector('meta[name="clarity-project-id"]')?.content || '';
 
 const profileStore = new ProfileStore();
 const eventBus = new EventBus({
@@ -43,7 +45,7 @@ const eventBus = new EventBus({
   })
 });
 eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
-eventBus.subscribe(new ClarityAdapter());
+eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
 eventBus.subscribe(new SentryAdapter());
 const pwa = new PwaManager({ appVersion });
 const profileUI = new ProfileUI({
@@ -60,16 +62,23 @@ const audioPlayer = new AudioPlayer({
   pauseIcon: document.getElementById('pause-icon'),
   seek: document.getElementById('audio-seek'),
   time: document.getElementById('audio-time'),
-  onError: () => pwa.showStatus(navigator.onLine ? 'Audio is currently unavailable.' : 'This audio is not available offline yet.')
+  onError: () => pwa.showStatus(navigator.onLine ? 'Audio is currently unavailable.' : 'This audio is not available offline yet.'),
+  onEvent: (name) => emitEvent(name, { context: verseContext() })
 });
 
 const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
+let engagementTimer = null;
+
+function verseContext(row = currentRow()) {
+  if (!row) return {};
+  return { experience: play, sid: row.sid, chapter: row.cid, language: state.language };
+}
 
 function emitEvent(name, { context = {}, details = {}, profile = state.activeProfile } = {}) {
   return eventBus.emit(name, {
     profileId: profile?.pid ?? null,
     anonymousProfileId: profile?.analyticsProfileId || null,
-    context,
+    context: { ...profileAnalyticsContext(profile), ...context },
     details
   });
 }
@@ -273,6 +282,7 @@ async function startPlayer(dataset, experience) {
 
   const defaultIndex = findSid('1.B');
   state.index = requestedIndex >= 0 ? requestedIndex : (defaultIndex >= 0 ? defaultIndex : 0);
+  emitEvent('experience_selected', { context: { experience: play, language: state.language } });
 
   state.editor = new InlineEditor({
     dataset: state.dataset,
@@ -363,6 +373,7 @@ function render(options = {}) {
   if (options.keepEditing && state.editor.active) state.renderer.setEditing(true);
   updateUrl();
   updateChapterSelection();
+  trackVerseEngagement(row);
   if (options.trackLocation !== false) {
     const source = options.source || state.locationSource || 'render';
     state.locationSource = null;
@@ -376,6 +387,35 @@ function render(options = {}) {
       details: { source }
     });
   }
+}
+
+function trackVerseEngagement(row) {
+  if (engagementTimer) clearInterval(engagementTimer);
+  const thresholds = new Map([
+    [2000, 'verse_viewed'],
+    [10000, 'verse_engaged_10s'],
+    [30000, 'verse_engaged_30s'],
+    [60000, 'verse_engaged_60s']
+  ]);
+  let activeMilliseconds = 0;
+  let lastTick = Date.now();
+  engagementTimer = setInterval(() => {
+    const now = Date.now();
+    const elapsed = now - lastTick;
+    lastTick = now;
+    if (document.visibilityState !== 'visible' || currentRow()?.sid !== row.sid) return;
+    activeMilliseconds += Math.min(elapsed, 1500);
+    thresholds.forEach((event, threshold) => {
+      if (activeMilliseconds >= threshold) {
+        emitEvent(event, { context: verseContext(row) });
+        thresholds.delete(threshold);
+      }
+    });
+    if (!thresholds.size) {
+      clearInterval(engagementTimer);
+      engagementTimer = null;
+    }
+  }, 1000);
 }
 
 function updateUrl() {

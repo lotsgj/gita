@@ -56,6 +56,8 @@ const version = `${major}.${build}`;
 const commit = process.env.GITHUB_SHA || 'local';
 const runId = process.env.GITHUB_RUN_ID || 'local';
 const builtAt = new Date().toISOString();
+const clarityProjectId = String(process.env.CLARITY_PROJECT_ID || '').trim();
+if (clarityProjectId && !/^[a-z0-9]+$/i.test(clarityProjectId)) throw new Error('CLARITY_PROJECT_ID must be alphanumeric.');
 
 run(process.execPath, ['scripts/build-verse-player.mjs']);
 run(process.execPath, ['--check', 'js/player.bundle.js']);
@@ -68,9 +70,13 @@ await mkdir(path.join(output, 'js'), { recursive: true });
 const sourceHtml = await readFile(path.join(root, 'player.html'), 'utf8');
 const deployedHtml = sourceHtml
   .replace('<meta name="app-version" content="dev">', `<meta name="app-version" content="${version}">`)
+  .replace('<meta name="clarity-project-id" content="">', `<meta name="clarity-project-id" content="${clarityProjectId}">`)
   .replaceAll('?v=dev', `?v=${encodeURIComponent(version)}`);
 if (deployedHtml === sourceHtml || deployedHtml.includes('?v=dev') || deployedHtml.includes('content="dev"')) {
   throw new Error('player.html does not contain the expected development version markers.');
+}
+if (!deployedHtml.includes(`<meta name="clarity-project-id" content="${clarityProjectId}">`)) {
+  throw new Error('player.html does not contain the expected Clarity project marker.');
 }
 
 await writeFile(path.join(output, 'player.html'), deployedHtml);

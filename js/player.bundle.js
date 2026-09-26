@@ -363,7 +363,20 @@ const EVENT_NAMES = new Set([
   'language_changed',
   'home_opened',
   'data_load_failed',
-  'profile_storage_failed'
+  'profile_storage_failed',
+  'verse_viewed',
+  'verse_engaged_10s',
+  'verse_engaged_30s',
+  'verse_engaged_60s',
+  'audio_started',
+  'audio_resumed',
+  'audio_paused',
+  'audio_seeked',
+  'audio_25',
+  'audio_50',
+  'audio_75',
+  'audio_completed',
+  'audio_failed'
 ]);
 
 function validateEventInput(name, input = {}) {
@@ -388,6 +401,46 @@ function deepFreeze(value) {
   if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
   Object.values(value).forEach(deepFreeze);
   return Object.freeze(value);
+}
+
+// Source: js/events/profile-analytics.js
+const GENDERS = new Set(['female', 'male', 'nonbinary', 'self-described']);
+
+function validDateParts(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
+  if (!match) return null;
+  const [, year, month, day] = match.map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+  return { year, month, day };
+}
+
+function ageBand(dob, now = new Date()) {
+  const birth = validDateParts(dob);
+  if (!birth || Number.isNaN(now.getTime())) return 'missing';
+  let age = now.getUTCFullYear() - birth.year;
+  const month = now.getUTCMonth() + 1;
+  const day = now.getUTCDate();
+  if (month < birth.month || (month === birth.month && day < birth.day)) age -= 1;
+  if (age < 0) return 'missing';
+  if (age < 13) return 'unknown';
+  if (age < 18) return '13-17';
+  if (age < 25) return '18-24';
+  if (age < 35) return '25-34';
+  if (age < 45) return '35-44';
+  if (age < 55) return '45-54';
+  if (age < 65) return '55-64';
+  if (age < 75) return '65-74';
+  return '75-plus';
+}
+
+function profileAnalyticsContext(profile, now = new Date()) {
+  if (!profile) return {};
+  return {
+    ageBand: ageBand(profile.dob, now),
+    genderGroup: GENDERS.has(profile.gender) ? profile.gender.replace('-', '_') : 'not_said',
+    profileLanguage: profile.language === 'kn' ? 'kn' : 'en'
+  };
 }
 
 // Source: js/events/event-bus.js
@@ -479,17 +532,70 @@ class ResumeAdapter {
 
 // Source: js/events/clarity-adapter.js
 class ClarityAdapter {
-  constructor() {
+  constructor({ projectId = '', target = globalThis, documentRef = globalThis.document } = {}) {
     this.id = 'clarity';
-    this.enabled = false;
+    this.projectId = String(projectId || '').trim();
+    this.target = target;
+    this.document = documentRef;
+    this.enabled = /^[a-z0-9]+$/i.test(this.projectId);
+    this.started = false;
+    this.tags = new Map();
   }
 
-  accepts() {
-    return this.enabled;
+  accepts(event) {
+    return this.enabled && Boolean(event.context.ageBand);
   }
 
-  handle() {
-    // Enabled in the dedicated Clarity integration pass.
+  start() {
+    if (this.started) return;
+    this.started = true;
+    const clarity = this.target.clarity = this.target.clarity || function clarityQueue() {
+      (clarity.q = clarity.q || []).push(arguments);
+    };
+    if (this.document?.querySelector(`script[data-clarity-project="${this.projectId}"]`)) return;
+    const script = this.document.createElement('script');
+    script.async = true;
+    script.dataset.clarityProject = this.projectId;
+    script.src = `https://www.clarity.ms/tag/${encodeURIComponent(this.projectId)}`;
+    this.document.head.appendChild(script);
+  }
+
+  setTag(key, value) {
+    if (value == null || value === '' || this.tags.get(key) === String(value)) return;
+    this.tags.set(key, String(value));
+    this.target.clarity('set', key, String(value));
+  }
+
+  handle(event) {
+    this.start();
+    const tags = {
+      age_band: event.context.ageBand,
+      gender_group: event.context.genderGroup,
+      profile_language: event.context.profileLanguage,
+      experience: event.context.experience,
+      content_language: event.context.language,
+      app_version: event.context.appVersion,
+      display_mode: event.context.displayMode
+    };
+    Object.entries(tags).forEach(([key, value]) => this.setTag(key, value));
+
+    const eventName = this.eventName(event);
+    if (eventName) this.target.clarity('event', eventName);
+  }
+
+  eventName(event) {
+    if (event.event === 'location_changed') {
+      const sourceEvents = { next: 'next_verse', previous: 'previous_verse', swipe: 'verse_swiped', goto: 'goto_verse', chapter: 'chapter_selected', resume: 'experience_resumed' };
+      return sourceEvents[event.details.source] || null;
+    }
+    const allowed = new Set([
+      'app_opened', 'profile_created', 'profile_selected', 'profile_updated', 'profile_switched',
+      'experience_selected', 'language_changed', 'home_opened', 'data_load_failed', 'profile_storage_failed',
+      'verse_viewed', 'verse_engaged_10s', 'verse_engaged_30s', 'verse_engaged_60s',
+      'audio_started', 'audio_resumed', 'audio_paused', 'audio_seeked', 'audio_25', 'audio_50',
+      'audio_75', 'audio_completed', 'audio_failed'
+    ]);
+    return allowed.has(event.event) ? event.event : null;
   }
 }
 
@@ -706,7 +812,7 @@ function languageField(stem, language) {
 
 // Source: js/audio-player.js
 class AudioPlayer {
-  constructor({ audio, playButton, playIcon, pauseIcon, seek, time, onError = () => {} }) {
+  constructor({ audio, playButton, playIcon, pauseIcon, seek, time, onError = () => {}, onEvent = () => {} }) {
     this.audio = audio;
     this.playButton = playButton;
     this.playIcon = playIcon;
@@ -714,25 +820,58 @@ class AudioPlayer {
     this.seek = seek;
     this.time = time;
     this.onError = onError;
+    this.onEvent = onEvent;
+    this.started = false;
+    this.suppressPause = false;
+    this.milestones = new Set();
+    this.listenedSeconds = 0;
+    this.lastPlaybackTime = 0;
     this.bind();
   }
 
   bind() {
     this.playButton.addEventListener('click', () => this.toggle());
-    this.audio.addEventListener('play', () => this.updatePlayState());
-    this.audio.addEventListener('pause', () => this.updatePlayState());
-    this.audio.addEventListener('ended', () => this.updatePlayState());
+    this.audio.addEventListener('play', () => {
+      this.onEvent(this.started ? 'audio_resumed' : 'audio_started');
+      this.started = true;
+      this.updatePlayState();
+    });
+    this.audio.addEventListener('pause', () => {
+      if (!this.suppressPause && this.started && !this.audio.ended && this.audio.currentTime > 0) this.onEvent('audio_paused');
+      this.updatePlayState();
+    });
+    this.audio.addEventListener('ended', () => {
+      this.onEvent('audio_completed');
+      this.updatePlayState();
+    });
     this.audio.addEventListener('loadedmetadata', () => {
       this.seek.max = Number.isFinite(this.audio.duration) ? String(this.audio.duration) : '0';
       this.seek.disabled = !Number.isFinite(this.audio.duration) || this.audio.duration <= 0;
       this.time.textContent = '00:00 / ' + this.formatTime(this.audio.duration);
     });
     this.audio.addEventListener('timeupdate', () => {
+      const currentTime = this.audio.currentTime || 0;
+      const playbackDelta = currentTime - this.lastPlaybackTime;
+      if (!this.audio.paused && playbackDelta > 0 && playbackDelta < 2) this.listenedSeconds += playbackDelta;
+      this.lastPlaybackTime = currentTime;
       this.seek.value = String(this.audio.currentTime || 0);
       this.time.textContent = this.formatTime(this.audio.currentTime) + ' / ' + this.formatTime(this.audio.duration);
+      if (Number.isFinite(this.audio.duration) && this.audio.duration > 0) {
+        const progress = this.listenedSeconds / this.audio.duration;
+        [[.25, 'audio_25'], [.5, 'audio_50'], [.75, 'audio_75']].forEach(([point, name]) => {
+          if (progress >= point && !this.milestones.has(name)) {
+            this.milestones.add(name);
+            this.onEvent(name);
+          }
+        });
+      }
     });
     this.seek.addEventListener('input', (event) => {
       if (Number.isFinite(this.audio.duration)) this.audio.currentTime = Number(event.target.value);
+    });
+    this.seek.addEventListener('change', () => {
+      this.lastPlaybackTime = this.audio.currentTime || 0;
+      this.onEvent('audio_seeked');
     });
     this.audio.addEventListener('error', () => {
       this.time.textContent = 'Audio unavailable';
@@ -740,11 +879,18 @@ class AudioPlayer {
       this.seek.disabled = true;
       this.updatePlayState();
       this.onError();
+      this.onEvent('audio_failed');
     });
   }
 
   setSource(source) {
+    this.suppressPause = true;
     this.stop();
+    this.suppressPause = false;
+    this.started = false;
+    this.milestones.clear();
+    this.listenedSeconds = 0;
+    this.lastPlaybackTime = 0;
     this.audio.removeAttribute('src');
     if (source) this.audio.src = source;
     this.playButton.disabled = !source;
@@ -1089,6 +1235,7 @@ let requestedSid = params.get('sid');
 let requestedLanguage = params.get('lang');
 const explicitLocationRequested = params.has('play') || params.has('sid') || params.has('lang');
 const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
+const clarityProjectId = document.querySelector('meta[name="clarity-project-id"]')?.content || '';
 
 const profileStore = new ProfileStore();
 const eventBus = new EventBus({
@@ -1099,7 +1246,7 @@ const eventBus = new EventBus({
   })
 });
 eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
-eventBus.subscribe(new ClarityAdapter());
+eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
 eventBus.subscribe(new SentryAdapter());
 const pwa = new PwaManager({ appVersion });
 const profileUI = new ProfileUI({
@@ -1116,16 +1263,23 @@ const audioPlayer = new AudioPlayer({
   pauseIcon: document.getElementById('pause-icon'),
   seek: document.getElementById('audio-seek'),
   time: document.getElementById('audio-time'),
-  onError: () => pwa.showStatus(navigator.onLine ? 'Audio is currently unavailable.' : 'This audio is not available offline yet.')
+  onError: () => pwa.showStatus(navigator.onLine ? 'Audio is currently unavailable.' : 'This audio is not available offline yet.'),
+  onEvent: (name) => emitEvent(name, { context: verseContext() })
 });
 
 const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
+let engagementTimer = null;
+
+function verseContext(row = currentRow()) {
+  if (!row) return {};
+  return { experience: play, sid: row.sid, chapter: row.cid, language: state.language };
+}
 
 function emitEvent(name, { context = {}, details = {}, profile = state.activeProfile } = {}) {
   return eventBus.emit(name, {
     profileId: profile?.pid ?? null,
     anonymousProfileId: profile?.analyticsProfileId || null,
-    context,
+    context: { ...profileAnalyticsContext(profile), ...context },
     details
   });
 }
@@ -1329,6 +1483,7 @@ async function startPlayer(dataset, experience) {
 
   const defaultIndex = findSid('1.B');
   state.index = requestedIndex >= 0 ? requestedIndex : (defaultIndex >= 0 ? defaultIndex : 0);
+  emitEvent('experience_selected', { context: { experience: play, language: state.language } });
 
   state.editor = new InlineEditor({
     dataset: state.dataset,
@@ -1419,6 +1574,7 @@ function render(options = {}) {
   if (options.keepEditing && state.editor.active) state.renderer.setEditing(true);
   updateUrl();
   updateChapterSelection();
+  trackVerseEngagement(row);
   if (options.trackLocation !== false) {
     const source = options.source || state.locationSource || 'render';
     state.locationSource = null;
@@ -1432,6 +1588,35 @@ function render(options = {}) {
       details: { source }
     });
   }
+}
+
+function trackVerseEngagement(row) {
+  if (engagementTimer) clearInterval(engagementTimer);
+  const thresholds = new Map([
+    [2000, 'verse_viewed'],
+    [10000, 'verse_engaged_10s'],
+    [30000, 'verse_engaged_30s'],
+    [60000, 'verse_engaged_60s']
+  ]);
+  let activeMilliseconds = 0;
+  let lastTick = Date.now();
+  engagementTimer = setInterval(() => {
+    const now = Date.now();
+    const elapsed = now - lastTick;
+    lastTick = now;
+    if (document.visibilityState !== 'visible' || currentRow()?.sid !== row.sid) return;
+    activeMilliseconds += Math.min(elapsed, 1500);
+    thresholds.forEach((event, threshold) => {
+      if (activeMilliseconds >= threshold) {
+        emitEvent(event, { context: verseContext(row) });
+        thresholds.delete(threshold);
+      }
+    });
+    if (!thresholds.size) {
+      clearInterval(engagementTimer);
+      engagementTimer = null;
+    }
+  }, 1000);
 }
 
 function updateUrl() {

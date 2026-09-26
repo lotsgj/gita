@@ -11,7 +11,20 @@ export const EVENT_NAMES = new Set([
   'language_changed',
   'home_opened',
   'data_load_failed',
-  'profile_storage_failed'
+  'profile_storage_failed',
+  'verse_viewed',
+  'verse_engaged_10s',
+  'verse_engaged_30s',
+  'verse_engaged_60s',
+  'audio_started',
+  'audio_resumed',
+  'audio_paused',
+  'audio_seeked',
+  'audio_25',
+  'audio_50',
+  'audio_75',
+  'audio_completed',
+  'audio_failed'
 ]);
 
 export function validateEventInput(name, input = {}) {
