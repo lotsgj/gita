@@ -104,7 +104,7 @@
   <section class="chooser-card">
     <div class="status-mark">ॐ</div>
     <h1>Unable to load the Gita collections</h1>
-    <p>Player 2 loads its language and media catalogs from <strong>data/collections</strong>. If automatic loading is unavailable, choose that folder to continue locally.</p>
+    <p>Gitaverse loads its language and media catalogs from <strong>data/collections</strong>. If automatic loading is unavailable, choose that folder to continue locally.</p>
     <div class="file-actions">
       <label class="file-button" for="collections-folder-input">Choose collections folder</label>
       <input id="collections-folder-input" type="file" webkitdirectory multiple hidden>
@@ -177,6 +177,21 @@
   <button class="download-reminder-action" id="download-reminder-action" type="button">↓ Download edited language files</button>
   <button class="download-reminder-close" id="download-reminder-close" type="button" aria-label="Dismiss download reminder">×</button>
 </aside>
+
+<div class="overlay" id="workspace-overlay" hidden>
+  <section class="dialog workspace-dialog" role="dialog" aria-modal="true" aria-labelledby="workspace-title">
+    <header class="dialog-head"><h2 id="workspace-title">Open local collections</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body">
+      <p>Select this repository’s <code>data/collections</code> folder. Gitaverse will reload its collection data and save edited verse text directly to the relevant language master file.</p>
+      <div class="file-actions">
+        <button class="file-button" id="open-collections-workspace" type="button">Open collections folder</button>
+        <button class="retry-button" id="edit-download-only" type="button">Edit with downloads only</button>
+      </div>
+      <div class="file-error" id="workspace-error" role="alert" aria-live="polite"></div>
+      <p class="file-note">The folder stays on your device. Gitaverse requests read and write access only after you choose it.</p>
+    </div>
+  </section>
+</div>
 
 <div class="overlay" id="goto-overlay" hidden>
   <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="goto-title">

@@ -85,7 +85,6 @@ if (!deployedHtml.includes(`<meta name="clarity-project-id" content="${clarityPr
 }
 
 await writeFile(path.join(output, 'player.html'), deployedHtml);
-await cp(path.join(root, 'player2.html'), path.join(output, 'player2.html'));
 await cp(path.join(root, 'index.html'), path.join(output, 'index.html'));
 await cp(path.join(root, 'CNAME'), path.join(output, 'CNAME'));
 await cp(path.join(root, 'manifest.webmanifest'), path.join(output, 'manifest.webmanifest'));
@@ -116,7 +115,6 @@ for (const absolute of await walk(output)) {
 
 const precache = Object.keys(assets).filter((relative) => {
   return relative === 'player.html'
-    || relative === 'player2.html'
     || relative === 'index.html'
     || relative === 'offline.html'
     || relative === 'manifest.webmanifest'

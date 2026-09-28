@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { loadCollectionExperienceFromFiles, normalizeCollectionData, parseCollectionTable, serializeLanguageMaster } from '../../js/player2/collection-data.js';
+import { loadCollectionExperienceFromFiles, normalizeCollectionData, openWritableCollectionWorkspace, parseCollectionTable, serializeLanguageMaster } from '../../js/player2/collection-data.js';
 import { projectRoot } from '../helpers/collection-data.mjs';
 
 async function table(relative) {
@@ -22,6 +22,47 @@ const dataset = normalizeCollectionData({
   imageCatalogs: new Map([['gita-chapter-icons', imageCatalog]]),
   experience: { id: 'gita-700' }
 });
+
+async function fakeWritableCollections() {
+  const collections = path.join(projectRoot, 'data/collections');
+  const entries = await readdir(collections, { recursive: true, withFileTypes: true });
+  const contents = new Map();
+  for (const entry of entries.filter((candidate) => candidate.isFile())) {
+    const absolute = path.join(entry.parentPath, entry.name);
+    const relative = path.relative(collections, absolute).split(path.sep).join('/');
+    contents.set(relative, await readFile(absolute));
+  }
+  function directory(prefix = '') {
+    return {
+      kind: 'directory',
+      name: prefix.split('/').filter(Boolean).at(-1) || 'collections',
+      async getDirectoryHandle(name) { return directory(prefix + name + '/'); },
+      async getFileHandle(name) {
+        const relative = prefix + name;
+        if (!contents.has(relative)) throw new Error('Not found: ' + relative);
+        return {
+          kind: 'file',
+          name,
+          async getFile() {
+            const content = contents.get(relative);
+            return {
+              testRelativePath: relative,
+              async text() { return Buffer.from(content).toString('utf8'); }
+            };
+          },
+          async createWritable() {
+            let next;
+            return {
+              async write(value) { next = Buffer.from(String(value)); },
+              async close() { contents.set(relative, next); }
+            };
+          }
+        };
+      }
+    };
+  }
+  return { handle: directory(), contents };
+}
 
 test('player2 builds its normalized model from collection data', () => {
   assert.equal(dataset.schemaVersion, 2);
@@ -76,4 +117,49 @@ test('player2 can load the selected collections folder for file-system use', asy
   } finally {
     URL.createObjectURL = originalCreateObjectUrl;
   }
+});
+
+test('a writable collections workspace updates only the affected language master', async () => {
+  const local = await fakeWritableCollections();
+  const originalCreateObjectUrl = URL.createObjectURL;
+  URL.createObjectURL = (file) => 'blob:writable-test/' + file.testRelativePath;
+  try {
+    const { dataset: writableDataset, workspace } = await openWritableCollectionWorkspace('gita-700', local.handle);
+    const saBefore = Buffer.from(local.contents.get('verses/bhagavad-gita/master_sa.csv'));
+    const verse = writableDataset.rows.find((row) => row.sid === '6.7');
+    verse.languages.en.meaning = 'Direct workspace regression meaning';
+    assert.deepEqual(await workspace.saveLanguageMasters(writableDataset, ['en']), ['master_en.csv']);
+    assert.match(local.contents.get('verses/bhagavad-gita/master_en.csv').toString('utf8'), /Direct workspace regression meaning/);
+    assert.deepEqual(local.contents.get('verses/bhagavad-gita/master_sa.csv'), saBefore);
+  } finally {
+    URL.createObjectURL = originalCreateObjectUrl;
+  }
+});
+
+test('a writable collections workspace refuses to overwrite an externally changed master', async () => {
+  const local = await fakeWritableCollections();
+  const originalCreateObjectUrl = URL.createObjectURL;
+  URL.createObjectURL = (file) => 'blob:conflict-test/' + file.testRelativePath;
+  try {
+    const { dataset: writableDataset, workspace } = await openWritableCollectionWorkspace('gita-700', local.handle);
+    const masterPath = 'verses/bhagavad-gita/master_en.csv';
+    local.contents.set(masterPath, Buffer.concat([local.contents.get(masterPath), Buffer.from('\n')]))
+    writableDataset.rows.find((row) => row.sid === '6.7').languages.en.meaning = 'Must not overwrite';
+    await assert.rejects(
+      workspace.saveLanguageMasters(writableDataset, ['en']),
+      (error) => error.code === 'WORKSPACE_CONFLICT' && /changed outside Gitaverse/.test(error.message)
+    );
+    assert.equal(local.contents.get(masterPath).toString('utf8').includes('Must not overwrite'), false);
+  } finally {
+    URL.createObjectURL = originalCreateObjectUrl;
+  }
+});
+
+test('a writable collections workspace validates the selected folder structure', async () => {
+  const empty = {
+    kind: 'directory', name: 'not-collections',
+    async getDirectoryHandle() { return this; },
+    async getFileHandle() { throw new Error('missing'); }
+  };
+  await assert.rejects(openWritableCollectionWorkspace('gita-700', empty), /missing experiences\/collection\.csv/);
 });

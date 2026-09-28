@@ -877,14 +877,7 @@ function selectedCollectionFiles(fileList) {
   return files;
 }
 
-async function loadCollectionExperienceFromFiles(experienceId, fileList) {
-  const files = selectedCollectionFiles(fileList);
-  if (!files.size) throw new Error('Choose the data/collections folder.');
-  const text = async (url) => {
-    const file = files.get(url);
-    if (!file) throw new Error('The selected folder is missing ' + url + '.');
-    return file.text();
-  };
+async function loadCollectionExperienceWithReader(experienceId, { text, resolveMediaUrl, onLanguageFile = () => {} }) {
   const table = async (url, headers = null) => parseCollectionTable(await text(url), headers, url);
   const experienceRegistry = await table(COLLECTION_ROOT + '/experiences/collection.csv');
   const experienceEntry = registryEntry(experienceRegistry, experienceId, 'Experience');
@@ -894,10 +887,12 @@ async function loadCollectionExperienceFromFiles(experienceId, fileList) {
   const verseRegistry = await table(COLLECTION_ROOT + '/verses/collection.csv');
   const verseEntry = registryEntry(verseRegistry, experience.verseCollection, 'Verse');
   const verseCatalog = await table(verseEntry.catalog_url, ['language', 'content_type', 'content_url']);
+  const languageUrls = Object.fromEntries(['sa', 'en', 'kn'].map((language) => [language, languageFile(verseCatalog, language)]));
+  Object.entries(languageUrls).forEach(([language, url]) => onLanguageFile(language, url));
   const [sa, en, kn, audioComposition, imageComposition] = await Promise.all([
-    table(languageFile(verseCatalog, 'sa'), MASTER_HEADERS.sa),
-    table(languageFile(verseCatalog, 'en'), MASTER_HEADERS.en),
-    table(languageFile(verseCatalog, 'kn'), MASTER_HEADERS.kn),
+    table(languageUrls.sa, MASTER_HEADERS.sa),
+    table(languageUrls.en, MASTER_HEADERS.en),
+    table(languageUrls.kn, MASTER_HEADERS.kn),
     table(catalogEntry(experienceCatalog, 'audio', experienceId), ['cid', 'snum', 'sid', 'chant_full_sa_collection', 'chant_full_sa_order']),
     table(catalogEntry(experienceCatalog, 'images', experienceId), ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order'])
   ]);
@@ -913,6 +908,17 @@ async function loadCollectionExperienceFromFiles(experienceId, fileList) {
     localCatalogs('audio', audioComposition, 'chant_full_sa_collection', ['sid', 'order', 'language', 'audio_url']),
     localCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url'])
   ]);
+  return normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience, resolveMediaUrl });
+}
+
+async function loadCollectionExperienceFromFiles(experienceId, fileList) {
+  const files = selectedCollectionFiles(fileList);
+  if (!files.size) throw new Error('Choose the data/collections folder.');
+  const text = async (url) => {
+    const file = files.get(url);
+    if (!file) throw new Error('The selected folder is missing ' + url + '.');
+    return file.text();
+  };
   const objectUrls = new Map();
   const resolveMediaUrl = (url) => {
     const file = files.get(url);
@@ -920,7 +926,100 @@ async function loadCollectionExperienceFromFiles(experienceId, fileList) {
     if (!objectUrls.has(url)) objectUrls.set(url, URL.createObjectURL(file));
     return objectUrls.get(url);
   };
-  return normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience, resolveMediaUrl });
+  return loadCollectionExperienceWithReader(experienceId, { text, resolveMediaUrl });
+}
+
+function relativeCollectionPath(url) {
+  const prefix = COLLECTION_ROOT + '/';
+  if (!String(url).startsWith(prefix)) throw new Error('Collection path is outside data/collections: ' + url + '.');
+  return String(url).slice(prefix.length);
+}
+
+async function fileHandleAt(rootHandle, url) {
+  const parts = relativeCollectionPath(url).split('/').filter(Boolean);
+  const filename = parts.pop();
+  let directory = rootHandle;
+  for (const part of parts) directory = await directory.getDirectoryHandle(part);
+  return directory.getFileHandle(filename);
+}
+
+class WritableCollectionWorkspace {
+  constructor(rootHandle) {
+    this.rootHandle = rootHandle;
+    this.languageFiles = new Map();
+    this.baselines = new Map();
+    this.objectUrls = new Map();
+  }
+
+  async readFile(url) {
+    try {
+      return await (await fileHandleAt(this.rootHandle, url)).getFile();
+    } catch (error) {
+      throw new Error('The selected collections folder is missing ' + relativeCollectionPath(url) + '.');
+    }
+  }
+
+  async readText(url) {
+    return (await this.readFile(url)).text();
+  }
+
+  async load(experienceId) {
+    this.languageFiles.clear();
+    this.baselines.clear();
+    const dataset = await loadCollectionExperienceWithReader(experienceId, {
+      text: async (url) => {
+        const value = await this.readText(url);
+        if ([...this.languageFiles.values()].includes(url)) this.baselines.set(url, value);
+        return value;
+      },
+      onLanguageFile: (language, url) => this.languageFiles.set(language, url),
+      resolveMediaUrl: (url) => {
+        if (!this.objectUrls.has(url)) {
+          const promise = this.readFile(url).then((file) => URL.createObjectURL(file));
+          this.objectUrls.set(url, promise);
+        }
+        return this.objectUrls.get(url);
+      }
+    });
+    for (const row of dataset.rows) {
+      for (const field of ['chantFullSaUrl', 'chapterIconUrl']) {
+        if (row.media[field] instanceof Promise) row.media[field] = await row.media[field];
+      }
+    }
+    return dataset;
+  }
+
+  async saveLanguageMasters(dataset, languages) {
+    const pending = [];
+    for (const language of [...new Set(languages)].sort()) {
+      const url = this.languageFiles.get(language);
+      if (!url) throw new Error('The workspace does not define master data for ' + language + '.');
+      const handle = await fileHandleAt(this.rootHandle, url);
+      const current = await (await handle.getFile()).text();
+      if (current !== this.baselines.get(url)) {
+        const error = new Error('The local ' + url.split('/').pop() + ' changed outside Gitaverse. Reload the collections folder before saving.');
+        error.code = 'WORKSPACE_CONFLICT';
+        throw error;
+      }
+      pending.push({ language, url, handle, content: serializeLanguageMaster(dataset, language) });
+    }
+    for (const entry of pending) {
+      const writable = await entry.handle.createWritable();
+      await writable.write(entry.content);
+      await writable.close();
+      const verified = await (await entry.handle.getFile()).text();
+      if (verified !== entry.content) throw new Error('Could not verify the saved ' + entry.url.split('/').pop() + '.');
+      this.baselines.set(entry.url, verified);
+    }
+    return pending.map((entry) => entry.url.split('/').pop());
+  }
+}
+
+async function openWritableCollectionWorkspace(experienceId, directoryHandle) {
+  if (!directoryHandle || directoryHandle.kind !== 'directory') throw new Error('Choose the data/collections folder.');
+  const workspace = new WritableCollectionWorkspace(directoryHandle);
+  const dataset = await workspace.load(experienceId);
+  return { dataset, workspace };
 }
 
 function serializeLanguageMaster(dataset, language) {
@@ -1188,12 +1287,13 @@ function availableExperiences() {
 
 // Source: js/player2/editor.js
 class InlineEditor {
-  constructor({ dataset, renderer, currentRow, rerender, onStateChange }) {
+  constructor({ dataset, renderer, currentRow, rerender, workspace = null, onStateChange }) {
     this.dataset = dataset;
     this.renderer = renderer;
     this.currentRow = currentRow;
     this.rerender = rerender;
     this.onStateChange = onStateChange || (() => {});
+    this.workspace = workspace;
     this.active = false;
     this.dirty = false;
     this.savedChanges = false;
@@ -1244,9 +1344,9 @@ class InlineEditor {
     this.updateUi();
   }
 
-  toggle() {
+  async toggle() {
     if (!this.active) this.enter();
-    else if (!this.dirty || this.save()) {
+    else if (!this.dirty || await this.save()) {
       this.exit();
       this.rerender();
     }
@@ -1262,7 +1362,7 @@ class InlineEditor {
     this.updateUi();
   }
 
-  save() {
+  async save() {
     if (!this.active) return true;
     const elements = this.renderer.editableElements();
     const invalid = elements.find((element) => element.innerText.includes('#'));
@@ -1272,23 +1372,51 @@ class InlineEditor {
       return false;
     }
     const row = this.currentRow();
+    const changes = [];
+    const languages = new Set();
     elements.forEach((element) => {
       const field = element.dataset.editField;
       const parts = field.split('.');
       const property = parts.pop();
       const target = parts.reduce((value, part) => value[part], row);
-      target[property] = element.innerText.replace(/\r/g, '').replace(/\n$/, '');
-      this.changedLanguages.add(field.startsWith('source.') ? 'sa' : field.split('.')[1]);
+      const value = element.innerText.replace(/\r/g, '').replace(/\n$/, '');
+      if (target[property] !== value) {
+        changes.push({ target, property, previous: target[property], value });
+        target[property] = value;
+        languages.add(field.startsWith('source.') ? 'sa' : field.split('.')[1]);
+      }
       element.setAttribute('aria-invalid', 'false');
     });
-    this.dirty = false;
-    this.savedChanges = true;
-    this.pendingDownload = true;
-    this.savedRevision += 1;
-    this.toolbar.querySelector('.edit-status').textContent = 'Saved in this browser session';
-    this.rerender({ keepEditing: true });
-    this.updateUi();
-    return true;
+    if (!changes.length) {
+      this.dirty = false;
+      this.toolbar.querySelector('.edit-status').textContent = 'No changes to save';
+      this.updateUi();
+      return true;
+    }
+    const saveButton = this.toolbar.querySelector('.save-edit');
+    saveButton.disabled = true;
+    this.toolbar.querySelector('.edit-status').textContent = this.workspace ? 'Saving to collections…' : 'Saving in this browser…';
+    try {
+      let savedFiles = [];
+      if (this.workspace) savedFiles = await this.workspace.saveLanguageMasters(this.dataset, languages);
+      languages.forEach((language) => this.changedLanguages.add(language));
+      this.dirty = false;
+      this.savedChanges = true;
+      this.pendingDownload = !this.workspace;
+      this.savedRevision += 1;
+      this.toolbar.querySelector('.edit-status').textContent = this.workspace
+        ? 'Saved to ' + savedFiles.join(' and ')
+        : 'Saved in this browser session';
+      this.rerender({ keepEditing: true });
+      this.updateUi();
+      return true;
+    } catch (error) {
+      changes.forEach(({ target, property, previous }) => { target[property] = previous; });
+      this.toolbar.querySelector('.edit-status').textContent = error.message || 'The local collections could not be saved.';
+      this.dirty = true;
+      this.updateUi();
+      return false;
+    }
   }
 
   cancel() {
@@ -1307,8 +1435,8 @@ class InlineEditor {
     return true;
   }
 
-  download() {
-    if (this.dirty && !this.save()) return;
+  async download() {
+    if (this.dirty && !await this.save()) return;
     Array.from(this.changedLanguages).sort().forEach((language) => {
       const blob = new Blob([serializeLanguageMaster(this.dataset, language)], { type: 'text/csv;charset=utf-8' });
       const link = document.createElement('a');
@@ -1332,6 +1460,7 @@ class InlineEditor {
       dirty: this.dirty,
       savedChanges: this.savedChanges,
       pendingDownload: this.pendingDownload,
+      workspace: Boolean(this.workspace),
       savedRevision: this.savedRevision
     });
   }
@@ -1605,13 +1734,13 @@ async function startRequestedExperience() {
   }
 }
 
-async function startPlayer(dataset, experience) {
+async function startPlayer(dataset, experience, { workspace = null, sid = requestedSid } = {}) {
   if (state.editor) state.editor.destroy();
   if (state.renderer) state.renderer.destroy();
   state.dataset = dataset;
   state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
-  const requestedIndex = requestedSid ? findSid(requestedSid) : -1;
-  if (state.locationSource === 'resume' && requestedSid && requestedIndex < 0) {
+  const requestedIndex = sid ? findSid(sid) : -1;
+  if (state.locationSource === 'resume' && sid && requestedIndex < 0) {
     state.locationSource = null;
     return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
   }
@@ -1627,14 +1756,15 @@ async function startPlayer(dataset, experience) {
     renderer: state.renderer,
     currentRow,
     rerender: (options = {}) => render({ ...options, trackLocation: false }),
-    onStateChange: ({ active, savedChanges, pendingDownload, savedRevision }) => {
+    workspace,
+    onStateChange: ({ active, savedChanges, pendingDownload, workspace: hasWorkspace, savedRevision }) => {
       document.querySelector('#edit-button .top-menu-label').textContent = active ? 'Leave edit mode' : 'Edit this shloka';
       if (savedRevision > state.lastSavedRevision) {
         state.lastSavedRevision = savedRevision;
         state.downloadReminderDismissed = false;
       }
       const reminder = document.getElementById('download-reminder');
-      reminder.hidden = !savedChanges || state.downloadReminderDismissed;
+      reminder.hidden = hasWorkspace || !savedChanges || state.downloadReminderDismissed;
       const action = document.getElementById('download-reminder-action');
       action.textContent = pendingDownload ? '↓ Download edited language files' : '↓ Download again';
     }
@@ -1643,7 +1773,7 @@ async function startPlayer(dataset, experience) {
   bindEvents();
   buildChapterList();
   showOnly('app');
-  render({ source: state.locationSource || (requestedSid ? 'deep_link' : 'experience_selection') });
+  render({ source: state.locationSource || (sid ? 'deep_link' : 'experience_selection') });
 }
 
 function showDataChooser(message) {
@@ -1831,18 +1961,61 @@ function openOverlay(id) {
       button.setAttribute('aria-pressed', button.dataset.language === state.language ? 'true' : 'false');
     });
     requestAnimationFrame(() => document.querySelector('.language-option.active')?.focus());
+  } else if (id === 'workspace-overlay') {
+    document.getElementById('workspace-error').textContent = '';
+    requestAnimationFrame(() => document.getElementById('open-collections-workspace').focus());
   }
 }
 
 function closeOverlays({ restoreFocus = true } = {}) {
   let closed = false;
-  ['goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay', 'profile-menu-overlay', 'about-overlay'].forEach((id) => {
+  ['workspace-overlay', 'goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay', 'profile-menu-overlay', 'about-overlay'].forEach((id) => {
     const overlay = document.getElementById(id);
     if (!overlay.hidden) { overlay.hidden = true; closed = true; }
   });
   if (closed && restoreFocus && state.overlayOpener && document.contains(state.overlayOpener)) state.overlayOpener.focus();
   if (closed) state.overlayOpener = null;
   return closed;
+}
+
+async function requestEditMode() {
+  setMenuOpen(false);
+  if (state.editor.active) return state.editor.toggle();
+  openOverlay('workspace-overlay');
+}
+
+async function openCollectionsWorkspace() {
+  const message = document.getElementById('workspace-error');
+  const button = document.getElementById('open-collections-workspace');
+  if (typeof window.showDirectoryPicker !== 'function') {
+    message.textContent = 'Direct folder saving is not supported by this browser. Use a current Chrome or Edge browser, or choose “Edit with downloads only”.';
+    return;
+  }
+  button.disabled = true;
+  message.textContent = 'Opening and validating the collections folder…';
+  try {
+    const handle = await window.showDirectoryPicker({ id: 'gitaverse-collections', mode: 'readwrite' });
+    const permission = { mode: 'readwrite' };
+    if (handle.queryPermission && await handle.queryPermission(permission) !== 'granted') {
+      if (!handle.requestPermission || await handle.requestPermission(permission) !== 'granted') {
+        throw new Error('Read and write access to the collections folder was not granted.');
+      }
+    }
+    const sid = currentRow().sid;
+    const { dataset, workspace } = await openWritableCollectionWorkspace(play, handle);
+    closeOverlays({ restoreFocus: false });
+    await startPlayer(dataset, getExperience(play), { workspace, sid });
+    state.editor.enter();
+  } catch (error) {
+    if (error?.name !== 'AbortError') message.textContent = error.message || 'The selected collections folder could not be opened.';
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function enterDownloadOnlyEditMode() {
+  closeOverlays({ restoreFocus: false });
+  state.editor.enter();
 }
 
 function setMenuOpen(open) {
@@ -2049,7 +2222,9 @@ function bindEvents() {
   document.getElementById('profile-form-cancel').addEventListener('click', () => {
     showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'chooser'));
   });
-  document.getElementById('edit-button').addEventListener('click', () => { setMenuOpen(false); state.editor.toggle(); });
+  document.getElementById('edit-button').addEventListener('click', requestEditMode);
+  document.getElementById('open-collections-workspace').addEventListener('click', openCollectionsWorkspace);
+  document.getElementById('edit-download-only').addEventListener('click', enterDownloadOnlyEditMode);
   document.getElementById('download-reminder-action').addEventListener('click', () => state.editor.download());
   document.getElementById('download-reminder-close').addEventListener('click', () => {
     if (state.editor.pendingDownload && !window.confirm('Changes have not been downloaded. Are you sure you want to dismiss this reminder?')) return;
@@ -2158,7 +2333,7 @@ function bindEvents() {
     else if (key === 'h') { event.preventDefault(); openOverlay('help-overlay'); }
     else if (key === 'k') { event.preventDefault(); openOverlay('about-overlay'); }
     else if (key === 'm') { event.preventDefault(); toggleMenu(); }
-    else if (key === 'e') { event.preventDefault(); state.editor.toggle(); }
+    else if (key === 'e') { event.preventDefault(); requestEditMode(); }
   });
 }
 

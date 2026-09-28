@@ -1,4 +1,4 @@
-import { loadCollectionExperience, loadCollectionExperienceFromFiles } from './collection-data.js';
+import { loadCollectionExperience, loadCollectionExperienceFromFiles, openWritableCollectionWorkspace } from './collection-data.js';
 import { ProfileStore } from '../profile-store.js';
 import { ProfileUI } from '../profile-ui.js';
 import { EventBus } from '../events/event-bus.js';
@@ -266,13 +266,13 @@ async function startRequestedExperience() {
   }
 }
 
-async function startPlayer(dataset, experience) {
+async function startPlayer(dataset, experience, { workspace = null, sid = requestedSid } = {}) {
   if (state.editor) state.editor.destroy();
   if (state.renderer) state.renderer.destroy();
   state.dataset = dataset;
   state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
-  const requestedIndex = requestedSid ? findSid(requestedSid) : -1;
-  if (state.locationSource === 'resume' && requestedSid && requestedIndex < 0) {
+  const requestedIndex = sid ? findSid(sid) : -1;
+  if (state.locationSource === 'resume' && sid && requestedIndex < 0) {
     state.locationSource = null;
     return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
   }
@@ -288,14 +288,15 @@ async function startPlayer(dataset, experience) {
     renderer: state.renderer,
     currentRow,
     rerender: (options = {}) => render({ ...options, trackLocation: false }),
-    onStateChange: ({ active, savedChanges, pendingDownload, savedRevision }) => {
+    workspace,
+    onStateChange: ({ active, savedChanges, pendingDownload, workspace: hasWorkspace, savedRevision }) => {
       document.querySelector('#edit-button .top-menu-label').textContent = active ? 'Leave edit mode' : 'Edit this shloka';
       if (savedRevision > state.lastSavedRevision) {
         state.lastSavedRevision = savedRevision;
         state.downloadReminderDismissed = false;
       }
       const reminder = document.getElementById('download-reminder');
-      reminder.hidden = !savedChanges || state.downloadReminderDismissed;
+      reminder.hidden = hasWorkspace || !savedChanges || state.downloadReminderDismissed;
       const action = document.getElementById('download-reminder-action');
       action.textContent = pendingDownload ? '↓ Download edited language files' : '↓ Download again';
     }
@@ -304,7 +305,7 @@ async function startPlayer(dataset, experience) {
   bindEvents();
   buildChapterList();
   showOnly('app');
-  render({ source: state.locationSource || (requestedSid ? 'deep_link' : 'experience_selection') });
+  render({ source: state.locationSource || (sid ? 'deep_link' : 'experience_selection') });
 }
 
 function showDataChooser(message) {
@@ -492,18 +493,61 @@ function openOverlay(id) {
       button.setAttribute('aria-pressed', button.dataset.language === state.language ? 'true' : 'false');
     });
     requestAnimationFrame(() => document.querySelector('.language-option.active')?.focus());
+  } else if (id === 'workspace-overlay') {
+    document.getElementById('workspace-error').textContent = '';
+    requestAnimationFrame(() => document.getElementById('open-collections-workspace').focus());
   }
 }
 
 function closeOverlays({ restoreFocus = true } = {}) {
   let closed = false;
-  ['goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay', 'profile-menu-overlay', 'about-overlay'].forEach((id) => {
+  ['workspace-overlay', 'goto-overlay', 'chapters-overlay', 'language-overlay', 'help-overlay', 'profile-menu-overlay', 'about-overlay'].forEach((id) => {
     const overlay = document.getElementById(id);
     if (!overlay.hidden) { overlay.hidden = true; closed = true; }
   });
   if (closed && restoreFocus && state.overlayOpener && document.contains(state.overlayOpener)) state.overlayOpener.focus();
   if (closed) state.overlayOpener = null;
   return closed;
+}
+
+async function requestEditMode() {
+  setMenuOpen(false);
+  if (state.editor.active) return state.editor.toggle();
+  openOverlay('workspace-overlay');
+}
+
+async function openCollectionsWorkspace() {
+  const message = document.getElementById('workspace-error');
+  const button = document.getElementById('open-collections-workspace');
+  if (typeof window.showDirectoryPicker !== 'function') {
+    message.textContent = 'Direct folder saving is not supported by this browser. Use a current Chrome or Edge browser, or choose “Edit with downloads only”.';
+    return;
+  }
+  button.disabled = true;
+  message.textContent = 'Opening and validating the collections folder…';
+  try {
+    const handle = await window.showDirectoryPicker({ id: 'gitaverse-collections', mode: 'readwrite' });
+    const permission = { mode: 'readwrite' };
+    if (handle.queryPermission && await handle.queryPermission(permission) !== 'granted') {
+      if (!handle.requestPermission || await handle.requestPermission(permission) !== 'granted') {
+        throw new Error('Read and write access to the collections folder was not granted.');
+      }
+    }
+    const sid = currentRow().sid;
+    const { dataset, workspace } = await openWritableCollectionWorkspace(play, handle);
+    closeOverlays({ restoreFocus: false });
+    await startPlayer(dataset, getExperience(play), { workspace, sid });
+    state.editor.enter();
+  } catch (error) {
+    if (error?.name !== 'AbortError') message.textContent = error.message || 'The selected collections folder could not be opened.';
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function enterDownloadOnlyEditMode() {
+  closeOverlays({ restoreFocus: false });
+  state.editor.enter();
 }
 
 function setMenuOpen(open) {
@@ -710,7 +754,9 @@ function bindEvents() {
   document.getElementById('profile-form-cancel').addEventListener('click', () => {
     showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'chooser'));
   });
-  document.getElementById('edit-button').addEventListener('click', () => { setMenuOpen(false); state.editor.toggle(); });
+  document.getElementById('edit-button').addEventListener('click', requestEditMode);
+  document.getElementById('open-collections-workspace').addEventListener('click', openCollectionsWorkspace);
+  document.getElementById('edit-download-only').addEventListener('click', enterDownloadOnlyEditMode);
   document.getElementById('download-reminder-action').addEventListener('click', () => state.editor.download());
   document.getElementById('download-reminder-close').addEventListener('click', () => {
     if (state.editor.pendingDownload && !window.confirm('Changes have not been downloaded. Are you sure you want to dismiss this reminder?')) return;
@@ -819,7 +865,7 @@ function bindEvents() {
     else if (key === 'h') { event.preventDefault(); openOverlay('help-overlay'); }
     else if (key === 'k') { event.preventDefault(); openOverlay('about-overlay'); }
     else if (key === 'm') { event.preventDefault(); toggleMenu(); }
-    else if (key === 'e') { event.preventDefault(); state.editor.toggle(); }
+    else if (key === 'e') { event.preventDefault(); requestEditMode(); }
   });
 }
 

@@ -1,12 +1,13 @@
 import { serializeLanguageMaster } from './collection-data.js';
 
 export class InlineEditor {
-  constructor({ dataset, renderer, currentRow, rerender, onStateChange }) {
+  constructor({ dataset, renderer, currentRow, rerender, workspace = null, onStateChange }) {
     this.dataset = dataset;
     this.renderer = renderer;
     this.currentRow = currentRow;
     this.rerender = rerender;
     this.onStateChange = onStateChange || (() => {});
+    this.workspace = workspace;
     this.active = false;
     this.dirty = false;
     this.savedChanges = false;
@@ -57,9 +58,9 @@ export class InlineEditor {
     this.updateUi();
   }
 
-  toggle() {
+  async toggle() {
     if (!this.active) this.enter();
-    else if (!this.dirty || this.save()) {
+    else if (!this.dirty || await this.save()) {
       this.exit();
       this.rerender();
     }
@@ -75,7 +76,7 @@ export class InlineEditor {
     this.updateUi();
   }
 
-  save() {
+  async save() {
     if (!this.active) return true;
     const elements = this.renderer.editableElements();
     const invalid = elements.find((element) => element.innerText.includes('#'));
@@ -85,23 +86,51 @@ export class InlineEditor {
       return false;
     }
     const row = this.currentRow();
+    const changes = [];
+    const languages = new Set();
     elements.forEach((element) => {
       const field = element.dataset.editField;
       const parts = field.split('.');
       const property = parts.pop();
       const target = parts.reduce((value, part) => value[part], row);
-      target[property] = element.innerText.replace(/\r/g, '').replace(/\n$/, '');
-      this.changedLanguages.add(field.startsWith('source.') ? 'sa' : field.split('.')[1]);
+      const value = element.innerText.replace(/\r/g, '').replace(/\n$/, '');
+      if (target[property] !== value) {
+        changes.push({ target, property, previous: target[property], value });
+        target[property] = value;
+        languages.add(field.startsWith('source.') ? 'sa' : field.split('.')[1]);
+      }
       element.setAttribute('aria-invalid', 'false');
     });
-    this.dirty = false;
-    this.savedChanges = true;
-    this.pendingDownload = true;
-    this.savedRevision += 1;
-    this.toolbar.querySelector('.edit-status').textContent = 'Saved in this browser session';
-    this.rerender({ keepEditing: true });
-    this.updateUi();
-    return true;
+    if (!changes.length) {
+      this.dirty = false;
+      this.toolbar.querySelector('.edit-status').textContent = 'No changes to save';
+      this.updateUi();
+      return true;
+    }
+    const saveButton = this.toolbar.querySelector('.save-edit');
+    saveButton.disabled = true;
+    this.toolbar.querySelector('.edit-status').textContent = this.workspace ? 'Saving to collections…' : 'Saving in this browser…';
+    try {
+      let savedFiles = [];
+      if (this.workspace) savedFiles = await this.workspace.saveLanguageMasters(this.dataset, languages);
+      languages.forEach((language) => this.changedLanguages.add(language));
+      this.dirty = false;
+      this.savedChanges = true;
+      this.pendingDownload = !this.workspace;
+      this.savedRevision += 1;
+      this.toolbar.querySelector('.edit-status').textContent = this.workspace
+        ? 'Saved to ' + savedFiles.join(' and ')
+        : 'Saved in this browser session';
+      this.rerender({ keepEditing: true });
+      this.updateUi();
+      return true;
+    } catch (error) {
+      changes.forEach(({ target, property, previous }) => { target[property] = previous; });
+      this.toolbar.querySelector('.edit-status').textContent = error.message || 'The local collections could not be saved.';
+      this.dirty = true;
+      this.updateUi();
+      return false;
+    }
   }
 
   cancel() {
@@ -120,8 +149,8 @@ export class InlineEditor {
     return true;
   }
 
-  download() {
-    if (this.dirty && !this.save()) return;
+  async download() {
+    if (this.dirty && !await this.save()) return;
     Array.from(this.changedLanguages).sort().forEach((language) => {
       const blob = new Blob([serializeLanguageMaster(this.dataset, language)], { type: 'text/csv;charset=utf-8' });
       const link = document.createElement('a');
@@ -145,6 +174,7 @@ export class InlineEditor {
       dirty: this.dirty,
       savedChanges: this.savedChanges,
       pendingDownload: this.pendingDownload,
+      workspace: Boolean(this.workspace),
       savedRevision: this.savedRevision
     });
   }

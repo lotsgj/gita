@@ -182,14 +182,7 @@ function selectedCollectionFiles(fileList) {
   return files;
 }
 
-export async function loadCollectionExperienceFromFiles(experienceId, fileList) {
-  const files = selectedCollectionFiles(fileList);
-  if (!files.size) throw new Error('Choose the data/collections folder.');
-  const text = async (url) => {
-    const file = files.get(url);
-    if (!file) throw new Error('The selected folder is missing ' + url + '.');
-    return file.text();
-  };
+async function loadCollectionExperienceWithReader(experienceId, { text, resolveMediaUrl, onLanguageFile = () => {} }) {
   const table = async (url, headers = null) => parseCollectionTable(await text(url), headers, url);
   const experienceRegistry = await table(COLLECTION_ROOT + '/experiences/collection.csv');
   const experienceEntry = registryEntry(experienceRegistry, experienceId, 'Experience');
@@ -199,10 +192,12 @@ export async function loadCollectionExperienceFromFiles(experienceId, fileList) 
   const verseRegistry = await table(COLLECTION_ROOT + '/verses/collection.csv');
   const verseEntry = registryEntry(verseRegistry, experience.verseCollection, 'Verse');
   const verseCatalog = await table(verseEntry.catalog_url, ['language', 'content_type', 'content_url']);
+  const languageUrls = Object.fromEntries(['sa', 'en', 'kn'].map((language) => [language, languageFile(verseCatalog, language)]));
+  Object.entries(languageUrls).forEach(([language, url]) => onLanguageFile(language, url));
   const [sa, en, kn, audioComposition, imageComposition] = await Promise.all([
-    table(languageFile(verseCatalog, 'sa'), MASTER_HEADERS.sa),
-    table(languageFile(verseCatalog, 'en'), MASTER_HEADERS.en),
-    table(languageFile(verseCatalog, 'kn'), MASTER_HEADERS.kn),
+    table(languageUrls.sa, MASTER_HEADERS.sa),
+    table(languageUrls.en, MASTER_HEADERS.en),
+    table(languageUrls.kn, MASTER_HEADERS.kn),
     table(catalogEntry(experienceCatalog, 'audio', experienceId), ['cid', 'snum', 'sid', 'chant_full_sa_collection', 'chant_full_sa_order']),
     table(catalogEntry(experienceCatalog, 'images', experienceId), ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order'])
   ]);
@@ -218,6 +213,17 @@ export async function loadCollectionExperienceFromFiles(experienceId, fileList) 
     localCatalogs('audio', audioComposition, 'chant_full_sa_collection', ['sid', 'order', 'language', 'audio_url']),
     localCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url'])
   ]);
+  return normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience, resolveMediaUrl });
+}
+
+export async function loadCollectionExperienceFromFiles(experienceId, fileList) {
+  const files = selectedCollectionFiles(fileList);
+  if (!files.size) throw new Error('Choose the data/collections folder.');
+  const text = async (url) => {
+    const file = files.get(url);
+    if (!file) throw new Error('The selected folder is missing ' + url + '.');
+    return file.text();
+  };
   const objectUrls = new Map();
   const resolveMediaUrl = (url) => {
     const file = files.get(url);
@@ -225,7 +231,100 @@ export async function loadCollectionExperienceFromFiles(experienceId, fileList) 
     if (!objectUrls.has(url)) objectUrls.set(url, URL.createObjectURL(file));
     return objectUrls.get(url);
   };
-  return normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience, resolveMediaUrl });
+  return loadCollectionExperienceWithReader(experienceId, { text, resolveMediaUrl });
+}
+
+function relativeCollectionPath(url) {
+  const prefix = COLLECTION_ROOT + '/';
+  if (!String(url).startsWith(prefix)) throw new Error('Collection path is outside data/collections: ' + url + '.');
+  return String(url).slice(prefix.length);
+}
+
+async function fileHandleAt(rootHandle, url) {
+  const parts = relativeCollectionPath(url).split('/').filter(Boolean);
+  const filename = parts.pop();
+  let directory = rootHandle;
+  for (const part of parts) directory = await directory.getDirectoryHandle(part);
+  return directory.getFileHandle(filename);
+}
+
+export class WritableCollectionWorkspace {
+  constructor(rootHandle) {
+    this.rootHandle = rootHandle;
+    this.languageFiles = new Map();
+    this.baselines = new Map();
+    this.objectUrls = new Map();
+  }
+
+  async readFile(url) {
+    try {
+      return await (await fileHandleAt(this.rootHandle, url)).getFile();
+    } catch (error) {
+      throw new Error('The selected collections folder is missing ' + relativeCollectionPath(url) + '.');
+    }
+  }
+
+  async readText(url) {
+    return (await this.readFile(url)).text();
+  }
+
+  async load(experienceId) {
+    this.languageFiles.clear();
+    this.baselines.clear();
+    const dataset = await loadCollectionExperienceWithReader(experienceId, {
+      text: async (url) => {
+        const value = await this.readText(url);
+        if ([...this.languageFiles.values()].includes(url)) this.baselines.set(url, value);
+        return value;
+      },
+      onLanguageFile: (language, url) => this.languageFiles.set(language, url),
+      resolveMediaUrl: (url) => {
+        if (!this.objectUrls.has(url)) {
+          const promise = this.readFile(url).then((file) => URL.createObjectURL(file));
+          this.objectUrls.set(url, promise);
+        }
+        return this.objectUrls.get(url);
+      }
+    });
+    for (const row of dataset.rows) {
+      for (const field of ['chantFullSaUrl', 'chapterIconUrl']) {
+        if (row.media[field] instanceof Promise) row.media[field] = await row.media[field];
+      }
+    }
+    return dataset;
+  }
+
+  async saveLanguageMasters(dataset, languages) {
+    const pending = [];
+    for (const language of [...new Set(languages)].sort()) {
+      const url = this.languageFiles.get(language);
+      if (!url) throw new Error('The workspace does not define master data for ' + language + '.');
+      const handle = await fileHandleAt(this.rootHandle, url);
+      const current = await (await handle.getFile()).text();
+      if (current !== this.baselines.get(url)) {
+        const error = new Error('The local ' + url.split('/').pop() + ' changed outside Gitaverse. Reload the collections folder before saving.');
+        error.code = 'WORKSPACE_CONFLICT';
+        throw error;
+      }
+      pending.push({ language, url, handle, content: serializeLanguageMaster(dataset, language) });
+    }
+    for (const entry of pending) {
+      const writable = await entry.handle.createWritable();
+      await writable.write(entry.content);
+      await writable.close();
+      const verified = await (await entry.handle.getFile()).text();
+      if (verified !== entry.content) throw new Error('Could not verify the saved ' + entry.url.split('/').pop() + '.');
+      this.baselines.set(entry.url, verified);
+    }
+    return pending.map((entry) => entry.url.split('/').pop());
+  }
+}
+
+export async function openWritableCollectionWorkspace(experienceId, directoryHandle) {
+  if (!directoryHandle || directoryHandle.kind !== 'directory') throw new Error('Choose the data/collections folder.');
+  const workspace = new WritableCollectionWorkspace(directoryHandle);
+  const dataset = await workspace.load(experienceId);
+  return { dataset, workspace };
 }
 
 export function serializeLanguageMaster(dataset, language) {

@@ -50,16 +50,43 @@ async function run() {
   const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext({ acceptDownloads: true });
   const page = await context.newPage();
+  await page.addInitScript(({ baseUrl }) => {
+    const writes = {};
+    window.__workspaceWrites = writes;
+    const directory = (prefix = '') => ({
+      kind: 'directory',
+      name: prefix.split('/').filter(Boolean).at(-1) || 'collections',
+      async getDirectoryHandle(name) { return directory(prefix + name + '/'); },
+      async getFileHandle(name) {
+        const relative = prefix + name;
+        return {
+          kind: 'file',
+          name,
+          async getFile() {
+            if (Object.hasOwn(writes, relative)) return new File([writes[relative]], name);
+            const response = await fetch(baseUrl + '/data/collections/' + relative);
+            if (!response.ok) throw new Error('Missing workspace file: ' + relative);
+            return new File([await response.blob()], name);
+          },
+          async createWritable() {
+            let value = '';
+            return {
+              async write(next) { value = String(next); },
+              async close() { writes[relative] = value; }
+            };
+          }
+        };
+      },
+      async queryPermission() { return 'granted'; },
+      async requestPermission() { return 'granted'; }
+    });
+    window.showDirectoryPicker = async () => directory();
+  }, { baseUrl: base });
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
 
   try {
-    const redirectPage = await context.newPage();
-    await redirectPage.goto(`${base}/player2.html?play=gita-700&sid=6.7&lang=kn`, { waitUntil: 'networkidle' });
-    assert.match(redirectPage.url(), /\/player\.html\?play=gita-700&sid=6\.7&lang=kn$/);
-    await redirectPage.close();
-
     await page.goto(`${base}/player.html?play=gita-700&sid=6.7&lang=kn`, { waitUntil: 'networkidle' });
     await createProfile(page);
     await page.getByRole('link', { name: /Gita 700/ }).click();
@@ -143,17 +170,33 @@ async function run() {
 
     await page.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
     await page.keyboard.press('e');
+    await page.locator('#workspace-overlay').waitFor({ state: 'visible' });
+    await page.getByRole('button', { name: 'Open collections folder' }).click();
     const meaning = page.locator('[data-edit-field="languages.en.meaning"]');
+    await meaning.waitFor();
+    assert.equal(await meaning.getAttribute('contenteditable'), 'true');
     await meaning.fill('Regression edited meaning');
     await page.getByRole('button', { name: 'Save row' }).click();
+    await page.waitForFunction(() => Object.keys(window.__workspaceWrites || {}).length === 1);
     assert.equal(await meaning.innerText(), 'Regression edited meaning');
+    assert.equal(await page.locator('#download-reminder').isVisible(), false);
+    const workspaceWrites = await page.evaluate(() => ({ ...window.__workspaceWrites }));
+    assert.deepEqual(Object.keys(workspaceWrites), ['verses/bhagavad-gita/master_en.csv']);
+    assert.match(workspaceWrites['verses/bhagavad-gita/master_en.csv'], /Regression edited meaning/);
+
+    await page.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
+    await page.keyboard.press('e');
+    await page.getByRole('button', { name: 'Edit with downloads only' }).click();
+    const fallbackMeaning = page.locator('[data-edit-field="languages.en.meaning"]');
+    await fallbackMeaning.fill('Regression downloaded meaning');
+    await page.getByRole('button', { name: 'Save row' }).click();
     assert.equal(await page.locator('#download-reminder').isVisible(), true);
     const downloadPromise = page.waitForEvent('download');
     await page.locator('#download-reminder-action').click();
     const download = await downloadPromise;
     assert.equal(download.suggestedFilename(), 'master_en.csv');
     const downloadPath = await download.path();
-    assert.match(fs.readFileSync(downloadPath, 'utf8'), /Regression edited meaning/);
+    assert.match(fs.readFileSync(downloadPath, 'utf8'), /Regression downloaded meaning/);
 
     await page.goto(`${base}/player.html?pid=1`, { waitUntil: 'networkidle' });
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
@@ -224,6 +267,8 @@ async function run() {
     assert.equal(await filePage.locator('#sid-label').innerText(), '1.B');
     await filePage.keyboard.press('ArrowRight');
     assert.match(await filePage.locator('#audio').getAttribute('src'), /^blob:/);
+    await filePage.keyboard.press('e');
+    assert.equal(await filePage.locator('#workspace-overlay').isVisible(), true);
     await fileContext.close();
 
     assert.deepEqual(errors, [], 'browser console/page errors');
@@ -241,7 +286,7 @@ async function run() {
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.locator('#sid-label').waitFor();
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
-    console.log('PASS: Player 2 browser parity, editing/export, profiles, file mode, mobile layout/swipe, resume, and offline reload');
+    console.log('PASS: collection player browser parity, direct workspace editing, download fallback, profiles, file mode, mobile layout/swipe, resume, and offline reload');
   } finally {
     if (server.listening) await new Promise((resolve) => server.close(resolve));
     await context.close();
