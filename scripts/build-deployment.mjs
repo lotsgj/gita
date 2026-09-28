@@ -61,7 +61,18 @@ if (clarityProjectId && !/^[a-z0-9]+$/i.test(clarityProjectId)) throw new Error(
 
 run(process.execPath, ['scripts/build-verse-player.mjs']);
 run(process.execPath, ['--check', 'js/player.bundle.js']);
-run(process.execPath, ['scripts/test-event-bus.mjs']);
+run(process.execPath, ['scripts/build-player2.mjs']);
+run(process.execPath, ['--check', 'js/player2.bundle.js']);
+run(process.execPath, ['--test',
+  'tests/unit/event-bus.test.mjs',
+  'tests/unit/gita-700-renderer.test.mjs',
+  'tests/unit/master-data.test.mjs',
+  'tests/unit/player2-collection-data.test.mjs',
+  'tests/unit/player2-renderer.test.mjs',
+  'tests/contract/collections.test.mjs',
+  'tests/contract/migration-equivalence.test.mjs',
+  'tests/contract/player2-isolation.test.mjs'
+]);
 run('python3', ['scripts/validate_master.py', 'data/master.csv']);
 
 await rm(output, { recursive: true, force: true });
@@ -80,6 +91,15 @@ if (!deployedHtml.includes(`<meta name="clarity-project-id" content="${clarityPr
 }
 
 await writeFile(path.join(output, 'player.html'), deployedHtml);
+const player2Source = await readFile(path.join(root, 'player2.html'), 'utf8');
+const deployedPlayer2 = player2Source
+  .replace('<meta name="app-version" content="dev">', `<meta name="app-version" content="${version}">`)
+  .replace('<meta name="clarity-project-id" content="">', `<meta name="clarity-project-id" content="${clarityProjectId}">`)
+  .replaceAll('?v=dev', `?v=${encodeURIComponent(version)}`);
+if (deployedPlayer2 === player2Source || deployedPlayer2.includes('?v=dev') || deployedPlayer2.includes('content="dev"')) {
+  throw new Error('player2.html does not contain the expected development version markers.');
+}
+await writeFile(path.join(output, 'player2.html'), deployedPlayer2);
 await cp(path.join(root, 'index.html'), path.join(output, 'index.html'));
 await cp(path.join(root, 'CNAME'), path.join(output, 'CNAME'));
 await cp(path.join(root, 'manifest.webmanifest'), path.join(output, 'manifest.webmanifest'));
@@ -90,6 +110,7 @@ await writeFile(path.join(output, 'service-worker.js'), serviceWorkerSource.repl
 await copyDirectory(path.join(root, 'css'), path.join(output, 'css'), (relative) => !relative.endsWith('.DS_Store'));
 await copyDirectory(path.join(root, 'assets'), path.join(output, 'assets'), (relative) => !relative.endsWith('.DS_Store'));
 await cp(path.join(root, 'js/player.bundle.js'), path.join(output, 'js/player.bundle.js'));
+await cp(path.join(root, 'js/player2.bundle.js'), path.join(output, 'js/player2.bundle.js'));
 await copyDirectory(path.join(root, 'data'), path.join(output, 'data'), (relative) => {
   return !relative.endsWith('.DS_Store') && relative !== 'app-version.json';
 });
@@ -110,16 +131,19 @@ for (const absolute of await walk(output)) {
 
 const precache = Object.keys(assets).filter((relative) => {
   return relative === 'player.html'
+    || relative === 'player2.html'
     || relative === 'index.html'
     || relative === 'offline.html'
     || relative === 'manifest.webmanifest'
     || relative === 'data/master.csv'
     || relative === 'data/app-version.json'
     || relative === 'js/player.bundle.js'
+    || relative === 'js/player2.bundle.js'
     || relative.startsWith('css/')
     || relative.startsWith('assets/icons/')
     || relative.startsWith('data/images/')
-    || relative.startsWith('data/gita-700/icons/');
+    || relative.startsWith('data/gita-700/icons/')
+    || relative.startsWith('data/collections/');
 });
 const assetManifest = { version, generatedAt: builtAt, assets, precache };
 await writeFile(path.join(output, 'asset-manifest.json'), JSON.stringify(assetManifest, null, 2) + '\n');

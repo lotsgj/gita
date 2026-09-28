@@ -1,0 +1,16 @@
+{
+  "id": "gita-700",
+  "schemaVersion": 1,
+  "title": "Gita 700",
+  "verseCollection": "bhagavad-gita",
+  "languages": [
+    "sa",
+    "en",
+    "kn"
+  ],
+  "renderer": "gita-700",
+  "resources": {
+    "audio": "data/collections/experiences/gita-700/audio.csv",
+    "images": "data/collections/experiences/gita-700/images.csv"
+  }
+}

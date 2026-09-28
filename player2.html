@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4efe5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="app-version" content="dev">
+<meta name="clarity-project-id" content="">
+<title>Gitaverse Player 2</title>
+<meta name="description" content="Explore and chant the verses of the Bhagavad Gita with Gitaverse.">
+<link rel="canonical" href="https://gitaverse.gitajyoti.org/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Gitaverse">
+<meta property="og:title" content="Gitaverse">
+<meta property="og:description" content="Explore and chant the verses of the Bhagavad Gita with Gitaverse.">
+<meta property="og:url" content="https://gitaverse.gitajyoti.org/">
+<meta property="og:image" content="https://gitaverse.gitajyoti.org/assets/social/gitaverse-preview.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Gitaverse with a Krishna flute and the title Shrimad Bhagavad Gita">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Gitaverse">
+<meta name="twitter:description" content="Explore and chant the verses of the Bhagavad Gita with Gitaverse.">
+<meta name="twitter:image" content="https://gitaverse.gitajyoti.org/assets/social/gitaverse-preview.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icons/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/player.css?v=dev">
+<link rel="stylesheet" href="css/editor.css?v=dev">
+<link rel="stylesheet" href="css/renderers/gita-700.css?v=dev">
+<link rel="stylesheet" href="css/player2.css?v=dev">
+
+</head>
+<body>
+<main id="profile-setup" class="profile-screen" data-clarity-mask="true" hidden>
+  <section class="profile-form-card">
+    <div class="status-mark">ॐ</div>
+    <h1 id="profile-form-title">Create your profile</h1>
+    <p id="profile-form-intro">Profiles keep each person’s language and experience separate on this device.</p>
+    <form id="profile-form">
+      <div class="profile-photo-field">
+        <div id="profile-photo-preview"></div>
+        <div class="profile-photo-actions">
+          <label class="secondary-button" for="profile-photo">Choose photo</label>
+          <input id="profile-photo" type="file" accept="image/*" hidden>
+          <button class="quiet-button" id="profile-photo-remove" type="button" hidden>Remove</button>
+          <small>Optional. Stored only on this device.</small>
+        </div>
+      </div>
+      <label class="field-label" for="profile-name">Name</label>
+      <input class="profile-input" id="profile-name" autocomplete="name" maxlength="60" required>
+      <div class="profile-field-grid">
+        <div><label class="field-label" for="profile-dob">Date of birth</label><input class="profile-input" id="profile-dob" type="date" required></div>
+        <div><label class="field-label" for="profile-gender">Gender <small>(optional)</small></label><select class="profile-input" id="profile-gender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="nonbinary">Non-binary</option><option value="self-described">Self-described</option></select></div>
+      </div>
+      <label class="field-label" for="profile-language">Preferred language</label>
+      <select class="profile-input" id="profile-language"><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
+      <label class="check-row"><input id="profile-default" type="checkbox" checked><span>Use this profile automatically on this device</span></label>
+      <p class="analytics-notice">We collect anonymised information to improve the product experience.</p>
+      <div class="form-error" id="profile-form-error" role="alert"></div>
+      <div class="profile-form-actions"><button class="quiet-button" id="profile-form-cancel" type="button" hidden>Cancel</button><button class="primary-button" type="submit">Save profile</button></div>
+    </form>
+    <div class="landing-links"><button class="about-link" type="button" data-about>About Gitaverse</button><button class="about-link" type="button" data-install hidden>Install Gitaverse</button></div>
+  </section>
+</main>
+
+<main id="profile-selection" class="profile-screen" data-clarity-mask="true" hidden>
+  <section class="profile-selection-card">
+    <div class="profile-selection-head"><div><div class="status-mark">ॐ</div><h1 id="profile-selection-title">Who is using Gitaverse?</h1><p>Choose a profile to continue.</p></div><button class="quiet-button" id="profile-selection-back" type="button" hidden>Back</button></div>
+    <div class="profile-list" id="profile-list"></div>
+    <button class="add-profile-button" id="add-profile-button" type="button">＋ Add another profile</button>
+    <div class="landing-links"><button class="about-link" type="button" data-about>About Gitaverse</button><button class="about-link" type="button" data-install hidden>Install Gitaverse</button></div>
+  </section>
+</main>
+
+<main id="chooser" class="chooser" hidden>
+  <button class="profile-pill landing-profile-pill" type="button" data-profile-pill data-clarity-mask="true"></button>
+  <section class="chooser-card">
+    <div class="status-mark">ॐ</div>
+    <h1>Choose an experience</h1>
+    <p>Read, reflect, and listen at your own pace.</p>
+    <div class="experience-list">
+      <a class="experience-link" id="gita-700-link" href="?play=gita-700"><span>Gita 700<br><small>Four-panel study experience</small></span><span>→</span></a>
+      <span class="experience-link disabled"><span>Gita Yoga<br><small>Experience to be designed</small></span><small>Coming later</small></span>
+      <span class="experience-link disabled"><span>Gita Sara<br><small>Experience to be designed</small></span><small>Coming later</small></span>
+    </div>
+    <div class="landing-links"><button class="about-link" type="button" data-about>About Gitaverse</button><button class="about-link" type="button" data-install hidden>Install Gitaverse</button></div>
+  </section>
+</main>
+
+<main id="loading" class="loading" hidden>
+  <section class="status-card"><div class="status-mark">ॐ</div><h1>Opening the Gita</h1><p>Preparing the verses…</p></section>
+</main>
+
+<main id="error" class="error" hidden>
+  <section class="status-card"><div class="status-mark">ॐ</div><h1>Unable to open the player</h1><p id="error-message"></p></section>
+</main>
+
+<main id="data-chooser" class="chooser" hidden>
+  <section class="chooser-card">
+    <div class="status-mark">ॐ</div>
+    <h1>Unable to load the Gita collections</h1>
+    <p>Player 2 loads its language and media catalogs from <strong>data/collections</strong>. If automatic loading is unavailable, choose that folder to continue locally.</p>
+    <div class="file-actions">
+      <label class="file-button" for="collections-folder-input">Choose collections folder</label>
+      <input id="collections-folder-input" type="file" webkitdirectory multiple hidden>
+      <button class="retry-button" id="retry-data-button" type="button">Try automatic loading again</button>
+    </div>
+    <div class="file-error" id="file-error" role="alert"></div>
+    <p class="file-note">Selected files stay in this browser session and are not uploaded or modified.</p>
+  </section>
+</main>
+
+<main id="app" hidden>
+  <div class="shell">
+    <header class="topbar">
+      <button class="chapter-context" id="chapter-trigger" type="button" aria-label="Choose chapter" title="Choose chapter (C)">
+        <img class="chapter-icon" id="chapter-icon" alt="" hidden>
+        <div class="chapter-heading" id="chapter-title"></div>
+      </button>
+      <div class="shloka-position">
+        <div class="sid-badge" id="sid-label"></div>
+      </div>
+      <div class="top-actions">
+      <div class="top-menu-wrap">
+        <button class="icon-button menu-toggle" id="menu-button" type="button" aria-label="Open menu" aria-expanded="false" title="Menu (M)">
+          <svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/></svg>
+        </button>
+        <div class="top-menu-panel" id="top-menu" hidden>
+          <button class="top-menu-item" id="chapters-button" type="button"><span class="top-menu-label">Chapters</span><span class="menu-shortcut">C</span></button>
+          <button class="top-menu-item" id="goto-button" type="button"><span class="top-menu-label">Go to shloka</span><span class="menu-shortcut">G</span></button>
+          <button class="top-menu-item" id="language-button" type="button"><span class="top-menu-label">Language (Eng)</span><span class="menu-shortcut">L</span></button>
+          <button class="top-menu-item" id="fullscreen-button" type="button"><span class="top-menu-label">Fullscreen</span><span class="menu-shortcut">F</span></button>
+          <div class="top-menu-divider"></div>
+          <button class="top-menu-item" id="edit-button" type="button"><span class="top-menu-label">Edit this shloka</span><span class="menu-shortcut">E</span></button>
+          <button class="top-menu-item" id="home-button" type="button"><span class="top-menu-label">Home</span><span class="menu-shortcut">A</span></button>
+          <button class="top-menu-item" id="help-button" type="button"><span class="top-menu-label">Help</span><span class="menu-shortcut">H</span></button>
+          <div class="top-menu-divider"></div>
+          <button class="top-menu-item" id="about-button" type="button"><span class="top-menu-label">About Gitaverse</span><span class="menu-shortcut">K</span></button>
+          <button class="top-menu-item" type="button" data-install hidden><span class="top-menu-label">Install Gitaverse</span></button>
+        </div>
+      </div>
+      <button class="profile-pill topbar-profile-pill" type="button" data-profile-pill data-clarity-mask="true"></button>
+      </div>
+    </header>
+
+    <div class="record-position" id="position-label" aria-label="Current shloka position"></div>
+
+    <section id="renderer-root" aria-live="polite"></section>
+
+    <footer class="controlbar">
+      <button class="footer-action" id="footer-goto-button" type="button" aria-label="Go to shloka" title="Go to shloka (G)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      </button>
+      <div class="audio-player">
+        <button class="play-button" id="play-button" type="button" aria-label="Play audio" title="Play / pause (P or Space)">
+          <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pause-icon" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
+        </button>
+        <input class="audio-seek" id="audio-seek" type="range" min="0" max="0" step="0.1" value="0" disabled aria-label="Audio position">
+        <span class="audio-time" id="audio-time">00:00 / 00:00</span>
+      </div>
+      <button class="footer-action" id="footer-fullscreen-button" type="button" aria-label="Enter fullscreen" title="Fullscreen (F)">
+        <svg class="fullscreen-enter-icon" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+        <svg class="fullscreen-exit-icon" viewBox="0 0 24 24" hidden><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>
+      </button>
+    </footer>
+  </div>
+  <audio id="audio" preload="metadata"></audio>
+</main>
+
+<aside class="download-reminder" id="download-reminder" hidden aria-label="Edited master download">
+  <button class="download-reminder-action" id="download-reminder-action" type="button">↓ Download edited language files</button>
+  <button class="download-reminder-close" id="download-reminder-close" type="button" aria-label="Dismiss download reminder">×</button>
+</aside>
+
+<div class="overlay" id="goto-overlay" hidden>
+  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="goto-title">
+    <header class="dialog-head"><h2 id="goto-title">Go to a shloka</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body">
+      <form id="goto-form">
+        <input class="goto-input" id="goto-input" autocomplete="off" spellcheck="false" placeholder="6.7" aria-label="Shloka ID">
+        <p class="dialog-note">Enter a stable shloka ID, such as 6.B, 6.7, or 6.E.</p>
+        <div class="dialog-error" id="goto-error"></div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="chapters-overlay" hidden>
+  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="chapters-title">
+    <header class="dialog-head"><h2 id="chapters-title">Chapters</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body"><div class="chapter-list" id="chapter-list"></div></div>
+  </section>
+</div>
+
+<div class="overlay" id="language-overlay" hidden>
+  <section class="dialog language-dialog" role="dialog" aria-modal="true" aria-labelledby="language-title">
+    <header class="dialog-head"><h2 id="language-title">Choose language</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body language-options" id="language-options">
+      <button class="language-option" type="button" data-language="en">English</button>
+      <button class="language-option" type="button" data-language="kn">ಕನ್ನಡ</button>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="help-overlay" hidden>
+  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <header class="dialog-head"><h2 id="help-title">Keyboard shortcuts</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body">
+      <div class="shortcut-list">
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>←</kbd></div><div class="shortcut-description">Previous shloka</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>→</kbd></div><div class="shortcut-description">Next shloka</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>G</kbd></div><div class="shortcut-description">Go to a shloka</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>C</kbd></div><div class="shortcut-description">Open chapters</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>L</kbd></div><div class="shortcut-description">Choose language</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>A</kbd></div><div class="shortcut-description">Return to Home</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>P</kbd><kbd>Space</kbd></div><div class="shortcut-description">Play or pause audio</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>F</kbd></div><div class="shortcut-description">Enter or exit fullscreen</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>H</kbd></div><div class="shortcut-description">Open this help</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>K</kbd></div><div class="shortcut-description">Open About Gitaverse</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>M</kbd></div><div class="shortcut-description">Open or close menu</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>E</kbd></div><div class="shortcut-description">Enter or leave edit mode</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>Esc</kbd></div><div class="shortcut-description">Close a dialog or exit fullscreen</div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="profile-menu-overlay" data-clarity-mask="true" hidden>
+  <section class="dialog profile-menu-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-menu-title">
+    <header class="dialog-head"><h2 id="profile-menu-title">Profile</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <div class="dialog-body profile-menu-options">
+      <button type="button" id="switch-profile-button">Switch profile</button>
+      <button type="button" id="edit-profile-button">Edit profile</button>
+      <button type="button" id="manage-profiles-button">Manage profiles</button>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="about-overlay" hidden>
+  <section class="dialog about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-title">
+    <button class="icon-button close-dialog about-close" type="button" aria-label="Close">×</button>
+    <div class="about-body">
+      <div class="about-flute" aria-hidden="true">
+        <img src="assets/images/krishna-flute.svg" alt="">
+        <i class="about-note about-note-one">♪</i>
+        <i class="about-note about-note-two">♫</i>
+        <i class="about-note about-note-three">♩</i>
+      </div>
+      <h2 id="about-title">About Gitaverse</h2>
+      <p>Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.</p>
+      <div class="about-links">
+        <a href="https://gitajyoti.org/" target="_blank" rel="noopener">Gita Jyoti</a>
+        <a href="https://lightoftheself.org/" target="_blank" rel="noopener">Light of the Self Foundation</a>
+      </div>
+      <p class="about-version">Version <span id="about-version">dev</span></p>
+    </div>
+  </section>
+</div>
+
+<aside class="pwa-notice" id="pwa-update-notice" hidden role="status" aria-live="polite">
+  <span>A new Gitaverse version is ready.</span>
+  <button id="pwa-update-action" type="button">Update now</button>
+  <button class="pwa-notice-close" id="pwa-update-dismiss" type="button" aria-label="Dismiss update">×</button>
+</aside>
+
+<aside class="pwa-notice pwa-status-notice" id="pwa-status-notice" hidden role="status" aria-live="polite">
+  <span id="pwa-status-message"></span>
+</aside>
+
+<script src="js/player2.bundle.js?v=dev"></script>
+</body>
+</html>

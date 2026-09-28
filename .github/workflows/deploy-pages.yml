@@ -27,6 +27,12 @@ jobs:
         with:
           node-version: 24
 
+      - name: Install test dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium for browser regression
+        run: npx playwright install --with-deps chromium
+
       - name: Generate build identifier
         shell: bash
         run: echo "GITAVERSE_BUILD_ID=$(TZ=Asia/Kolkata date +'%d%b%Y-%H%M%S')" >> "$GITHUB_ENV"
@@ -35,6 +41,9 @@ jobs:
         run: node scripts/build-deployment.mjs
         env:
           CLARITY_PROJECT_ID: ${{ vars.CLARITY_PROJECT_ID }}
+
+      - name: Run Player 2 browser regression
+        run: npm run test:browser
 
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'
