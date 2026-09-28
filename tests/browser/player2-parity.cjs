@@ -55,13 +55,18 @@ async function run() {
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
 
   try {
-    await page.goto(`${base}/player2.html?play=gita-700&sid=6.7&lang=kn`, { waitUntil: 'networkidle' });
+    const redirectPage = await context.newPage();
+    await redirectPage.goto(`${base}/player2.html?play=gita-700&sid=6.7&lang=kn`, { waitUntil: 'networkidle' });
+    assert.match(redirectPage.url(), /\/player\.html\?play=gita-700&sid=6\.7&lang=kn$/);
+    await redirectPage.close();
+
+    await page.goto(`${base}/player.html?play=gita-700&sid=6.7&lang=kn`, { waitUntil: 'networkidle' });
     await createProfile(page);
     await page.getByRole('link', { name: /Gita 700/ }).click();
     await assert.doesNotReject(() => page.locator('#sid-label').waitFor());
     assert.equal(await page.locator('#sid-label').innerText(), '1.B');
 
-    await page.goto(`${base}/player2.html?play=gita-700&sid=6.7&lang=kn&pid=1`, { waitUntil: 'networkidle' });
+    await page.goto(`${base}/player.html?play=gita-700&sid=6.7&lang=kn&pid=1`, { waitUntil: 'networkidle' });
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
     assert.match(await page.locator('#chapter-title').innerText(), /^6 — /);
     assert.equal(await page.locator('.gita-700-panel').count(), 4);
@@ -136,7 +141,7 @@ async function run() {
     });
     assert.deepEqual(accessibilityProblems, { visibleButtonsWithoutNames: 0, invalidDialogs: 0 });
 
-    await page.goto(`${base}/player2.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
+    await page.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
     await page.keyboard.press('e');
     const meaning = page.locator('[data-edit-field="languages.en.meaning"]');
     await meaning.fill('Regression edited meaning');
@@ -150,7 +155,7 @@ async function run() {
     const downloadPath = await download.path();
     assert.match(fs.readFileSync(downloadPath, 'utf8'), /Regression edited meaning/);
 
-    await page.goto(`${base}/player2.html?pid=1`, { waitUntil: 'networkidle' });
+    await page.goto(`${base}/player.html?pid=1`, { waitUntil: 'networkidle' });
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
     await page.keyboard.press('a');
     await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
@@ -186,9 +191,9 @@ async function run() {
 
     const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     const mobilePage = await mobile.newPage();
-    await mobilePage.goto(`${base}/player2.html?play=gita-700&sid=6.7`, { waitUntil: 'networkidle' });
+    await mobilePage.goto(`${base}/player.html?play=gita-700&sid=6.7`, { waitUntil: 'networkidle' });
     await createProfile(mobilePage, 'Mobile Regression');
-    await mobilePage.goto(`${base}/player2.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
+    await mobilePage.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
     const boxes = await mobilePage.locator('.gita-700-panel').evaluateAll((panels) => panels.map((panel) => panel.getBoundingClientRect().top));
     assert.ok(boxes.every((top, index) => index === 0 || top > boxes[index - 1]), 'mobile panels must stack vertically');
     assert.equal(await mobilePage.locator('.controlbar').evaluate((element) => getComputedStyle(element).position), 'fixed');
@@ -209,7 +214,7 @@ async function run() {
 
     const fileContext = await browser.newContext();
     const filePage = await fileContext.newPage();
-    const fileUrl = pathToFileURL(path.join(root, 'player2.html')).href + '?play=gita-700&sid=6.7';
+    const fileUrl = pathToFileURL(path.join(root, 'player.html')).href + '?play=gita-700&sid=6.7';
     await filePage.goto(fileUrl, { waitUntil: 'domcontentloaded' });
     await createProfile(filePage, 'File Regression');
     await filePage.getByRole('link', { name: /Gita 700/ }).click();
@@ -222,7 +227,7 @@ async function run() {
     await fileContext.close();
 
     assert.deepEqual(errors, [], 'browser console/page errors');
-    await page.goto(`${base}/player2.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
+    await page.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
     await page.locator('#sid-label').waitFor();
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;

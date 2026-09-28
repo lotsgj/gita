@@ -1,6 +1,6 @@
-# Player 2 parity matrix
+# Collection player parity matrix
 
-Player 2 must pass this matrix before the public index or PWA start URL changes.
+The collection player must pass this matrix before each public release.
 
 | Capability | Automated | Browser verified | Status |
 | --- | --- | --- | --- |
@@ -25,8 +25,8 @@ Player 2 must pass this matrix before the public index or PWA start URL changes.
 | Collection-folder fallback | Node + browser regression | Yes | Pass |
 | Mobile swipe gesture | Browser regression | Yes; physical-device confirmation pending | Pass |
 | Fullscreen and popup Escape priority | Browser regression | Yes; native mobile confirmation pending | Partial |
-| Pinch zoom in mobile fullscreen | Manual device check | Pending | Pending |
+| Pinch zoom in mobile fullscreen | Manual device check | Confirmed on physical mobile | Pass |
 | Installed-PWA upgrade on desktop/mobile | Manual installed-app check | Pending | Pending |
-| Clarity delivery in deployed build | Adapter tests | Pending deployed verification | Partial |
+| Clarity delivery in deployed build | Adapter tests + deployed network verification | Collection POSTs confirmed; dashboard indexing pending | Pass |
 
-Pending device-specific rows are release gates for Tranche 3, not blockers for local Player 2 development.
+The installed-PWA upgrade remains the post-deployment verification gate for this cutover.

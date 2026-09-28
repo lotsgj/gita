@@ -2,11 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { access } from 'node:fs/promises';
 import path from 'node:path';
-import { parseMaster } from '../../js/master-data.js';
-import { readFile } from 'node:fs/promises';
 import { assertIdentitySequence, parseTable, projectRoot } from '../helpers/collection-data.mjs';
 
-const legacy = parseMaster(await readFile(path.join(projectRoot, 'data/master.csv'), 'utf8'));
 const sa = await parseTable('data/collections/verses/bhagavad-gita/master_sa.csv');
 const en = await parseTable('data/collections/verses/bhagavad-gita/master_en.csv');
 const kn = await parseTable('data/collections/verses/bhagavad-gita/master_kn.csv');
@@ -16,7 +13,7 @@ const images = await parseTable('data/collections/experiences/gita-700/images.cs
 test('all language masters and Gita-700 compositions have every SID in canonical order', () => {
   for (const [label, dataset] of Object.entries({ sa, en, kn, audio, images })) {
     assert.equal(dataset.rows.length, 746, `${label} row count`);
-    assertIdentitySequence(assert, legacy.rows, dataset.rows, label);
+    assertIdentitySequence(assert, sa.rows, dataset.rows, label);
     assert.equal(new Set(dataset.rows.map((row) => row.sid)).size, 746, `${label} unique SID count`);
   }
 });

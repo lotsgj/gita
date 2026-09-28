@@ -1,6 +1,7 @@
 const BUILD_VERSION = '__GITAVERSE_VERSION__';
 const SHELL_CACHE = `gitaverse-shell-${BUILD_VERSION}`;
-const AUDIO_CACHE = 'gitaverse-audio-v1';
+const AUDIO_CACHE = 'gitaverse-audio-v2';
+const AUDIO_PREFIX = 'gitaverse-audio-';
 const SHELL_PREFIX = 'gitaverse-shell-';
 
 function scopedUrl(path) {
@@ -26,7 +27,10 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const names = await caches.keys();
-    await Promise.all(names.filter((name) => name.startsWith(SHELL_PREFIX) && name !== SHELL_CACHE).map((name) => caches.delete(name)));
+    await Promise.all(names.filter((name) => (
+      (name.startsWith(SHELL_PREFIX) && name !== SHELL_CACHE)
+      || (name.startsWith(AUDIO_PREFIX) && name !== AUDIO_CACHE)
+    )).map((name) => caches.delete(name)));
     await self.clients.claim();
   })());
 });

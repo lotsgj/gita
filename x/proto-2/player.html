@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="app-version" content="dev">
 <meta name="clarity-project-id" content="">
-<title>Gitaverse</title>
+<title>Verse Player</title>
 <meta name="description" content="Explore and chant the verses of the Bhagavad Gita with Gitaverse.">
 <link rel="canonical" href="https://gitaverse.gitajyoti.org/">
 <meta property="og:type" content="website">
@@ -32,7 +32,6 @@
 <link rel="stylesheet" href="css/player.css?v=dev">
 <link rel="stylesheet" href="css/editor.css?v=dev">
 <link rel="stylesheet" href="css/renderers/gita-700.css?v=dev">
-<link rel="stylesheet" href="css/player2.css?v=dev">
 
 </head>
 <body>
@@ -103,15 +102,15 @@
 <main id="data-chooser" class="chooser" hidden>
   <section class="chooser-card">
     <div class="status-mark">ॐ</div>
-    <h1>Unable to load the Gita collections</h1>
-    <p>Player 2 loads its language and media catalogs from <strong>data/collections</strong>. If automatic loading is unavailable, choose that folder to continue locally.</p>
+    <h1>Select the Gita master data</h1>
+    <p>The browser could not load <strong>data/master.csv</strong> automatically. Choose the file to continue.</p>
     <div class="file-actions">
-      <label class="file-button" for="collections-folder-input">Choose collections folder</label>
-      <input id="collections-folder-input" type="file" webkitdirectory multiple hidden>
+      <label class="file-button" for="master-file-input">Choose master.csv</label>
+      <input id="master-file-input" type="file" accept=".csv,text/csv" hidden>
       <button class="retry-button" id="retry-data-button" type="button">Try automatic loading again</button>
     </div>
     <div class="file-error" id="file-error" role="alert"></div>
-    <p class="file-note">Selected files stay in this browser session and are not uploaded or modified.</p>
+    <p class="file-note">The selected file stays in this browser session. It is not uploaded or modified.</p>
   </section>
 </main>
 
@@ -174,7 +173,7 @@
 </main>
 
 <aside class="download-reminder" id="download-reminder" hidden aria-label="Edited master download">
-  <button class="download-reminder-action" id="download-reminder-action" type="button">↓ Download edited language files</button>
+  <button class="download-reminder-action" id="download-reminder-action" type="button">↓ Download edited master.csv</button>
   <button class="download-reminder-close" id="download-reminder-close" type="button" aria-label="Dismiss download reminder">×</button>
 </aside>
 
@@ -247,7 +246,7 @@
     <button class="icon-button close-dialog about-close" type="button" aria-label="Close">×</button>
     <div class="about-body">
       <div class="about-flute" aria-hidden="true">
-        <img src="assets/images/krishna-flute.svg" alt="">
+        <img src="data/images/krishna-flute.svg" alt="">
         <i class="about-note about-note-one">♪</i>
         <i class="about-note about-note-two">♫</i>
         <i class="about-note about-note-three">♩</i>

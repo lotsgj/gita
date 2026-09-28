@@ -11,7 +11,6 @@
     "test:contract": "node --test tests/contract/*.test.mjs",
     "test:browser": "node tests/browser/player2-parity.cjs",
     "test:events": "node --test tests/unit/event-bus.test.mjs",
-    "generate:collections": "node scripts/generate-collections.mjs",
     "build:player2": "node scripts/build-player2.mjs",
     "build": "node scripts/build-deployment.mjs"
   }

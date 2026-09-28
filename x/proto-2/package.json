@@ -1,0 +1,9 @@
+{
+  "name": "gitaverse-proto-2-archive",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/unit/*.test.mjs",
+    "test:data": "python3 scripts/validate_master.py"
+  }
+}
