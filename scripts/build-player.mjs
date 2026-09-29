@@ -1,6 +1,9 @@
 import { readFile, writeFile } from 'node:fs/promises';
 
 const sources = [
+  'js/i18n/en.js',
+  'js/i18n/kn.js',
+  'js/i18n/i18n.js',
   'js/profile-store.js',
   'js/profile-ui.js',
   'js/events/event-schema.js',

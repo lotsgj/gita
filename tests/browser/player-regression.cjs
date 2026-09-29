@@ -36,6 +36,7 @@ function staticServer() {
 async function createProfile(page, name = 'Regression Profile') {
   await page.getByLabel('Name', { exact: true }).fill(name);
   await page.getByLabel('Date of birth', { exact: true }).fill('1990-01-01');
+  await page.getByLabel('App language', { exact: true }).selectOption('en');
   await page.getByRole('button', { name: 'Save profile' }).click();
   await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
 }
@@ -88,6 +89,7 @@ async function run() {
 
   try {
     await page.goto(`${base}/player.html?play=gita-700&sid=6.7&lang=kn`, { waitUntil: 'networkidle' });
+    assert.equal(await page.getByLabel('App language', { exact: true }).inputValue(), '', 'first profile must require an explicit app language');
     await createProfile(page);
     await page.getByRole('link', { name: /Gita 700/ }).click();
     await assert.doesNotReject(() => page.locator('#sid-label').waitFor());
@@ -95,6 +97,8 @@ async function run() {
 
     await page.goto(`${base}/player.html?play=gita-700&sid=6.7&lang=kn&pid=1`, { waitUntil: 'networkidle' });
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
+    assert.equal(await page.locator('#language-button .top-menu-label').innerText(), 'Content language (ಕನ್ನಡ)');
+    assert.equal(await page.locator('#help-button .top-menu-label').innerText(), 'Help');
     assert.match(await page.locator('#chapter-title').innerText(), /^6 — /);
     assert.equal(await page.locator('.gita-700-panel').count(), 4);
     assert.equal(await page.locator('#play-button').isEnabled(), true);
@@ -265,6 +269,68 @@ async function run() {
     const landscapeBoxes = await mobilePage.locator('.gita-700-panel').evaluateAll((panels) => panels.map((panel) => panel.getBoundingClientRect().top));
     assert.ok(landscapeBoxes.every((top, index) => index === 0 || top > landscapeBoxes[index - 1]), 'mobile landscape panels must remain vertically stacked');
     await mobile.close();
+
+    const migrationContext = await browser.newContext();
+    const migrationPage = await migrationContext.newPage();
+    await migrationPage.goto(`${base}/offline.html`, { waitUntil: 'domcontentloaded' });
+    await migrationPage.evaluate(() => new Promise((resolve, reject) => {
+      const request = indexedDB.open('gitaverse-profiles', 2);
+      request.onupgradeneeded = () => {
+        const database = request.result;
+        database.createObjectStore('profiles', { keyPath: 'pid', autoIncrement: true });
+        database.createObjectStore('settings', { keyPath: 'key' });
+        database.createObjectStore('resumePoints', { keyPath: 'pid' });
+      };
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const database = request.result;
+        const transaction = database.transaction(['profiles', 'settings'], 'readwrite');
+        transaction.objectStore('profiles').put({
+          pid: 1, name: 'Legacy Kannada', dob: '1990-01-01', gender: '', language: 'kn',
+          photo: '', analyticsProfileId: 'legacy-regression', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z'
+        });
+        transaction.objectStore('settings').put({ key: 'defaultPid', value: 1 });
+        transaction.oncomplete = () => { database.close(); resolve(); };
+        transaction.onerror = () => reject(transaction.error);
+      };
+    }));
+    await migrationPage.goto(`${base}/player.html?play=gita-700&sid=1.B&pid=1`, { waitUntil: 'networkidle' });
+    assert.equal(await migrationPage.locator('#help-button .top-menu-label').innerText(), 'ಸಹಾಯ');
+    assert.equal(await migrationPage.locator('#language-button .top-menu-label').innerText(), 'ವಿಷಯ ಭಾಷೆ (ಕನ್ನಡ)');
+    const migratedProfile = await migrationPage.evaluate(() => new Promise((resolve, reject) => {
+      const request = indexedDB.open('gitaverse-profiles');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const database = request.result;
+        const get = database.transaction('profiles').objectStore('profiles').get(1);
+        get.onerror = () => reject(get.error);
+        get.onsuccess = () => { database.close(); resolve(get.result); };
+      };
+    }));
+    assert.equal(migratedProfile.interfaceLanguage, 'kn');
+    assert.equal(migratedProfile.contentLanguage, 'kn');
+    assert.equal(Object.hasOwn(migratedProfile, 'language'), false);
+    await migrationContext.close();
+
+    const languageContext = await browser.newContext();
+    const languagePage = await languageContext.newPage();
+    await languagePage.goto(`${base}/player.html`, { waitUntil: 'networkidle' });
+    await languagePage.getByLabel('Name', { exact: true }).fill('Kannada Interface');
+    await languagePage.getByLabel('Date of birth', { exact: true }).fill('1990-01-01');
+    await languagePage.getByLabel('App language', { exact: true }).selectOption('kn');
+    await languagePage.getByLabel('ಆದ್ಯತೆಯ ಗೀತಾ ವಿಷಯ ಭಾಷೆ', { exact: true }).selectOption('en');
+    await languagePage.getByRole('button', { name: 'ಪ್ರೊಫೈಲ್ ಉಳಿಸಿ' }).click();
+    await languagePage.getByRole('heading', { name: 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ' }).waitFor();
+    await languagePage.locator('#gita-700-link').click();
+    await languagePage.locator('#sid-label').waitFor();
+    assert.equal(await languagePage.locator('#help-button .top-menu-label').innerText(), 'ಸಹಾಯ');
+    assert.equal(await languagePage.locator('#language-button .top-menu-label').innerText(), 'ವಿಷಯ ಭಾಷೆ (English)');
+    assert.match(await languagePage.locator('#chapter-title').innerText(), /^1 — Arjuna Vishada Yoga$/);
+    await languagePage.goto(`${base}/player.html?play=gita-700&sid=1.B&lang=kn&pid=1`, { waitUntil: 'networkidle' });
+    assert.equal(await languagePage.locator('#help-button .top-menu-label').innerText(), 'ಸಹಾಯ');
+    assert.equal(await languagePage.locator('#language-button .top-menu-label').innerText(), 'ವಿಷಯ ಭಾಷೆ (ಕನ್ನಡ)');
+    assert.match(await languagePage.locator('#chapter-title').innerText(), /^1 — ಅರ್ಜುನ ವಿಷಾದ ಯೋಗ$/);
+    await languageContext.close();
 
     const fileContext = await browser.newContext();
     const filePage = await fileContext.newPage();

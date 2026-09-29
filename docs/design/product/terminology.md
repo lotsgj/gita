@@ -18,6 +18,8 @@
 - **SNUM** — the shloka position within a chapter, including `B` and `E`.
 - **Profile** — a local, unauthenticated person-specific space on one device.
 - **Language master** — a complete SID-aligned verse file for one language.
+- **App language** — the profile preference that controls Gitaverse labels, dialogs, actions, and messages.
+- **Content language** — the independent language used for chapter names, transliteration, meaning, and word-by-word meaning. It may be overridden by the `lang` URL parameter.
 - **Purpose** — the role of a media reference within an experience, such as full Sanskrit chanting.
 
 ## Language codes

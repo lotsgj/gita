@@ -82,6 +82,7 @@ run(process.execPath, ['--check', 'js/player.bundle.js']);
 run(process.execPath, ['scripts/build-docs.mjs']);
 run(process.execPath, ['--check', 'js/docs.bundle.js']);
 run(process.execPath, ['--test',
+  'tests/unit/i18n.test.mjs',
   'tests/unit/event-bus.test.mjs',
   'tests/unit/player-collection-data.test.mjs',
   'tests/unit/player-renderer.test.mjs',

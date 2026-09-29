@@ -56,6 +56,7 @@ async function run() {
     await page.getByRole('button', { name: 'Create a Gitaverse profile' }).click();
     await page.getByLabel('Name', { exact: true }).fill('Rachana Regression');
     await page.getByLabel('Date of birth', { exact: true }).fill('1990-01-01');
+    await page.getByLabel('App language', { exact: true }).selectOption('en');
     await page.getByRole('button', { name: 'Save profile' }).click();
     await page.waitForFunction(() => document.getElementById('docs-profile-pill').getAttribute('aria-label')?.includes('Rachana Regression'));
     assert.match(await page.locator('#docs-profile-pill').getAttribute('aria-label'), /Rachana Regression/);

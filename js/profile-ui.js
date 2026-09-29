@@ -1,11 +1,13 @@
 import { resizeProfilePhoto } from './profile-store.js';
 
 export class ProfileUI {
-  constructor({ store, onSelected, onCreated, onChanged }) {
+  constructor({ store, onSelected, onCreated, onChanged, translate = (key, fallback) => fallback, onInterfaceLanguagePreview = () => {} }) {
     this.store = store;
     this.onSelected = onSelected;
     this.onCreated = onCreated;
     this.onChanged = onChanged;
+    this.translate = translate;
+    this.onInterfaceLanguagePreview = onInterfaceLanguagePreview;
     this.editingPid = null;
     this.photo = '';
     this.bind();
@@ -47,36 +49,45 @@ export class ProfileUI {
       const name = document.createElement('strong');
       name.textContent = profile.name;
       const language = document.createElement('small');
-      language.textContent = profile.language === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      const interfaceName = profile.interfaceLanguage === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      const contentName = profile.contentLanguage === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      language.textContent = interfaceName + ' · ' + contentName;
       copy.append(name, language);
       select.appendChild(copy);
       if (profile.pid === defaultPid) {
         const badge = document.createElement('span');
         badge.className = 'default-badge';
-        badge.textContent = 'Default';
+        badge.textContent = this.translate('profile.defaultBadge', 'Default');
         select.appendChild(badge);
       }
       const actions = document.createElement('div');
       actions.className = 'profile-card-actions';
-      actions.innerHTML = `<button type="button" data-profile-action="edit" data-pid="${profile.pid}">Edit</button><button type="button" data-profile-action="default" data-pid="${profile.pid}">${profile.pid === defaultPid ? 'Unset default' : 'Make default'}</button><button type="button" data-profile-action="delete" data-pid="${profile.pid}">Delete</button>`;
+      actions.innerHTML = `<button type="button" data-profile-action="edit" data-pid="${profile.pid}">${this.translate('profile.editAction', 'Edit')}</button><button type="button" data-profile-action="default" data-pid="${profile.pid}">${profile.pid === defaultPid ? this.translate('profile.unsetDefault', 'Unset default') : this.translate('profile.makeDefault', 'Make default')}</button><button type="button" data-profile-action="delete" data-pid="${profile.pid}">${this.translate('profile.delete', 'Delete')}</button>`;
       card.append(select, actions);
       list.appendChild(card);
     });
-    document.getElementById('profile-selection-title').textContent = switching ? 'Switch profile' : 'Who is using Gitaverse?';
+    const selectionTitle = document.getElementById('profile-selection-title');
+    selectionTitle.dataset.i18n = switching ? 'profile.switch' : 'profile.who';
+    selectionTitle.textContent = switching ? this.translate('profile.switch', 'Switch profile') : this.translate('profile.who', 'Who is using Gitaverse?');
     document.getElementById('profile-selection-back').hidden = !switching;
   }
 
   async showForm(profile = null) {
     this.editingPid = profile?.pid || null;
     this.photo = profile?.photo || '';
-    document.getElementById('profile-form-title').textContent = profile ? 'Edit profile' : 'Create your profile';
-    document.getElementById('profile-form-intro').textContent = profile
-      ? 'Keep this profile’s local preferences up to date.'
-      : 'Profiles keep each person’s language and experience separate on this device.';
+    const formTitle = document.getElementById('profile-form-title');
+    const formIntro = document.getElementById('profile-form-intro');
+    formTitle.dataset.i18n = profile ? 'profile.edit' : 'profile.create';
+    formIntro.dataset.i18n = profile ? 'profile.intro.edit' : 'profile.intro.create';
+    formTitle.textContent = profile ? this.translate('profile.edit', 'Edit profile') : this.translate('profile.create', 'Create your profile');
+    formIntro.textContent = profile
+      ? this.translate('profile.intro.edit', 'Keep this profile’s local preferences up to date.')
+      : this.translate('profile.intro.create', 'Profiles keep each person’s language and experience separate on this device.');
     document.getElementById('profile-name').value = profile?.name || '';
     document.getElementById('profile-dob').value = profile?.dob || '';
     document.getElementById('profile-gender').value = profile?.gender || '';
-    document.getElementById('profile-language').value = profile?.language || 'en';
+    document.getElementById('profile-interface-language').value = profile?.interfaceLanguage || '';
+    document.getElementById('profile-content-language').value = profile?.contentLanguage || 'en';
     document.getElementById('profile-default').checked = profile ? (await this.store.defaultPid()) === profile.pid : true;
     document.getElementById('profile-form-cancel').hidden = !profile;
     document.getElementById('profile-form-error').textContent = '';
@@ -108,14 +119,20 @@ export class ProfileUI {
       const error = document.getElementById('profile-form-error');
       error.textContent = '';
       try {
+        if (!document.getElementById('profile-name').value.trim()) throw new Error(this.translate('validation.name', 'Enter a profile name.'));
         const dob = document.getElementById('profile-dob').value;
-        if (!dob || new Date(dob + 'T00:00:00') > new Date()) throw new Error('Enter a valid date of birth.');
+        if (!dob || new Date(dob + 'T00:00:00') > new Date()) throw new Error(this.translate('validation.dob', 'Enter a valid date of birth.'));
+        const interfaceLanguage = document.getElementById('profile-interface-language').value;
+        const contentLanguage = document.getElementById('profile-content-language').value;
+        if (!interfaceLanguage) throw new Error(this.translate('validation.appLanguage', 'Choose an app language.'));
+        if (!contentLanguage) throw new Error(this.translate('validation.contentLanguage', 'Choose a preferred Gita content language.'));
         const profile = await this.store.save({
           pid: this.editingPid,
           name: document.getElementById('profile-name').value,
           dob,
           gender: document.getElementById('profile-gender').value,
-          language: document.getElementById('profile-language').value,
+          interfaceLanguage,
+          contentLanguage,
           photo: this.photo,
           analyticsConsent: true
         });
@@ -124,10 +141,15 @@ export class ProfileUI {
         if (this.editingPid) await this.onChanged(profile);
         else await this.onCreated(profile);
       } catch (failure) {
-        error.textContent = failure.message || 'The profile could not be saved.';
+        error.textContent = failure.message || this.translate('validation.profileSave', 'The profile could not be saved.');
       }
     });
     document.getElementById('profile-name').addEventListener('input', () => this.renderPhotoPreview());
+    document.getElementById('profile-interface-language').addEventListener('change', (event) => {
+      const content = document.getElementById('profile-content-language');
+      if (!this.editingPid && event.target.value) content.value = event.target.value;
+      this.onInterfaceLanguagePreview(event.target.value || 'en');
+    });
     document.getElementById('profile-photo').addEventListener('change', async (event) => {
       const error = document.getElementById('profile-form-error');
       try {

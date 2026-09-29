@@ -1,13 +1,14 @@
 import { serializeLanguageMaster } from './collection-data.js';
 
 export class InlineEditor {
-  constructor({ dataset, renderer, currentRow, rerender, workspace = null, onStateChange }) {
+  constructor({ dataset, renderer, currentRow, rerender, workspace = null, onStateChange, translate = (key, fallback) => fallback }) {
     this.dataset = dataset;
     this.renderer = renderer;
     this.currentRow = currentRow;
     this.rerender = rerender;
     this.onStateChange = onStateChange || (() => {});
     this.workspace = workspace;
+    this.translate = translate;
     this.active = false;
     this.dirty = false;
     this.savedChanges = false;
@@ -25,9 +26,9 @@ export class InlineEditor {
     toolbar.className = 'edit-toolbar';
     toolbar.hidden = true;
     toolbar.innerHTML =
-      '<span class="edit-status">Edit the four visible fields</span>' +
-      '<button class="cancel-edit" type="button">Cancel</button>' +
-      '<button class="save-edit" type="button">Save row</button>';
+      '<span class="edit-status">' + this.translate('editor.editVisible', 'Edit the four visible fields') + '</span>' +
+      '<button class="cancel-edit" type="button">' + this.translate('editor.cancel', 'Cancel') + '</button>' +
+      '<button class="save-edit" type="button">' + this.translate('editor.save', 'Save row') + '</button>';
     document.body.appendChild(toolbar);
     toolbar.querySelector('.cancel-edit').addEventListener('click', () => this.cancel());
     toolbar.querySelector('.save-edit').addEventListener('click', () => this.save());
@@ -71,8 +72,8 @@ export class InlineEditor {
     const invalid = event.currentTarget.innerText.includes('#');
     event.currentTarget.setAttribute('aria-invalid', invalid ? 'true' : 'false');
     this.toolbar.querySelector('.edit-status').textContent = invalid
-      ? 'Remove # before saving'
-      : 'Unsaved changes';
+      ? this.translate('editor.removeHash', 'Remove # before saving')
+      : this.translate('editor.unsaved', 'Unsaved changes');
     this.updateUi();
   }
 
@@ -82,7 +83,7 @@ export class InlineEditor {
     const invalid = elements.find((element) => element.innerText.includes('#'));
     if (invalid) {
       invalid.focus();
-      this.toolbar.querySelector('.edit-status').textContent = 'Remove # before saving';
+      this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.removeHash', 'Remove # before saving');
       return false;
     }
     const row = this.currentRow();
@@ -103,13 +104,13 @@ export class InlineEditor {
     });
     if (!changes.length) {
       this.dirty = false;
-      this.toolbar.querySelector('.edit-status').textContent = 'No changes to save';
+      this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.noChanges', 'No changes to save');
       this.updateUi();
       return true;
     }
     const saveButton = this.toolbar.querySelector('.save-edit');
     saveButton.disabled = true;
-    this.toolbar.querySelector('.edit-status').textContent = this.workspace ? 'Saving to collections…' : 'Saving in this browser…';
+    this.toolbar.querySelector('.edit-status').textContent = this.workspace ? this.translate('editor.savingFiles', 'Saving to collections…') : this.translate('editor.savingBrowser', 'Saving in this browser…');
     try {
       let savedFiles = [];
       if (this.workspace) savedFiles = await this.workspace.saveLanguageMasters(this.dataset, languages);
@@ -119,14 +120,14 @@ export class InlineEditor {
       this.pendingDownload = !this.workspace;
       this.savedRevision += 1;
       this.toolbar.querySelector('.edit-status').textContent = this.workspace
-        ? 'Saved to ' + savedFiles.join(' and ')
-        : 'Saved in this browser session';
+        ? this.translate('editor.savedFiles', 'Saved to {files}', { files: savedFiles.join(' and ') })
+        : this.translate('editor.savedBrowser', 'Saved in this browser session');
       this.rerender({ keepEditing: true });
       this.updateUi();
       return true;
     } catch (error) {
       changes.forEach(({ target, property, previous }) => { target[property] = previous; });
-      this.toolbar.querySelector('.edit-status').textContent = error.message || 'The local collections could not be saved.';
+      this.toolbar.querySelector('.edit-status').textContent = error.message || this.translate('editor.saveFailed', 'The local collections could not be saved.');
       this.dirty = true;
       this.updateUi();
       return false;
@@ -134,7 +135,7 @@ export class InlineEditor {
   }
 
   cancel() {
-    if (this.dirty && !window.confirm('Discard the unsaved edits to this shloka?')) return false;
+    if (this.dirty && !window.confirm(this.translate('editor.discard', 'Discard the unsaved edits to this shloka?'))) return false;
     this.dirty = false;
     this.exit();
     this.rerender();
@@ -143,7 +144,7 @@ export class InlineEditor {
 
   canNavigate() {
     if (!this.active || !this.dirty) return true;
-    if (!window.confirm('Discard the unsaved edits to this shloka and continue?')) return false;
+    if (!window.confirm(this.translate('editor.discardNavigate', 'Discard the unsaved edits to this shloka and continue?'))) return false;
     this.dirty = false;
     this.exit();
     return true;
@@ -163,7 +164,7 @@ export class InlineEditor {
       URL.revokeObjectURL(url);
     });
     this.pendingDownload = false;
-    this.toolbar.querySelector('.edit-status').textContent = 'Downloaded edited language data';
+    this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.downloaded', 'Downloaded edited language data');
     this.updateUi();
   }
 

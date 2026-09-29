@@ -1,11 +1,22 @@
 export class AboutDialog {
-  constructor({ version = 'dev', onOpen = () => {} } = {}) {
+  constructor({ version = 'dev', onOpen = () => {}, translate = (key, fallback) => fallback } = {}) {
     this.version = version;
     this.onOpen = onOpen;
+    this.translate = translate;
     this.overlay = this.ensureMarkup();
     this.overlay.querySelector('[data-about-version]').textContent = version;
+    this.refresh();
     this.overlay.querySelector('[data-about-close]').addEventListener('click', () => this.close());
     this.overlay.addEventListener('click', (event) => { if (event.target === this.overlay) this.close(); });
+  }
+
+  refresh() {
+    this.overlay.querySelector('#about-title').textContent = this.translate('common.about', 'About Gitaverse');
+    this.overlay.querySelector('.about-body > p').textContent = this.translate('about.body', 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.');
+    const version = this.overlay.querySelector('.about-version');
+    const value = version.querySelector('[data-about-version]');
+    version.replaceChildren(document.createTextNode(this.translate('about.version', 'Version') + ' '), value);
+    this.overlay.querySelector('[data-about-close]').setAttribute('aria-label', this.translate('common.close', 'Close'));
   }
 
   ensureMarkup() {
@@ -37,6 +48,7 @@ export class AboutDialog {
   }
 
   open(opener = document.activeElement) {
+    this.refresh();
     this.opener = opener;
     this.overlay.hidden = false;
     this.onOpen();

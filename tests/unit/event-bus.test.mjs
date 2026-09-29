@@ -51,7 +51,7 @@ test('profile analytics retains the privacy age-band decisions', () => {
   assert.equal(ageBand('2020-01-01', now), 'unknown');
   assert.equal(ageBand('2010-10-01', now), '13-17');
   assert.equal(ageBand('2001-09-26', now), '25-34');
-  assert.deepEqual(profileAnalyticsContext({ dob: '1980-01-01', gender: 'self-described', language: 'kn' }, now), {
+  assert.deepEqual(profileAnalyticsContext({ dob: '1980-01-01', gender: 'self-described', interfaceLanguage: 'kn', contentLanguage: 'en' }, now), {
     ageBand: '45-54', genderGroup: 'self_described', profileLanguage: 'kn'
   });
 });

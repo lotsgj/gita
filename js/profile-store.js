@@ -1,5 +1,5 @@
 const PROFILE_DB_NAME = 'gitaverse-profiles';
-const PROFILE_DB_VERSION = 2;
+const PROFILE_DB_VERSION = 3;
 const PROFILE_STORE = 'profiles';
 const SETTINGS_STORE = 'settings';
 const RESUME_STORE = 'resumePoints';
@@ -22,8 +22,9 @@ function transactionDone(transaction) {
 function openProfileDatabase() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(PROFILE_DB_NAME, PROFILE_DB_VERSION);
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const database = request.result;
+      const transaction = request.transaction;
       if (!database.objectStoreNames.contains(PROFILE_STORE)) {
         database.createObjectStore(PROFILE_STORE, { keyPath: 'pid', autoIncrement: true });
       }
@@ -32,6 +33,20 @@ function openProfileDatabase() {
       }
       if (!database.objectStoreNames.contains(RESUME_STORE)) {
         database.createObjectStore(RESUME_STORE, { keyPath: 'pid' });
+      }
+      if (event.oldVersion < 3 && database.objectStoreNames.contains(PROFILE_STORE)) {
+        const profiles = transaction.objectStore(PROFILE_STORE);
+        profiles.openCursor().onsuccess = (event) => {
+          const cursor = event.target.result;
+          if (!cursor) return;
+          const profile = cursor.value;
+          const legacyLanguage = profile.language === 'kn' ? 'kn' : 'en';
+          profile.interfaceLanguage = profile.interfaceLanguage === 'kn' ? 'kn' : legacyLanguage;
+          profile.contentLanguage = profile.contentLanguage === 'kn' ? 'kn' : legacyLanguage;
+          delete profile.language;
+          cursor.update(profile);
+          cursor.continue();
+        };
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -74,6 +89,8 @@ export class ProfileStore {
     await this.open();
     const name = String(input.name || '').trim();
     if (!name) throw new Error('Enter a profile name.');
+    if (!['en', 'kn'].includes(input.interfaceLanguage)) throw new Error('Choose an app language.');
+    if (!['en', 'kn'].includes(input.contentLanguage)) throw new Error('Choose a preferred Gita content language.');
     const now = new Date().toISOString();
     const existing = input.pid ? await this.get(input.pid) : null;
     const profile = {
@@ -81,13 +98,15 @@ export class ProfileStore {
       name,
       dob: input.dob,
       gender: input.gender || '',
-      language: input.language === 'kn' ? 'kn' : 'en',
+      interfaceLanguage: input.interfaceLanguage,
+      contentLanguage: input.contentLanguage,
       photo: input.photo || '',
       analyticsConsent: Boolean(input.analyticsConsent),
       analyticsProfileId: existing?.analyticsProfileId || randomAnalyticsId(),
       createdAt: existing?.createdAt || now,
       updatedAt: now
     };
+    delete profile.language;
     if (existing) profile.pid = existing.pid;
     const transaction = this.database.transaction(PROFILE_STORE, 'readwrite');
     const request = transaction.objectStore(PROFILE_STORE).put(profile);

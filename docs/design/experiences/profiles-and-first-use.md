@@ -5,7 +5,7 @@
 
 ## First visit
 
-Gitaverse requires a profile; there is no guest route. On first use, the person enters a name, exact date of birth, optional gender, preferred supported language, optional profile photo, and whether the profile should open automatically on this device.
+Gitaverse requires a profile; there is no guest route. On first use, the person enters a name, exact date of birth, optional gender, mandatory app language, preferred Gita content language, optional profile photo, and whether the profile should open automatically on this device. App language has no preselected value. Choosing it initially suggests the same content language, but the two choices remain independent.
 
 The form states: “We collect anonymised information to improve the product experience.” It is informational, not an analytics opt-in. Names, dates of birth, and photos remain local and are masked from Clarity.
 
@@ -13,7 +13,7 @@ The form states: “We collect anonymised information to improve the product exp
 
 When no default profile is set, Gitaverse displays all local profiles and lets the person choose one or add another. A default profile bypasses selection. The persistent profile pill opens actions to switch, edit, or manage profiles; those actions are not duplicated in the main menu.
 
-After profile selection, Gitaverse either resumes the saved location or opens experience selection. Explicit URL parameters remain authoritative.
+After profile selection, Gitaverse either resumes the saved location or opens experience selection. The profile’s app language controls all Gitaverse labels and messages. Content language controls chapter names, transliteration, meaning, and word-by-word meaning and may differ by experience. An explicit `lang` URL parameter overrides content only; it never changes interface language.
 
 ## Profile identity
 

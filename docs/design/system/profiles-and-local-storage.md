@@ -7,11 +7,11 @@
 
 Profiles and resume locations are stored in the browser’s IndexedDB for the Gitaverse origin. The store supports multiple profiles, incremental numeric IDs, a default profile, profile editing, deletion/management, the current screen, and one resume point per profile and experience.
 
-Profile photos are device-local data. Name, exact birth date, gender selection, and photo are never added to page URLs or analytics payloads.
+Profile photos are device-local data. Each profile stores separate `interfaceLanguage` and `contentLanguage` preferences. Existing profiles are migrated by using their former language value for both fields. Name, exact birth date, gender selection, and photo are never added to page URLs or analytics payloads.
 
 ## URL and profile state
 
-`pid` identifies the local profile within application URLs. It is meaningful only on the device and browser storage where that profile exists. Experience, SID, and language parameters make content links addressable; profile selection resolves local personalization.
+`pid` identifies the local profile within application URLs. It is meaningful only on the device and browser storage where that profile exists. Experience and SID make content links addressable. `lang` overrides content language only; interface language is never controlled by a URL.
 
 Opening Home records Home as the current screen but preserves every experience’s last SID, language, and saved time. Selecting an experience from Home restores that experience’s point. Explicit URL parameters still take precedence. Older single-location records are read as a compatible resume point and are upgraded naturally by later navigation.
 

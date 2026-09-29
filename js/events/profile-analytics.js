@@ -33,6 +33,6 @@ export function profileAnalyticsContext(profile, now = new Date()) {
   return {
     ageBand: ageBand(profile.dob, now),
     genderGroup: GENDERS.has(profile.gender) ? profile.gender.replace('-', '_') : 'not_said',
-    profileLanguage: profile.language === 'kn' ? 'kn' : 'en'
+    profileLanguage: profile.interfaceLanguage === 'kn' ? 'kn' : 'en'
   };
 }

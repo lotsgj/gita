@@ -4,9 +4,127 @@
 (() => {
 'use strict';
 
+// Source: js/i18n/en.js
+const EN_MESSAGES = {
+  'profile.create': 'Create your profile', 'profile.edit': 'Edit profile',
+  'profile.intro.create': 'Profiles keep each person’s language and experience separate on this device.',
+  'profile.intro.edit': 'Keep this profile’s local preferences up to date.',
+  'profile.appLanguage': 'App language', 'profile.contentLanguage': 'Preferred Gita content language',
+  'profile.chooseLanguage': 'Choose your language', 'profile.name': 'Name', 'profile.dob': 'Date of birth',
+  'profile.gender': 'Gender', 'profile.optional': '(optional)', 'profile.notSaid': 'Prefer not to say',
+  'profile.female': 'Female', 'profile.male': 'Male', 'profile.nonbinary': 'Non-binary', 'profile.selfDescribed': 'Self-described',
+  'profile.choosePhoto': 'Choose photo', 'profile.remove': 'Remove', 'profile.photoNote': 'Optional. Stored only on this device.',
+  'profile.default': 'Use this profile automatically on this device', 'profile.analytics': 'We collect anonymised information to improve the product experience.',
+  'profile.cancel': 'Cancel', 'profile.save': 'Save profile', 'profile.title': 'Profile', 'profile.switch': 'Switch profile', 'profile.manage': 'Manage profiles',
+  'profile.who': 'Who is using Gitaverse?', 'profile.choose': 'Choose a profile to continue.', 'profile.add': '＋ Add another profile', 'profile.back': 'Back',
+  'profile.defaultBadge': 'Default', 'profile.editAction': 'Edit', 'profile.makeDefault': 'Make default', 'profile.unsetDefault': 'Unset default', 'profile.delete': 'Delete',
+  'home.chooseExperience': 'Choose an experience', 'home.intro': 'Read, reflect, and listen at your own pace.',
+  'home.gita700Note': 'Four-panel study experience', 'home.future': 'Experience to be designed', 'home.coming': 'Coming later',
+  'common.about': 'About Gitaverse', 'common.install': 'Install Gitaverse', 'common.close': 'Close',
+  'loading.title': 'Opening the Gita', 'loading.message': 'Preparing the verses…', 'error.title': 'Unable to open the player',
+  'menu.chapters': 'Chapters', 'menu.goto': 'Go to shloka', 'menu.contentLanguage': 'Content language ({language})',
+  'menu.fullscreen': 'Fullscreen', 'menu.exitFullscreen': 'Exit fullscreen', 'menu.edit': 'Edit this shloka', 'menu.leaveEdit': 'Leave edit mode',
+  'menu.home': 'Home', 'menu.help': 'Help', 'menu.open': 'Open menu', 'menu.close': 'Close menu',
+  'dialog.contentLanguage': 'Choose content language', 'dialog.goto': 'Go to a shloka', 'dialog.chapters': 'Chapters', 'dialog.shortcuts': 'Keyboard shortcuts',
+  'about.body': 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.',
+  'about.version': 'Version',
+  'pwa.ready': 'A new Gitaverse version is ready.', 'pwa.update': 'Update now',
+  'audio.play': 'Play audio', 'audio.pause': 'Pause audio', 'audio.unavailable': 'Audio unavailable', 'audio.none': 'No audio',
+  'audio.shortcut': 'P or Space',
+  'audio.onlineError': 'Audio is currently unavailable.', 'audio.offlineError': 'This audio is not available offline yet.',
+  'help.previous': 'Previous shloka', 'help.next': 'Next shloka', 'help.goto': 'Go to a shloka', 'help.chapters': 'Open chapters',
+  'help.language': 'Choose content language', 'help.home': 'Return to Home', 'help.play': 'Play or pause audio', 'help.fullscreen': 'Enter or exit fullscreen',
+  'help.help': 'Open this help', 'help.about': 'Open About Gitaverse', 'help.menu': 'Open or close menu', 'help.edit': 'Enter or leave edit mode', 'help.escape': 'Close a dialog or exit fullscreen',
+  'data.title': 'Unable to load the Gita collections', 'data.description': 'Gitaverse could not load its language and media collections automatically. Choose the local data/collections folder to continue.',
+  'data.choose': 'Choose collections folder', 'data.retry': 'Try automatic loading again', 'data.localNote': 'Selected files stay in this browser session and are not uploaded or modified.',
+  'workspace.title': 'Open local collections', 'workspace.open': 'Open collections folder', 'workspace.downloadOnly': 'Edit with downloads only',
+  'workspace.note': 'The folder stays on your device. Gitaverse requests read and write access only after you choose it.',
+  'workspace.unsupported': 'Direct folder saving is not supported by this browser. Use a current Chrome or Edge browser, or choose “Edit with downloads only”.',
+  'workspace.opening': 'Opening and validating the collections folder…', 'workspace.permission': 'Read and write access to the collections folder was not granted.',
+  'workspace.openFailed': 'The selected collections folder could not be opened.',
+  'goto.note': 'Enter a stable shloka ID, such as 6.B, 6.7, or 6.E.', 'goto.notFound': 'That shloka ID was not found.',
+  'editor.editVisible': 'Edit the four visible fields', 'editor.cancel': 'Cancel', 'editor.save': 'Save row', 'editor.unsaved': 'Unsaved changes', 'editor.removeHash': 'Remove # before saving',
+  'editor.noChanges': 'No changes to save', 'editor.savingFiles': 'Saving to collections…', 'editor.savingBrowser': 'Saving in this browser…', 'editor.savedBrowser': 'Saved in this browser session', 'editor.savedFiles': 'Saved to {files}', 'editor.saveFailed': 'The local collections could not be saved.', 'editor.downloaded': 'Downloaded edited language data',
+  'editor.discard': 'Discard the unsaved edits to this shloka?', 'editor.discardNavigate': 'Discard the unsaved edits to this shloka and continue?',
+  'editor.download': '↓ Download edited language files', 'editor.downloadAgain': '↓ Download again',
+  'editor.returnHome': 'Changes have not been downloaded. Are you sure you want to return Home?', 'editor.dismissDownload': 'Changes have not been downloaded. Are you sure you want to dismiss this reminder?',
+  'fullscreen.enter': 'Enter fullscreen', 'fullscreen.exit': 'Exit fullscreen',
+  'validation.name': 'Enter a profile name.', 'validation.dob': 'Enter a valid date of birth.', 'validation.appLanguage': 'Choose an app language.', 'validation.contentLanguage': 'Choose a preferred Gita content language.', 'validation.profileSave': 'The profile could not be saved.'
+};
+
+// Source: js/i18n/kn.js
+const KN_MESSAGES = {
+  'profile.create': 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ರಚಿಸಿ', 'profile.edit': 'ಪ್ರೊಫೈಲ್ ಸಂಪಾದಿಸಿ',
+  'profile.intro.create': 'ಈ ಸಾಧನದಲ್ಲಿ ಪ್ರತಿಯೊಬ್ಬರ ಭಾಷೆ ಮತ್ತು ಅನುಭವವನ್ನು ಪ್ರೊಫೈಲ್ ಪ್ರತ್ಯೇಕವಾಗಿ ಇಡುತ್ತದೆ.',
+  'profile.intro.edit': 'ಈ ಪ್ರೊಫೈಲ್‌ನ ಸ್ಥಳೀಯ ಆದ್ಯತೆಗಳನ್ನು ನವೀಕರಿಸಿ.',
+  'profile.appLanguage': 'ಆ್ಯಪ್ ಭಾಷೆ', 'profile.contentLanguage': 'ಆದ್ಯತೆಯ ಗೀತಾ ವಿಷಯ ಭಾಷೆ',
+  'profile.chooseLanguage': 'ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ', 'profile.name': 'ಹೆಸರು', 'profile.dob': 'ಜನ್ಮ ದಿನಾಂಕ',
+  'profile.gender': 'ಲಿಂಗ', 'profile.optional': '(ಐಚ್ಛಿಕ)', 'profile.notSaid': 'ಹೇಳಲು ಬಯಸುವುದಿಲ್ಲ',
+  'profile.female': 'ಮಹಿಳೆ', 'profile.male': 'ಪುರುಷ', 'profile.nonbinary': 'ದ್ವಿಲಿಂಗೇತರ', 'profile.selfDescribed': 'ಸ್ವಯಂ ವಿವರಣೆ',
+  'profile.choosePhoto': 'ಚಿತ್ರ ಆಯ್ಕೆಮಾಡಿ', 'profile.remove': 'ತೆಗೆದುಹಾಕಿ', 'profile.photoNote': 'ಐಚ್ಛಿಕ. ಈ ಸಾಧನದಲ್ಲೇ ಉಳಿಯುತ್ತದೆ.',
+  'profile.default': 'ಈ ಸಾಧನದಲ್ಲಿ ಈ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಬಳಸಿ', 'profile.analytics': 'ಉತ್ಪನ್ನ ಅನುಭವವನ್ನು ಉತ್ತಮಗೊಳಿಸಲು ನಾವು ಅನಾಮಧೇಯ ಮಾಹಿತಿಯನ್ನು ಸಂಗ್ರಹಿಸುತ್ತೇವೆ.',
+  'profile.cancel': 'ರದ್ದುಮಾಡಿ', 'profile.save': 'ಪ್ರೊಫೈಲ್ ಉಳಿಸಿ', 'profile.title': 'ಪ್ರೊಫೈಲ್', 'profile.switch': 'ಪ್ರೊಫೈಲ್ ಬದಲಿಸಿ', 'profile.manage': 'ಪ್ರೊಫೈಲ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಿ',
+  'profile.who': 'Gitaverse ಅನ್ನು ಯಾರು ಬಳಸುತ್ತಿದ್ದಾರೆ?', 'profile.choose': 'ಮುಂದುವರಿಸಲು ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ.', 'profile.add': '＋ ಮತ್ತೊಂದು ಪ್ರೊಫೈಲ್ ಸೇರಿಸಿ', 'profile.back': 'ಹಿಂದೆ',
+  'profile.defaultBadge': 'ಪೂರ್ವನಿಯೋಜಿತ', 'profile.editAction': 'ಸಂಪಾದಿಸಿ', 'profile.makeDefault': 'ಪೂರ್ವನಿಯೋಜಿತವಾಗಿಸಿ', 'profile.unsetDefault': 'ಪೂರ್ವನಿಯೋಜಿತ ತೆಗೆದುಹಾಕಿ', 'profile.delete': 'ಅಳಿಸಿ',
+  'home.chooseExperience': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ', 'home.intro': 'ನಿಮ್ಮ ವೇಗದಲ್ಲಿ ಓದಿ, ಚಿಂತಿಸಿ ಮತ್ತು ಆಲಿಸಿ.',
+  'home.gita700Note': 'ನಾಲ್ಕು ಫಲಕಗಳ ಅಧ್ಯಯನ ಅನುಭವ', 'home.future': 'ಅನುಭವವನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಬೇಕಿದೆ', 'home.coming': 'ಮುಂದೆ ಬರಲಿದೆ',
+  'common.about': 'Gitaverse ಕುರಿತು', 'common.install': 'Gitaverse ಸ್ಥಾಪಿಸಿ', 'common.close': 'ಮುಚ್ಚಿ',
+  'loading.title': 'ಗೀತೆಯನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ', 'loading.message': 'ಶ್ಲೋಕಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ…', 'error.title': 'ಪ್ಲೇಯರ್ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ',
+  'menu.chapters': 'ಅಧ್ಯಾಯಗಳು', 'menu.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'menu.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ({language})',
+  'menu.fullscreen': 'ಪೂರ್ಣ ಪರದೆ', 'menu.exitFullscreen': 'ಪೂರ್ಣ ಪರದೆಯಿಂದ ಹೊರಗೆ', 'menu.edit': 'ಈ ಶ್ಲೋಕ ಸಂಪಾದಿಸಿ', 'menu.leaveEdit': 'ಸಂಪಾದನೆ ಮುಗಿಸಿ',
+  'menu.home': 'ಮುಖಪುಟ', 'menu.help': 'ಸಹಾಯ', 'menu.open': 'ಮೆನು ತೆರೆಯಿರಿ', 'menu.close': 'ಮೆನು ಮುಚ್ಚಿ',
+  'dialog.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'dialog.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'dialog.chapters': 'ಅಧ್ಯಾಯಗಳು', 'dialog.shortcuts': 'ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್‌ಕಟ್‌ಗಳು',
+  'about.body': 'Gitaverse ಗೀತಾಜ್ಯೋತಿಯ ಶ್ಲೋಕ ಮತ್ತು ಪಠಣ ಅನುಭವ—ಭಗವದ್ಗೀತೆಯನ್ನು ಆಲಿಸಲು, ಅಧ್ಯಯನ ಮಾಡಲು ಮತ್ತು ಅದರ ಸಮೀಪದಲ್ಲಿರಲು ಸರಳ ಸ್ಥಳ.',
+  'about.version': 'ಆವೃತ್ತಿ',
+  'pwa.ready': 'Gitaverse ನ ಹೊಸ ಆವೃತ್ತಿ ಸಿದ್ಧವಾಗಿದೆ.', 'pwa.update': 'ಈಗ ನವೀಕರಿಸಿ',
+  'audio.play': 'ಆಡಿಯೊ ಪ್ಲೇ ಮಾಡಿ', 'audio.pause': 'ಆಡಿಯೊ ವಿರಾಮಗೊಳಿಸಿ', 'audio.unavailable': 'ಆಡಿಯೊ ಲಭ್ಯವಿಲ್ಲ', 'audio.none': 'ಆಡಿಯೊ ಇಲ್ಲ',
+  'audio.shortcut': 'P ಅಥವಾ Space',
+  'audio.onlineError': 'ಆಡಿಯೊ ಈಗ ಲಭ್ಯವಿಲ್ಲ.', 'audio.offlineError': 'ಈ ಆಡಿಯೊ ಇನ್ನೂ ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ.',
+  'help.previous': 'ಹಿಂದಿನ ಶ್ಲೋಕ', 'help.next': 'ಮುಂದಿನ ಶ್ಲೋಕ', 'help.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'help.chapters': 'ಅಧ್ಯಾಯಗಳನ್ನು ತೆರೆಯಿರಿ',
+  'help.language': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'help.home': 'ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ', 'help.play': 'ಆಡಿಯೊ ಪ್ಲೇ ಅಥವಾ ವಿರಾಮ', 'help.fullscreen': 'ಪೂರ್ಣ ಪರದೆಗೆ ಹೋಗಿ ಅಥವಾ ಹೊರಬನ್ನಿ',
+  'help.help': 'ಈ ಸಹಾಯ ತೆರೆಯಿರಿ', 'help.about': 'Gitaverse ಕುರಿತು ತೆರೆಯಿರಿ', 'help.menu': 'ಮೆನು ತೆರೆಯಿರಿ ಅಥವಾ ಮುಚ್ಚಿ', 'help.edit': 'ಸಂಪಾದನೆಗೆ ಹೋಗಿ ಅಥವಾ ಹೊರಬನ್ನಿ', 'help.escape': 'ಸಂವಾದ ಮುಚ್ಚಿ ಅಥವಾ ಪೂರ್ಣ ಪರದೆಯಿಂದ ಹೊರಬನ್ನಿ',
+  'data.title': 'ಗೀತಾ ಸಂಗ್ರಹಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ', 'data.description': 'Gitaverse ಭಾಷೆ ಮತ್ತು ಮಾಧ್ಯಮ ಸಂಗ್ರಹಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮುಂದುವರಿಸಲು ಸ್ಥಳೀಯ data/collections ಫೋಲ್ಡರ್ ಆಯ್ಕೆಮಾಡಿ.',
+  'data.choose': 'ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ಆಯ್ಕೆಮಾಡಿ', 'data.retry': 'ಸ್ವಯಂಚಾಲಿತ ಲೋಡ್ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ', 'data.localNote': 'ಆಯ್ಕೆಮಾಡಿದ ಫೈಲ್‌ಗಳು ಈ ಬ್ರೌಸರ್ ಅವಧಿಯಲ್ಲೇ ಇರುತ್ತವೆ; ಅಪ್‌ಲೋಡ್ ಅಥವಾ ಬದಲಾವಣೆ ಆಗುವುದಿಲ್ಲ.',
+  'workspace.title': 'ಸ್ಥಳೀಯ ಸಂಗ್ರಹಗಳನ್ನು ತೆರೆಯಿರಿ', 'workspace.open': 'ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ತೆರೆಯಿರಿ', 'workspace.downloadOnly': 'ಡೌನ್‌ಲೋಡ್ ಮೂಲಕ ಮಾತ್ರ ಸಂಪಾದಿಸಿ',
+  'workspace.note': 'ಫೋಲ್ಡರ್ ನಿಮ್ಮ ಸಾಧನದಲ್ಲೇ ಇರುತ್ತದೆ. ಆಯ್ಕೆಮಾಡಿದ ನಂತರ ಮಾತ್ರ Gitaverse ಓದು ಮತ್ತು ಬರವಣಿಗೆ ಅನುಮತಿ ಕೇಳುತ್ತದೆ.',
+  'workspace.unsupported': 'ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಫೋಲ್ಡರ್‌ಗೆ ನೇರವಾಗಿ ಉಳಿಸುವುದು ಬೆಂಬಲಿತವಾಗಿಲ್ಲ. ಇತ್ತೀಚಿನ Chrome ಅಥವಾ Edge ಬಳಸಿ, ಅಥವಾ “ಡೌನ್‌ಲೋಡ್ ಮೂಲಕ ಮಾತ್ರ ಸಂಪಾದಿಸಿ” ಆಯ್ಕೆಮಾಡಿ.',
+  'workspace.opening': 'ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ ಮತ್ತು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…', 'workspace.permission': 'ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್‌ಗೆ ಓದು ಮತ್ತು ಬರವಣಿಗೆ ಅನುಮತಿ ನೀಡಲಾಗಿಲ್ಲ.',
+  'workspace.openFailed': 'ಆಯ್ಕೆಮಾಡಿದ ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.',
+  'goto.note': '6.B, 6.7 ಅಥವಾ 6.E ನಂತಹ ಸ್ಥಿರ ಶ್ಲೋಕ ID ನಮೂದಿಸಿ.', 'goto.notFound': 'ಆ ಶ್ಲೋಕ ID ಕಂಡುಬಂದಿಲ್ಲ.',
+  'editor.editVisible': 'ಕಾಣುವ ನಾಲ್ಕು ಕ್ಷೇತ್ರಗಳನ್ನು ಸಂಪಾದಿಸಿ', 'editor.cancel': 'ರದ್ದುಮಾಡಿ', 'editor.save': 'ಸಾಲು ಉಳಿಸಿ', 'editor.unsaved': 'ಉಳಿಸದ ಬದಲಾವಣೆಗಳು', 'editor.removeHash': 'ಉಳಿಸುವ ಮೊದಲು # ತೆಗೆದುಹಾಕಿ',
+  'editor.noChanges': 'ಉಳಿಸಲು ಬದಲಾವಣೆಗಳಿಲ್ಲ', 'editor.savingFiles': 'ಸಂಗ್ರಹಗಳಿಗೆ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'editor.savingBrowser': 'ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'editor.savedBrowser': 'ಈ ಬ್ರೌಸರ್ ಅವಧಿಯಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ', 'editor.savedFiles': '{files} ಗೆ ಉಳಿಸಲಾಗಿದೆ', 'editor.saveFailed': 'ಸ್ಥಳೀಯ ಸಂಗ್ರಹಗಳನ್ನು ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.', 'editor.downloaded': 'ಸಂಪಾದಿತ ಭಾಷಾ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಆಗಿದೆ',
+  'editor.discard': 'ಈ ಶ್ಲೋಕದ ಉಳಿಸದ ಸಂಪಾದನೆಗಳನ್ನು ತ್ಯಜಿಸುವುದೇ?', 'editor.discardNavigate': 'ಈ ಶ್ಲೋಕದ ಉಳಿಸದ ಸಂಪಾದನೆಗಳನ್ನು ತ್ಯಜಿಸಿ ಮುಂದುವರಿಯುವುದೇ?',
+  'editor.download': '↓ ಸಂಪಾದಿತ ಭಾಷಾ ಫೈಲ್‌ಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ', 'editor.downloadAgain': '↓ ಮತ್ತೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
+  'editor.returnHome': 'ಬದಲಾವಣೆಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿಲ್ಲ. ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗುವುದೇ?', 'editor.dismissDownload': 'ಬದಲಾವಣೆಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿಲ್ಲ. ಈ ಜ್ಞಾಪನೆಯನ್ನು ಮುಚ್ಚುವುದೇ?',
+  'fullscreen.enter': 'ಪೂರ್ಣ ಪರದೆಗೆ ಹೋಗಿ', 'fullscreen.exit': 'ಪೂರ್ಣ ಪರದೆಯಿಂದ ಹೊರಬನ್ನಿ',
+  'validation.name': 'ಪ್ರೊಫೈಲ್ ಹೆಸರನ್ನು ನಮೂದಿಸಿ.', 'validation.dob': 'ಮಾನ್ಯ ಜನ್ಮ ದಿನಾಂಕವನ್ನು ನಮೂದಿಸಿ.', 'validation.appLanguage': 'ಆ್ಯಪ್ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.', 'validation.contentLanguage': 'ಆದ್ಯತೆಯ ಗೀತಾ ವಿಷಯ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.', 'validation.profileSave': 'ಪ್ರೊಫೈಲ್ ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.'
+};
+
+// Source: js/i18n/i18n.js
+const SUPPORTED_INTERFACE_LANGUAGES = new Set(['en', 'kn']);
+const MESSAGE_CATALOGS = { en: EN_MESSAGES, kn: KN_MESSAGES };
+
+class I18n {
+  constructor(language = 'en') { this.language = SUPPORTED_INTERFACE_LANGUAGES.has(language) ? language : 'en'; }
+  setLanguage(language) {
+    this.language = SUPPORTED_INTERFACE_LANGUAGES.has(language) ? language : 'en';
+    document.documentElement.lang = this.language;
+    this.apply();
+  }
+  t(key, values = {}) {
+    const template = MESSAGE_CATALOGS[this.language][key] ?? EN_MESSAGES[key] ?? key;
+    return Object.entries(values).reduce((text, [name, value]) => text.replaceAll('{' + name + '}', value), template);
+  }
+  apply(root = document) {
+    root.querySelectorAll('[data-i18n]').forEach((element) => { element.textContent = this.t(element.dataset.i18n); });
+    root.querySelectorAll('[data-i18n-aria]').forEach((element) => element.setAttribute('aria-label', this.t(element.dataset.i18nAria)));
+    root.querySelectorAll('[data-i18n-title]').forEach((element) => element.setAttribute('title', this.t(element.dataset.i18nTitle)));
+  }
+}
+
 // Source: js/profile-store.js
 const PROFILE_DB_NAME = 'gitaverse-profiles';
-const PROFILE_DB_VERSION = 2;
+const PROFILE_DB_VERSION = 3;
 const PROFILE_STORE = 'profiles';
 const SETTINGS_STORE = 'settings';
 const RESUME_STORE = 'resumePoints';
@@ -29,8 +147,9 @@ function transactionDone(transaction) {
 function openProfileDatabase() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(PROFILE_DB_NAME, PROFILE_DB_VERSION);
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const database = request.result;
+      const transaction = request.transaction;
       if (!database.objectStoreNames.contains(PROFILE_STORE)) {
         database.createObjectStore(PROFILE_STORE, { keyPath: 'pid', autoIncrement: true });
       }
@@ -39,6 +158,20 @@ function openProfileDatabase() {
       }
       if (!database.objectStoreNames.contains(RESUME_STORE)) {
         database.createObjectStore(RESUME_STORE, { keyPath: 'pid' });
+      }
+      if (event.oldVersion < 3 && database.objectStoreNames.contains(PROFILE_STORE)) {
+        const profiles = transaction.objectStore(PROFILE_STORE);
+        profiles.openCursor().onsuccess = (event) => {
+          const cursor = event.target.result;
+          if (!cursor) return;
+          const profile = cursor.value;
+          const legacyLanguage = profile.language === 'kn' ? 'kn' : 'en';
+          profile.interfaceLanguage = profile.interfaceLanguage === 'kn' ? 'kn' : legacyLanguage;
+          profile.contentLanguage = profile.contentLanguage === 'kn' ? 'kn' : legacyLanguage;
+          delete profile.language;
+          cursor.update(profile);
+          cursor.continue();
+        };
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -81,6 +214,8 @@ class ProfileStore {
     await this.open();
     const name = String(input.name || '').trim();
     if (!name) throw new Error('Enter a profile name.');
+    if (!['en', 'kn'].includes(input.interfaceLanguage)) throw new Error('Choose an app language.');
+    if (!['en', 'kn'].includes(input.contentLanguage)) throw new Error('Choose a preferred Gita content language.');
     const now = new Date().toISOString();
     const existing = input.pid ? await this.get(input.pid) : null;
     const profile = {
@@ -88,13 +223,15 @@ class ProfileStore {
       name,
       dob: input.dob,
       gender: input.gender || '',
-      language: input.language === 'kn' ? 'kn' : 'en',
+      interfaceLanguage: input.interfaceLanguage,
+      contentLanguage: input.contentLanguage,
       photo: input.photo || '',
       analyticsConsent: Boolean(input.analyticsConsent),
       analyticsProfileId: existing?.analyticsProfileId || randomAnalyticsId(),
       createdAt: existing?.createdAt || now,
       updatedAt: now
     };
+    delete profile.language;
     if (existing) profile.pid = existing.pid;
     const transaction = this.database.transaction(PROFILE_STORE, 'readwrite');
     const request = transaction.objectStore(PROFILE_STORE).put(profile);
@@ -218,11 +355,13 @@ async function resizeProfilePhoto(file) {
 
 // Source: js/profile-ui.js
 class ProfileUI {
-  constructor({ store, onSelected, onCreated, onChanged }) {
+  constructor({ store, onSelected, onCreated, onChanged, translate = (key, fallback) => fallback, onInterfaceLanguagePreview = () => {} }) {
     this.store = store;
     this.onSelected = onSelected;
     this.onCreated = onCreated;
     this.onChanged = onChanged;
+    this.translate = translate;
+    this.onInterfaceLanguagePreview = onInterfaceLanguagePreview;
     this.editingPid = null;
     this.photo = '';
     this.bind();
@@ -264,36 +403,45 @@ class ProfileUI {
       const name = document.createElement('strong');
       name.textContent = profile.name;
       const language = document.createElement('small');
-      language.textContent = profile.language === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      const interfaceName = profile.interfaceLanguage === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      const contentName = profile.contentLanguage === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      language.textContent = interfaceName + ' · ' + contentName;
       copy.append(name, language);
       select.appendChild(copy);
       if (profile.pid === defaultPid) {
         const badge = document.createElement('span');
         badge.className = 'default-badge';
-        badge.textContent = 'Default';
+        badge.textContent = this.translate('profile.defaultBadge', 'Default');
         select.appendChild(badge);
       }
       const actions = document.createElement('div');
       actions.className = 'profile-card-actions';
-      actions.innerHTML = `<button type="button" data-profile-action="edit" data-pid="${profile.pid}">Edit</button><button type="button" data-profile-action="default" data-pid="${profile.pid}">${profile.pid === defaultPid ? 'Unset default' : 'Make default'}</button><button type="button" data-profile-action="delete" data-pid="${profile.pid}">Delete</button>`;
+      actions.innerHTML = `<button type="button" data-profile-action="edit" data-pid="${profile.pid}">${this.translate('profile.editAction', 'Edit')}</button><button type="button" data-profile-action="default" data-pid="${profile.pid}">${profile.pid === defaultPid ? this.translate('profile.unsetDefault', 'Unset default') : this.translate('profile.makeDefault', 'Make default')}</button><button type="button" data-profile-action="delete" data-pid="${profile.pid}">${this.translate('profile.delete', 'Delete')}</button>`;
       card.append(select, actions);
       list.appendChild(card);
     });
-    document.getElementById('profile-selection-title').textContent = switching ? 'Switch profile' : 'Who is using Gitaverse?';
+    const selectionTitle = document.getElementById('profile-selection-title');
+    selectionTitle.dataset.i18n = switching ? 'profile.switch' : 'profile.who';
+    selectionTitle.textContent = switching ? this.translate('profile.switch', 'Switch profile') : this.translate('profile.who', 'Who is using Gitaverse?');
     document.getElementById('profile-selection-back').hidden = !switching;
   }
 
   async showForm(profile = null) {
     this.editingPid = profile?.pid || null;
     this.photo = profile?.photo || '';
-    document.getElementById('profile-form-title').textContent = profile ? 'Edit profile' : 'Create your profile';
-    document.getElementById('profile-form-intro').textContent = profile
-      ? 'Keep this profile’s local preferences up to date.'
-      : 'Profiles keep each person’s language and experience separate on this device.';
+    const formTitle = document.getElementById('profile-form-title');
+    const formIntro = document.getElementById('profile-form-intro');
+    formTitle.dataset.i18n = profile ? 'profile.edit' : 'profile.create';
+    formIntro.dataset.i18n = profile ? 'profile.intro.edit' : 'profile.intro.create';
+    formTitle.textContent = profile ? this.translate('profile.edit', 'Edit profile') : this.translate('profile.create', 'Create your profile');
+    formIntro.textContent = profile
+      ? this.translate('profile.intro.edit', 'Keep this profile’s local preferences up to date.')
+      : this.translate('profile.intro.create', 'Profiles keep each person’s language and experience separate on this device.');
     document.getElementById('profile-name').value = profile?.name || '';
     document.getElementById('profile-dob').value = profile?.dob || '';
     document.getElementById('profile-gender').value = profile?.gender || '';
-    document.getElementById('profile-language').value = profile?.language || 'en';
+    document.getElementById('profile-interface-language').value = profile?.interfaceLanguage || '';
+    document.getElementById('profile-content-language').value = profile?.contentLanguage || 'en';
     document.getElementById('profile-default').checked = profile ? (await this.store.defaultPid()) === profile.pid : true;
     document.getElementById('profile-form-cancel').hidden = !profile;
     document.getElementById('profile-form-error').textContent = '';
@@ -325,14 +473,20 @@ class ProfileUI {
       const error = document.getElementById('profile-form-error');
       error.textContent = '';
       try {
+        if (!document.getElementById('profile-name').value.trim()) throw new Error(this.translate('validation.name', 'Enter a profile name.'));
         const dob = document.getElementById('profile-dob').value;
-        if (!dob || new Date(dob + 'T00:00:00') > new Date()) throw new Error('Enter a valid date of birth.');
+        if (!dob || new Date(dob + 'T00:00:00') > new Date()) throw new Error(this.translate('validation.dob', 'Enter a valid date of birth.'));
+        const interfaceLanguage = document.getElementById('profile-interface-language').value;
+        const contentLanguage = document.getElementById('profile-content-language').value;
+        if (!interfaceLanguage) throw new Error(this.translate('validation.appLanguage', 'Choose an app language.'));
+        if (!contentLanguage) throw new Error(this.translate('validation.contentLanguage', 'Choose a preferred Gita content language.'));
         const profile = await this.store.save({
           pid: this.editingPid,
           name: document.getElementById('profile-name').value,
           dob,
           gender: document.getElementById('profile-gender').value,
-          language: document.getElementById('profile-language').value,
+          interfaceLanguage,
+          contentLanguage,
           photo: this.photo,
           analyticsConsent: true
         });
@@ -341,10 +495,15 @@ class ProfileUI {
         if (this.editingPid) await this.onChanged(profile);
         else await this.onCreated(profile);
       } catch (failure) {
-        error.textContent = failure.message || 'The profile could not be saved.';
+        error.textContent = failure.message || this.translate('validation.profileSave', 'The profile could not be saved.');
       }
     });
     document.getElementById('profile-name').addEventListener('input', () => this.renderPhotoPreview());
+    document.getElementById('profile-interface-language').addEventListener('change', (event) => {
+      const content = document.getElementById('profile-content-language');
+      if (!this.editingPid && event.target.value) content.value = event.target.value;
+      this.onInterfaceLanguagePreview(event.target.value || 'en');
+    });
     document.getElementById('profile-photo').addEventListener('change', async (event) => {
       const error = document.getElementById('profile-form-error');
       try {
@@ -476,7 +635,7 @@ function profileAnalyticsContext(profile, now = new Date()) {
   return {
     ageBand: ageBand(profile.dob, now),
     genderGroup: GENDERS.has(profile.gender) ? profile.gender.replace('-', '_') : 'not_said',
-    profileLanguage: profile.language === 'kn' ? 'kn' : 'en'
+    profileLanguage: profile.interfaceLanguage === 'kn' ? 'kn' : 'en'
   };
 }
 
@@ -736,13 +895,24 @@ class PwaManager {
 
 // Source: js/shared/about-dialog.js
 class AboutDialog {
-  constructor({ version = 'dev', onOpen = () => {} } = {}) {
+  constructor({ version = 'dev', onOpen = () => {}, translate = (key, fallback) => fallback } = {}) {
     this.version = version;
     this.onOpen = onOpen;
+    this.translate = translate;
     this.overlay = this.ensureMarkup();
     this.overlay.querySelector('[data-about-version]').textContent = version;
+    this.refresh();
     this.overlay.querySelector('[data-about-close]').addEventListener('click', () => this.close());
     this.overlay.addEventListener('click', (event) => { if (event.target === this.overlay) this.close(); });
+  }
+
+  refresh() {
+    this.overlay.querySelector('#about-title').textContent = this.translate('common.about', 'About Gitaverse');
+    this.overlay.querySelector('.about-body > p').textContent = this.translate('about.body', 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.');
+    const version = this.overlay.querySelector('.about-version');
+    const value = version.querySelector('[data-about-version]');
+    version.replaceChildren(document.createTextNode(this.translate('about.version', 'Version') + ' '), value);
+    this.overlay.querySelector('[data-about-close]').setAttribute('aria-label', this.translate('common.close', 'Close'));
   }
 
   ensureMarkup() {
@@ -774,6 +944,7 @@ class AboutDialog {
   }
 
   open(opener = document.activeElement) {
+    this.refresh();
     this.opener = opener;
     this.overlay.hidden = false;
     this.onOpen();
@@ -1133,7 +1304,7 @@ function serializeLanguageMaster(dataset, language) {
 
 // Source: js/player/audio-player.js
 class AudioPlayer {
-  constructor({ audio, playButton, playIcon, pauseIcon, seek, time, onError = () => {}, onEvent = () => {} }) {
+  constructor({ audio, playButton, playIcon, pauseIcon, seek, time, onError = () => {}, onEvent = () => {}, translate = (key, fallback) => fallback }) {
     this.audio = audio;
     this.playButton = playButton;
     this.playIcon = playIcon;
@@ -1142,6 +1313,7 @@ class AudioPlayer {
     this.time = time;
     this.onError = onError;
     this.onEvent = onEvent;
+    this.translate = translate;
     this.started = false;
     this.suppressPause = false;
     this.milestones = new Set();
@@ -1195,7 +1367,7 @@ class AudioPlayer {
       this.onEvent('audio_seeked');
     });
     this.audio.addEventListener('error', () => {
-      this.time.textContent = 'Audio unavailable';
+      this.time.textContent = this.translate('audio.unavailable', 'Audio unavailable');
       this.playButton.disabled = true;
       this.seek.disabled = true;
       this.updatePlayState();
@@ -1218,7 +1390,7 @@ class AudioPlayer {
     this.seek.disabled = !source;
     this.seek.max = '0';
     this.seek.value = '0';
-    this.time.textContent = source ? '00:00 / 00:00' : 'No audio';
+    this.time.textContent = source ? '00:00 / 00:00' : this.translate('audio.none', 'No audio');
   }
 
   toggle() {
@@ -1238,8 +1410,8 @@ class AudioPlayer {
     const playing = !this.audio.paused && !this.audio.ended;
     this.playIcon.toggleAttribute('hidden', playing);
     this.pauseIcon.toggleAttribute('hidden', !playing);
-    this.playButton.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
-    this.playButton.title = (playing ? 'Pause audio' : 'Play audio') + ' (P or Space)';
+    this.playButton.setAttribute('aria-label', playing ? this.translate('audio.pause', 'Pause audio') : this.translate('audio.play', 'Play audio'));
+    this.playButton.title = (playing ? this.translate('audio.pause', 'Pause audio') : this.translate('audio.play', 'Play audio')) + ' (' + this.translate('audio.shortcut', 'P or Space') + ')';
   }
 
   formatTime(seconds) {
@@ -1383,13 +1555,14 @@ function availableExperiences() {
 
 // Source: js/player/editor.js
 class InlineEditor {
-  constructor({ dataset, renderer, currentRow, rerender, workspace = null, onStateChange }) {
+  constructor({ dataset, renderer, currentRow, rerender, workspace = null, onStateChange, translate = (key, fallback) => fallback }) {
     this.dataset = dataset;
     this.renderer = renderer;
     this.currentRow = currentRow;
     this.rerender = rerender;
     this.onStateChange = onStateChange || (() => {});
     this.workspace = workspace;
+    this.translate = translate;
     this.active = false;
     this.dirty = false;
     this.savedChanges = false;
@@ -1407,9 +1580,9 @@ class InlineEditor {
     toolbar.className = 'edit-toolbar';
     toolbar.hidden = true;
     toolbar.innerHTML =
-      '<span class="edit-status">Edit the four visible fields</span>' +
-      '<button class="cancel-edit" type="button">Cancel</button>' +
-      '<button class="save-edit" type="button">Save row</button>';
+      '<span class="edit-status">' + this.translate('editor.editVisible', 'Edit the four visible fields') + '</span>' +
+      '<button class="cancel-edit" type="button">' + this.translate('editor.cancel', 'Cancel') + '</button>' +
+      '<button class="save-edit" type="button">' + this.translate('editor.save', 'Save row') + '</button>';
     document.body.appendChild(toolbar);
     toolbar.querySelector('.cancel-edit').addEventListener('click', () => this.cancel());
     toolbar.querySelector('.save-edit').addEventListener('click', () => this.save());
@@ -1453,8 +1626,8 @@ class InlineEditor {
     const invalid = event.currentTarget.innerText.includes('#');
     event.currentTarget.setAttribute('aria-invalid', invalid ? 'true' : 'false');
     this.toolbar.querySelector('.edit-status').textContent = invalid
-      ? 'Remove # before saving'
-      : 'Unsaved changes';
+      ? this.translate('editor.removeHash', 'Remove # before saving')
+      : this.translate('editor.unsaved', 'Unsaved changes');
     this.updateUi();
   }
 
@@ -1464,7 +1637,7 @@ class InlineEditor {
     const invalid = elements.find((element) => element.innerText.includes('#'));
     if (invalid) {
       invalid.focus();
-      this.toolbar.querySelector('.edit-status').textContent = 'Remove # before saving';
+      this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.removeHash', 'Remove # before saving');
       return false;
     }
     const row = this.currentRow();
@@ -1485,13 +1658,13 @@ class InlineEditor {
     });
     if (!changes.length) {
       this.dirty = false;
-      this.toolbar.querySelector('.edit-status').textContent = 'No changes to save';
+      this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.noChanges', 'No changes to save');
       this.updateUi();
       return true;
     }
     const saveButton = this.toolbar.querySelector('.save-edit');
     saveButton.disabled = true;
-    this.toolbar.querySelector('.edit-status').textContent = this.workspace ? 'Saving to collections…' : 'Saving in this browser…';
+    this.toolbar.querySelector('.edit-status').textContent = this.workspace ? this.translate('editor.savingFiles', 'Saving to collections…') : this.translate('editor.savingBrowser', 'Saving in this browser…');
     try {
       let savedFiles = [];
       if (this.workspace) savedFiles = await this.workspace.saveLanguageMasters(this.dataset, languages);
@@ -1501,14 +1674,14 @@ class InlineEditor {
       this.pendingDownload = !this.workspace;
       this.savedRevision += 1;
       this.toolbar.querySelector('.edit-status').textContent = this.workspace
-        ? 'Saved to ' + savedFiles.join(' and ')
-        : 'Saved in this browser session';
+        ? this.translate('editor.savedFiles', 'Saved to {files}', { files: savedFiles.join(' and ') })
+        : this.translate('editor.savedBrowser', 'Saved in this browser session');
       this.rerender({ keepEditing: true });
       this.updateUi();
       return true;
     } catch (error) {
       changes.forEach(({ target, property, previous }) => { target[property] = previous; });
-      this.toolbar.querySelector('.edit-status').textContent = error.message || 'The local collections could not be saved.';
+      this.toolbar.querySelector('.edit-status').textContent = error.message || this.translate('editor.saveFailed', 'The local collections could not be saved.');
       this.dirty = true;
       this.updateUi();
       return false;
@@ -1516,7 +1689,7 @@ class InlineEditor {
   }
 
   cancel() {
-    if (this.dirty && !window.confirm('Discard the unsaved edits to this shloka?')) return false;
+    if (this.dirty && !window.confirm(this.translate('editor.discard', 'Discard the unsaved edits to this shloka?'))) return false;
     this.dirty = false;
     this.exit();
     this.rerender();
@@ -1525,7 +1698,7 @@ class InlineEditor {
 
   canNavigate() {
     if (!this.active || !this.dirty) return true;
-    if (!window.confirm('Discard the unsaved edits to this shloka and continue?')) return false;
+    if (!window.confirm(this.translate('editor.discardNavigate', 'Discard the unsaved edits to this shloka and continue?'))) return false;
     this.dirty = false;
     this.exit();
     return true;
@@ -1545,7 +1718,7 @@ class InlineEditor {
       URL.revokeObjectURL(url);
     });
     this.pendingDownload = false;
-    this.toolbar.querySelector('.edit-status').textContent = 'Downloaded edited language data';
+    this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.downloaded', 'Downloaded edited language data');
     this.updateUi();
   }
 
@@ -1600,6 +1773,8 @@ let requestedLanguage = params.get('lang');
 const explicitLocationRequested = params.has('play') || params.has('sid') || params.has('lang');
 const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
 const clarityProjectId = document.querySelector('meta[name="clarity-project-id"]')?.content || '';
+const i18n = new I18n('en');
+const translate = (key, fallback, values = {}) => i18n.t(key, values) === key ? fallback : i18n.t(key, values);
 
 const profileStore = new ProfileStore();
 const eventBus = new EventBus({
@@ -1613,13 +1788,24 @@ eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
 eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
 eventBus.subscribe(new SentryAdapter());
 const pwa = new PwaManager({ appVersion });
-const aboutDialog = new AboutDialog({ version: appVersion });
+const aboutDialog = new AboutDialog({ version: appVersion, translate });
 const profileUI = new ProfileUI({
   store: profileStore,
   onSelected: selectProfile,
   onCreated: createProfile,
-  onChanged: handleProfileChange
+  onChanged: handleProfileChange,
+  translate,
+  onInterfaceLanguagePreview: setInterfaceLanguage
 });
+
+function setInterfaceLanguage(language) {
+  i18n.setLanguage(language);
+  aboutDialog.refresh();
+  if (state.dataset && state.renderer) {
+    render({ trackLocation: false, keepEditing: Boolean(state.editor?.active) });
+    syncFullscreenUi();
+  }
+}
 
 const audioPlayer = new AudioPlayer({
   audio: document.getElementById('audio'),
@@ -1628,8 +1814,9 @@ const audioPlayer = new AudioPlayer({
   pauseIcon: document.getElementById('pause-icon'),
   seek: document.getElementById('audio-seek'),
   time: document.getElementById('audio-time'),
-  onError: () => pwa.showStatus(navigator.onLine ? 'Audio is currently unavailable.' : 'This audio is not available offline yet.'),
-  onEvent: (name) => emitEvent(name, { context: verseContext() })
+  onError: () => pwa.showStatus(navigator.onLine ? i18n.t('audio.onlineError') : i18n.t('audio.offlineError')),
+  onEvent: (name) => emitEvent(name, { context: verseContext() }),
+  translate
 });
 
 const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
@@ -1668,6 +1855,7 @@ function updateProfileUrl(profile) {
 async function activateProfile(profile) {
   if (state.activeProfile?.pid !== profile.pid) state.experienceResumes.clear();
   state.activeProfile = profile;
+  setInterfaceLanguage(profile.interfaceLanguage);
   updateProfileUrl(profile);
   await profileUI.renderPills(profile);
 }
@@ -1701,7 +1889,7 @@ async function handleProfileChange(profile, options = {}) {
   }
   showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
   if (state.dataset && state.profileReturnView === 'app') {
-    state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.language;
+    state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.contentLanguage;
     render();
   }
 }
@@ -1709,7 +1897,7 @@ async function handleProfileChange(profile, options = {}) {
 function goToExperienceSelection(profile = state.activeProfile, { source = 'home', track = true } = {}) {
   play = null;
   requestedSid = null;
-  requestedLanguage = profile?.language || 'en';
+  requestedLanguage = profile?.contentLanguage || 'en';
   const home = new URL(location.href);
   home.searchParams.delete('play');
   home.searchParams.delete('sid');
@@ -1733,7 +1921,7 @@ async function openProfileLocation(profile, { honorExplicit = false } = {}) {
     return startRequestedExperience();
   }
   const resume = await profileStore.getResume(profile.pid);
-  requestedLanguage = resume?.language || profile.language;
+  requestedLanguage = resume?.language || profile.contentLanguage;
   if (resume?.view === 'experience') {
     play = resume.experience;
     requestedSid = resume.sid;
@@ -1809,7 +1997,7 @@ async function startRequestedExperience() {
   if (chooserResume?.sid) chooserUrl.searchParams.set('sid', chooserResume.sid);
   else chooserUrl.searchParams.delete('sid');
   chooserUrl.searchParams.set('pid', state.activeProfile.pid);
-  const chooserLanguage = chooserResume?.language || (requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language);
+  const chooserLanguage = chooserResume?.language || (requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.contentLanguage);
   if (chooserLanguage === 'kn') chooserUrl.searchParams.set('lang', 'kn');
   else chooserUrl.searchParams.delete('lang');
   chooserLink.href = chooserUrl.href;
@@ -1829,7 +2017,7 @@ async function startRequestedExperience() {
     await startPlayer(await loadCollectionExperience(play, { version: appVersion }), experience);
   } catch (error) {
     emitEvent('data_load_failed', {
-      context: { experience: play, language: requestedLanguage || state.activeProfile.language },
+      context: { experience: play, language: requestedLanguage || state.activeProfile.contentLanguage },
       details: { source: 'automatic' }
     });
     showDataChooser(error.message);
@@ -1840,7 +2028,7 @@ async function startPlayer(dataset, experience, { workspace = null, sid = reques
   if (state.editor) state.editor.destroy();
   if (state.renderer) state.renderer.destroy();
   state.dataset = dataset;
-  state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
+  state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.contentLanguage;
   const requestedIndex = sid ? findSid(sid) : -1;
   if (state.locationSource === 'resume' && sid && requestedIndex < 0) {
     state.locationSource = null;
@@ -1859,8 +2047,9 @@ async function startPlayer(dataset, experience, { workspace = null, sid = reques
     currentRow,
     rerender: (options = {}) => render({ ...options, trackLocation: false }),
     workspace,
+    translate,
     onStateChange: ({ active, savedChanges, pendingDownload, workspace: hasWorkspace, savedRevision }) => {
-      document.querySelector('#edit-button .top-menu-label').textContent = active ? 'Leave edit mode' : 'Edit this shloka';
+      document.querySelector('#edit-button .top-menu-label').textContent = active ? i18n.t('menu.leaveEdit') : i18n.t('menu.edit');
       if (savedRevision > state.lastSavedRevision) {
         state.lastSavedRevision = savedRevision;
         state.downloadReminderDismissed = false;
@@ -1868,7 +2057,7 @@ async function startPlayer(dataset, experience, { workspace = null, sid = reques
       const reminder = document.getElementById('download-reminder');
       reminder.hidden = hasWorkspace || !savedChanges || state.downloadReminderDismissed;
       const action = document.getElementById('download-reminder-action');
-      action.textContent = pendingDownload ? '↓ Download edited language files' : '↓ Download again';
+      action.textContent = pendingDownload ? i18n.t('editor.download') : i18n.t('editor.downloadAgain');
     }
   });
 
@@ -1927,10 +2116,7 @@ function render(options = {}) {
   else chapterIcon.removeAttribute('src');
   document.getElementById('sid-label').textContent = row.sid;
   document.getElementById('position-label').textContent = (state.index + 1) + ' / ' + state.dataset.rows.length;
-  document.querySelector('#language-button .top-menu-label').textContent = state.language === 'kn'
-    ? 'Language (ಕನ್ನಡ)'
-    : 'Language (Eng)';
-  document.documentElement.lang = state.language;
+  document.querySelector('#language-button .top-menu-label').textContent = i18n.t('menu.contentLanguage', { language: state.language === 'kn' ? 'ಕನ್ನಡ' : 'English' });
   state.renderer.render(row, state.language);
   state.experienceResumes.set(play, {
     experience: play,
@@ -2033,7 +2219,7 @@ function setLanguage(language) {
   if (!state.editor.canNavigate()) return;
   state.language = language === 'kn' ? 'kn' : 'en';
   requestedLanguage = state.language;
-  state.activeProfile.language = state.language;
+  state.activeProfile.contentLanguage = state.language;
   profileStore.save(state.activeProfile).then((profile) => {
     state.activeProfile = profile;
     profileUI.renderPills(profile);
@@ -2094,17 +2280,17 @@ async function openCollectionsWorkspace() {
   const message = document.getElementById('workspace-error');
   const button = document.getElementById('open-collections-workspace');
   if (typeof window.showDirectoryPicker !== 'function') {
-    message.textContent = 'Direct folder saving is not supported by this browser. Use a current Chrome or Edge browser, or choose “Edit with downloads only”.';
+    message.textContent = i18n.t('workspace.unsupported');
     return;
   }
   button.disabled = true;
-  message.textContent = 'Opening and validating the collections folder…';
+  message.textContent = i18n.t('workspace.opening');
   try {
     const handle = await window.showDirectoryPicker({ id: 'gitaverse-collections', mode: 'readwrite' });
     const permission = { mode: 'readwrite' };
     if (handle.queryPermission && await handle.queryPermission(permission) !== 'granted') {
       if (!handle.requestPermission || await handle.requestPermission(permission) !== 'granted') {
-        throw new Error('Read and write access to the collections folder was not granted.');
+        throw new Error(i18n.t('workspace.permission'));
       }
     }
     const sid = currentRow().sid;
@@ -2113,7 +2299,7 @@ async function openCollectionsWorkspace() {
     await startPlayer(dataset, getExperience(play), { workspace, sid });
     state.editor.enter();
   } catch (error) {
-    if (error?.name !== 'AbortError') message.textContent = error.message || 'The selected collections folder could not be opened.';
+    if (error?.name !== 'AbortError') message.textContent = error.message || i18n.t('workspace.openFailed');
   } finally {
     button.disabled = false;
   }
@@ -2129,7 +2315,7 @@ function setMenuOpen(open) {
   const button = document.getElementById('menu-button');
   menu.hidden = !open;
   button.setAttribute('aria-expanded', open ? 'true' : 'false');
-  button.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  button.setAttribute('aria-label', open ? i18n.t('menu.close') : i18n.t('menu.open'));
   if (open) requestAnimationFrame(() => menuOptions()[0]?.focus());
   else if (menu.contains(document.activeElement)) button.focus();
 }
@@ -2179,7 +2365,7 @@ function chooseLanguage(language) {
 function goHome() {
   setMenuOpen(false);
   if (!state.editor.canNavigate()) return;
-  if (state.editor.pendingDownload && !window.confirm('Changes have not been downloaded. Are you sure you want to return Home?')) return;
+  if (state.editor.pendingDownload && !window.confirm(i18n.t('editor.returnHome'))) return;
   goToExperienceSelection();
 }
 
@@ -2250,10 +2436,10 @@ function updateDeviceLayout() {
 function syncFullscreenUi() {
   const active = Boolean(document.fullscreenElement || document.webkitFullscreenElement)
     || document.documentElement.classList.contains('immersive');
-  document.querySelector('#fullscreen-button .top-menu-label').textContent = active ? 'Exit fullscreen' : 'Fullscreen';
+  document.querySelector('#fullscreen-button .top-menu-label').textContent = active ? i18n.t('menu.exitFullscreen') : i18n.t('menu.fullscreen');
   const button = document.getElementById('footer-fullscreen-button');
-  button.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Enter fullscreen');
-  button.title = (active ? 'Exit fullscreen' : 'Fullscreen') + ' (F)';
+  button.setAttribute('aria-label', active ? i18n.t('fullscreen.exit') : i18n.t('fullscreen.enter'));
+  button.title = (active ? i18n.t('fullscreen.exit') : i18n.t('menu.fullscreen')) + ' (F)';
   button.querySelector('.fullscreen-enter-icon').toggleAttribute('hidden', active);
   button.querySelector('.fullscreen-exit-icon').toggleAttribute('hidden', !active);
 }
@@ -2326,6 +2512,7 @@ function bindEvents() {
     showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
   });
   document.getElementById('profile-form-cancel').addEventListener('click', () => {
+    setInterfaceLanguage(state.activeProfile?.interfaceLanguage || 'en');
     showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'chooser'));
   });
   document.getElementById('edit-button').addEventListener('click', requestEditMode);
@@ -2333,7 +2520,7 @@ function bindEvents() {
   document.getElementById('edit-download-only').addEventListener('click', enterDownloadOnlyEditMode);
   document.getElementById('download-reminder-action').addEventListener('click', () => state.editor.download());
   document.getElementById('download-reminder-close').addEventListener('click', () => {
-    if (state.editor.pendingDownload && !window.confirm('Changes have not been downloaded. Are you sure you want to dismiss this reminder?')) return;
+    if (state.editor.pendingDownload && !window.confirm(i18n.t('editor.dismissDownload'))) return;
     state.downloadReminderDismissed = true;
     document.getElementById('download-reminder').hidden = true;
   });
@@ -2350,7 +2537,7 @@ function bindEvents() {
   document.querySelectorAll('.overlay').forEach((overlay) => overlay.addEventListener('click', (event) => { if (event.target === overlay) closeOverlays(); }));
   document.getElementById('goto-form').addEventListener('submit', (event) => {
     event.preventDefault();
-    if (!goToSid(document.getElementById('goto-input').value)) document.getElementById('goto-error').textContent = 'That shloka ID was not found.';
+    if (!goToSid(document.getElementById('goto-input').value)) document.getElementById('goto-error').textContent = i18n.t('goto.notFound');
   });
   document.getElementById('chapter-list').addEventListener('click', (event) => {
     const button = event.target.closest('.chapter-button');

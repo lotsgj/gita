@@ -3,9 +3,18 @@
 **Status:** Current  
 **Last updated:** 29 September 2026
 
-Ideas approved for future implementation. Add new ideas to this list and remove an item after it has been implemented and verified.
+Sampada keeps both future possibilities and completed enhancements. Items retain their number after completion so decisions and delivery history remain traceable.
 
-## 1. Diksoochi — Know · Able · Use
+| List | Meaning |
+| --- | --- |
+| **To unfold** | Approved possibilities that are not yet implemented and verified. |
+| **Done** | Enhancements that have been implemented, documented and regression-tested. |
+
+## To unfold
+
+### 1. Diksoochi — Know · Able · Use
+
+**Status:** To unfold
 
 **Tag:** Major
 
@@ -13,7 +22,7 @@ Create a calm, profile-specific Gita compass rather than a scorecard or competit
 
 Do not calculate one overall score. Present each dimension as a simple, encouraging sentence. When reliable data is unavailable, do not display zero; explain that this part of the relationship will unfold with future activity or experiences.
 
-### Know
+#### Know
 
 Purpose: **I can find my way through the Gita.**
 
@@ -27,7 +36,7 @@ Example:
 
 > You have explored **9 chapters** and spent meaningful time with **84 shlokas**.
 
-### Able
+#### Able
 
 Purpose: **I am becoming comfortable chanting and interpreting the Gita.**
 
@@ -41,7 +50,7 @@ Example:
 
 > You can chant **12 shlokas with guidance** and **5 independently**. You feel able to explain **8 shlokas in your own words**.
 
-### Use
+#### Use
 
 Purpose: **I can bring the Gita into my life.**
 
@@ -55,7 +64,7 @@ Example:
 
 > You have connected **6 shlokas** with situations in your life. **4 insights felt helpful**, while **2 are still unfolding**.
 
-### Gentle next step
+#### Gentle next step
 
 End with one grounded recommendation, selected in this order:
 
@@ -68,13 +77,15 @@ Include the reassurance:
 
 > Diksoochi is a personal compass, not a test. Your journey is stored separately for this profile on this device.
 
-### Suggested delivery order
+#### Suggested delivery order
 
 1. Activate Know using trustworthy engagement data already available.
 2. Add the self-assessment controls required for Able.
 3. Add private reflection and follow-up experiences required for Use.
 
-## 2. I WISH — Share feedback with Sudhama
+### 2. I WISH — Share feedback with Sudhama
+
+**Status:** To unfold
 
 **Tag:** Major
 
@@ -99,44 +110,64 @@ Example introduction:
 
 Keep this as a user-initiated external contact action. Gitaverse should not silently transmit feedback or contact information.
 
-## 3. Consistent chapter names
+### 4. Garuda — contextual guide
 
-**Tag:** Minor
-
-Make every chapter UI display the chapter name consistently. Some current surfaces show names while others show only chapter numbers. Use the chapter name in the active language wherever a chapter is identified, with the number retained where it helps orientation.
-
-## 4. Global language preference
-
-**Tag:** Major
-
-Make the profile’s selected language global. Once the user chooses a language, every supported experience and shared application surface should open in that language. An experience may fall back gracefully only when content is unavailable in the chosen language, and should make that fallback clear.
-
-## 5. Garuda — contextual guide
+**Status:** To unfold
 
 **Tag:** Major
 
 Create **Garuda**, a simple contextual guide that helps the user understand what is available and what to do next. Guidance should be brief, relevant to the current screen or activity, and dismissible. Garuda should support the user without becoming a chatty or intrusive assistant.
 
-## 6. Make Install app prominent
+### 5. Make Install app prominent
+
+**Status:** To unfold
 
 **Tag:** Minor
 
 Make **Install Gitaverse** prominently visible when installation is supported and the app is not already installed. Keep it discoverable from the landing experience and provide a clear fallback explanation when the browser requires manual installation steps.
 
-## 7. Choose an audio voice or collection
+### 6. Choose an audio voice or collection
+
+**Status:** To unfold
 
 **Tag:** Major
 
 Let the user choose the audio voice or collection used for an experience—for example, **Swami Brahmananda**, **Acharini Padma**, and future contributors. Present only collections compatible with the current content and audio purpose, remember the choice for the profile, and fall back clearly when the selected collection has no audio for a particular SID.
 
-## 8. Bhetal — reflect and go deeper
+### 7. Bhetal — reflect and go deeper
+
+**Status:** To unfold
 
 **Tag:** Major
 
 Create a feature, provisionally named **Bhetal**, that helps the user reflect, question assumptions and go deeper into a shloka or teaching. Its interaction model, relationship with MyGita, and final name will be designed later.
 
-## 9. Sadguru — interpretations from acharyas
+### 8. Sadguru — interpretations from acharyas
+
+**Status:** To unfold
 
 **Tag:** Major
 
 Create **Sadguru**, an experience for studying interpretations from Prabhuji and other respected acharyas. Preserve the source and attribution of every interpretation, let the user choose whose interpretation to explore, and keep commentary distinct from the canonical shloka text and translation.
+
+## Done
+
+### 3. Consistent chapter names
+
+**Status:** Done
+
+**Tag:** Minor
+
+**Completed:** 29 September 2026
+
+Every chapter UI now displays the number and chapter name consistently in the selected content language. English and Kannada masters provide the names, including Dhyana, and the interface contains no hard-coded chapter-name exception.
+
+### 9. Global app-language preference
+
+**Status:** Done
+
+**Tag:** Major
+
+**Completed:** 29 September 2026
+
+Every profile now has a mandatory app-language preference, independently of its preferred Gita content language. The app language governs Gitaverse labels, actions, dialogs and messages; content language governs chapter names and verse content. The `lang` URL parameter overrides content only. Existing profiles migrate their earlier language preference to both fields, and analytics records the two dimensions separately.

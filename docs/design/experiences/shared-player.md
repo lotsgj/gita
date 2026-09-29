@@ -17,6 +17,6 @@ Escape closes an open dialog before leaving fullscreen. Desktop uses browser ful
 
 ## Shared capabilities
 
-The shell supplies language choice, chapter and SID routing, audio controls, profile access, About, Help, local editing entry, install/update notices, events, and resume. Renderers supply their own panel layout and editable field mapping.
+The shell supplies content-language choice, chapter and SID routing, audio controls, profile access, About, Help, local editing entry, install/update notices, events, and resume. Every shell label and message follows the profile’s app language; renderer content follows the independently selected content language. Renderers supply their own panel layout and editable field mapping.
 
 See [Gita 700](gita-700.md) for the current renderer.

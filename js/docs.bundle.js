@@ -80,7 +80,7 @@ const marked = g;
 
 // Source: js/profile-store.js
 const PROFILE_DB_NAME = 'gitaverse-profiles';
-const PROFILE_DB_VERSION = 2;
+const PROFILE_DB_VERSION = 3;
 const PROFILE_STORE = 'profiles';
 const SETTINGS_STORE = 'settings';
 const RESUME_STORE = 'resumePoints';
@@ -103,8 +103,9 @@ function transactionDone(transaction) {
 function openProfileDatabase() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(PROFILE_DB_NAME, PROFILE_DB_VERSION);
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const database = request.result;
+      const transaction = request.transaction;
       if (!database.objectStoreNames.contains(PROFILE_STORE)) {
         database.createObjectStore(PROFILE_STORE, { keyPath: 'pid', autoIncrement: true });
       }
@@ -113,6 +114,20 @@ function openProfileDatabase() {
       }
       if (!database.objectStoreNames.contains(RESUME_STORE)) {
         database.createObjectStore(RESUME_STORE, { keyPath: 'pid' });
+      }
+      if (event.oldVersion < 3 && database.objectStoreNames.contains(PROFILE_STORE)) {
+        const profiles = transaction.objectStore(PROFILE_STORE);
+        profiles.openCursor().onsuccess = (event) => {
+          const cursor = event.target.result;
+          if (!cursor) return;
+          const profile = cursor.value;
+          const legacyLanguage = profile.language === 'kn' ? 'kn' : 'en';
+          profile.interfaceLanguage = profile.interfaceLanguage === 'kn' ? 'kn' : legacyLanguage;
+          profile.contentLanguage = profile.contentLanguage === 'kn' ? 'kn' : legacyLanguage;
+          delete profile.language;
+          cursor.update(profile);
+          cursor.continue();
+        };
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -155,6 +170,8 @@ class ProfileStore {
     await this.open();
     const name = String(input.name || '').trim();
     if (!name) throw new Error('Enter a profile name.');
+    if (!['en', 'kn'].includes(input.interfaceLanguage)) throw new Error('Choose an app language.');
+    if (!['en', 'kn'].includes(input.contentLanguage)) throw new Error('Choose a preferred Gita content language.');
     const now = new Date().toISOString();
     const existing = input.pid ? await this.get(input.pid) : null;
     const profile = {
@@ -162,13 +179,15 @@ class ProfileStore {
       name,
       dob: input.dob,
       gender: input.gender || '',
-      language: input.language === 'kn' ? 'kn' : 'en',
+      interfaceLanguage: input.interfaceLanguage,
+      contentLanguage: input.contentLanguage,
       photo: input.photo || '',
       analyticsConsent: Boolean(input.analyticsConsent),
       analyticsProfileId: existing?.analyticsProfileId || randomAnalyticsId(),
       createdAt: existing?.createdAt || now,
       updatedAt: now
     };
+    delete profile.language;
     if (existing) profile.pid = existing.pid;
     const transaction = this.database.transaction(PROFILE_STORE, 'readwrite');
     const request = transaction.objectStore(PROFILE_STORE).put(profile);
@@ -294,11 +313,13 @@ async function resizeProfilePhoto(file) {
 // Source: js/profile-ui.js
 
 class ProfileUI {
-  constructor({ store, onSelected, onCreated, onChanged }) {
+  constructor({ store, onSelected, onCreated, onChanged, translate = (key, fallback) => fallback, onInterfaceLanguagePreview = () => {} }) {
     this.store = store;
     this.onSelected = onSelected;
     this.onCreated = onCreated;
     this.onChanged = onChanged;
+    this.translate = translate;
+    this.onInterfaceLanguagePreview = onInterfaceLanguagePreview;
     this.editingPid = null;
     this.photo = '';
     this.bind();
@@ -340,36 +361,45 @@ class ProfileUI {
       const name = document.createElement('strong');
       name.textContent = profile.name;
       const language = document.createElement('small');
-      language.textContent = profile.language === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      const interfaceName = profile.interfaceLanguage === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      const contentName = profile.contentLanguage === 'kn' ? 'ಕನ್ನಡ' : 'English';
+      language.textContent = interfaceName + ' · ' + contentName;
       copy.append(name, language);
       select.appendChild(copy);
       if (profile.pid === defaultPid) {
         const badge = document.createElement('span');
         badge.className = 'default-badge';
-        badge.textContent = 'Default';
+        badge.textContent = this.translate('profile.defaultBadge', 'Default');
         select.appendChild(badge);
       }
       const actions = document.createElement('div');
       actions.className = 'profile-card-actions';
-      actions.innerHTML = `<button type="button" data-profile-action="edit" data-pid="${profile.pid}">Edit</button><button type="button" data-profile-action="default" data-pid="${profile.pid}">${profile.pid === defaultPid ? 'Unset default' : 'Make default'}</button><button type="button" data-profile-action="delete" data-pid="${profile.pid}">Delete</button>`;
+      actions.innerHTML = `<button type="button" data-profile-action="edit" data-pid="${profile.pid}">${this.translate('profile.editAction', 'Edit')}</button><button type="button" data-profile-action="default" data-pid="${profile.pid}">${profile.pid === defaultPid ? this.translate('profile.unsetDefault', 'Unset default') : this.translate('profile.makeDefault', 'Make default')}</button><button type="button" data-profile-action="delete" data-pid="${profile.pid}">${this.translate('profile.delete', 'Delete')}</button>`;
       card.append(select, actions);
       list.appendChild(card);
     });
-    document.getElementById('profile-selection-title').textContent = switching ? 'Switch profile' : 'Who is using Gitaverse?';
+    const selectionTitle = document.getElementById('profile-selection-title');
+    selectionTitle.dataset.i18n = switching ? 'profile.switch' : 'profile.who';
+    selectionTitle.textContent = switching ? this.translate('profile.switch', 'Switch profile') : this.translate('profile.who', 'Who is using Gitaverse?');
     document.getElementById('profile-selection-back').hidden = !switching;
   }
 
   async showForm(profile = null) {
     this.editingPid = profile?.pid || null;
     this.photo = profile?.photo || '';
-    document.getElementById('profile-form-title').textContent = profile ? 'Edit profile' : 'Create your profile';
-    document.getElementById('profile-form-intro').textContent = profile
-      ? 'Keep this profile’s local preferences up to date.'
-      : 'Profiles keep each person’s language and experience separate on this device.';
+    const formTitle = document.getElementById('profile-form-title');
+    const formIntro = document.getElementById('profile-form-intro');
+    formTitle.dataset.i18n = profile ? 'profile.edit' : 'profile.create';
+    formIntro.dataset.i18n = profile ? 'profile.intro.edit' : 'profile.intro.create';
+    formTitle.textContent = profile ? this.translate('profile.edit', 'Edit profile') : this.translate('profile.create', 'Create your profile');
+    formIntro.textContent = profile
+      ? this.translate('profile.intro.edit', 'Keep this profile’s local preferences up to date.')
+      : this.translate('profile.intro.create', 'Profiles keep each person’s language and experience separate on this device.');
     document.getElementById('profile-name').value = profile?.name || '';
     document.getElementById('profile-dob').value = profile?.dob || '';
     document.getElementById('profile-gender').value = profile?.gender || '';
-    document.getElementById('profile-language').value = profile?.language || 'en';
+    document.getElementById('profile-interface-language').value = profile?.interfaceLanguage || '';
+    document.getElementById('profile-content-language').value = profile?.contentLanguage || 'en';
     document.getElementById('profile-default').checked = profile ? (await this.store.defaultPid()) === profile.pid : true;
     document.getElementById('profile-form-cancel').hidden = !profile;
     document.getElementById('profile-form-error').textContent = '';
@@ -401,14 +431,20 @@ class ProfileUI {
       const error = document.getElementById('profile-form-error');
       error.textContent = '';
       try {
+        if (!document.getElementById('profile-name').value.trim()) throw new Error(this.translate('validation.name', 'Enter a profile name.'));
         const dob = document.getElementById('profile-dob').value;
-        if (!dob || new Date(dob + 'T00:00:00') > new Date()) throw new Error('Enter a valid date of birth.');
+        if (!dob || new Date(dob + 'T00:00:00') > new Date()) throw new Error(this.translate('validation.dob', 'Enter a valid date of birth.'));
+        const interfaceLanguage = document.getElementById('profile-interface-language').value;
+        const contentLanguage = document.getElementById('profile-content-language').value;
+        if (!interfaceLanguage) throw new Error(this.translate('validation.appLanguage', 'Choose an app language.'));
+        if (!contentLanguage) throw new Error(this.translate('validation.contentLanguage', 'Choose a preferred Gita content language.'));
         const profile = await this.store.save({
           pid: this.editingPid,
           name: document.getElementById('profile-name').value,
           dob,
           gender: document.getElementById('profile-gender').value,
-          language: document.getElementById('profile-language').value,
+          interfaceLanguage,
+          contentLanguage,
           photo: this.photo,
           analyticsConsent: true
         });
@@ -417,10 +453,15 @@ class ProfileUI {
         if (this.editingPid) await this.onChanged(profile);
         else await this.onCreated(profile);
       } catch (failure) {
-        error.textContent = failure.message || 'The profile could not be saved.';
+        error.textContent = failure.message || this.translate('validation.profileSave', 'The profile could not be saved.');
       }
     });
     document.getElementById('profile-name').addEventListener('input', () => this.renderPhotoPreview());
+    document.getElementById('profile-interface-language').addEventListener('change', (event) => {
+      const content = document.getElementById('profile-content-language');
+      if (!this.editingPid && event.target.value) content.value = event.target.value;
+      this.onInterfaceLanguagePreview(event.target.value || 'en');
+    });
     document.getElementById('profile-photo').addEventListener('change', async (event) => {
       const error = document.getElementById('profile-form-error');
       try {
@@ -554,7 +595,7 @@ function profileAnalyticsContext(profile, now = new Date()) {
   return {
     ageBand: ageBand(profile.dob, now),
     genderGroup: GENDERS.has(profile.gender) ? profile.gender.replace('-', '_') : 'not_said',
-    profileLanguage: profile.language === 'kn' ? 'kn' : 'en'
+    profileLanguage: profile.interfaceLanguage === 'kn' ? 'kn' : 'en'
   };
 }
 
@@ -695,13 +736,24 @@ class ClarityAdapter {
 
 // Source: js/shared/about-dialog.js
 class AboutDialog {
-  constructor({ version = 'dev', onOpen = () => {} } = {}) {
+  constructor({ version = 'dev', onOpen = () => {}, translate = (key, fallback) => fallback } = {}) {
     this.version = version;
     this.onOpen = onOpen;
+    this.translate = translate;
     this.overlay = this.ensureMarkup();
     this.overlay.querySelector('[data-about-version]').textContent = version;
+    this.refresh();
     this.overlay.querySelector('[data-about-close]').addEventListener('click', () => this.close());
     this.overlay.addEventListener('click', (event) => { if (event.target === this.overlay) this.close(); });
+  }
+
+  refresh() {
+    this.overlay.querySelector('#about-title').textContent = this.translate('common.about', 'About Gitaverse');
+    this.overlay.querySelector('.about-body > p').textContent = this.translate('about.body', 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.');
+    const version = this.overlay.querySelector('.about-version');
+    const value = version.querySelector('[data-about-version]');
+    version.replaceChildren(document.createTextNode(this.translate('about.version', 'Version') + ' '), value);
+    this.overlay.querySelector('[data-about-close]').setAttribute('aria-label', this.translate('common.close', 'Close'));
   }
 
   ensureMarkup() {
@@ -733,6 +785,7 @@ class AboutDialog {
   }
 
   open(opener = document.activeElement) {
+    this.refresh();
     this.opener = opener;
     this.overlay.hidden = false;
     this.onOpen();

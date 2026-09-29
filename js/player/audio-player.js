@@ -1,5 +1,5 @@
 export class AudioPlayer {
-  constructor({ audio, playButton, playIcon, pauseIcon, seek, time, onError = () => {}, onEvent = () => {} }) {
+  constructor({ audio, playButton, playIcon, pauseIcon, seek, time, onError = () => {}, onEvent = () => {}, translate = (key, fallback) => fallback }) {
     this.audio = audio;
     this.playButton = playButton;
     this.playIcon = playIcon;
@@ -8,6 +8,7 @@ export class AudioPlayer {
     this.time = time;
     this.onError = onError;
     this.onEvent = onEvent;
+    this.translate = translate;
     this.started = false;
     this.suppressPause = false;
     this.milestones = new Set();
@@ -61,7 +62,7 @@ export class AudioPlayer {
       this.onEvent('audio_seeked');
     });
     this.audio.addEventListener('error', () => {
-      this.time.textContent = 'Audio unavailable';
+      this.time.textContent = this.translate('audio.unavailable', 'Audio unavailable');
       this.playButton.disabled = true;
       this.seek.disabled = true;
       this.updatePlayState();
@@ -84,7 +85,7 @@ export class AudioPlayer {
     this.seek.disabled = !source;
     this.seek.max = '0';
     this.seek.value = '0';
-    this.time.textContent = source ? '00:00 / 00:00' : 'No audio';
+    this.time.textContent = source ? '00:00 / 00:00' : this.translate('audio.none', 'No audio');
   }
 
   toggle() {
@@ -104,8 +105,8 @@ export class AudioPlayer {
     const playing = !this.audio.paused && !this.audio.ended;
     this.playIcon.toggleAttribute('hidden', playing);
     this.pauseIcon.toggleAttribute('hidden', !playing);
-    this.playButton.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
-    this.playButton.title = (playing ? 'Pause audio' : 'Play audio') + ' (P or Space)';
+    this.playButton.setAttribute('aria-label', playing ? this.translate('audio.pause', 'Pause audio') : this.translate('audio.play', 'Play audio'));
+    this.playButton.title = (playing ? this.translate('audio.pause', 'Pause audio') : this.translate('audio.play', 'Play audio')) + ' (' + this.translate('audio.shortcut', 'P or Space') + ')';
   }
 
   formatTime(seconds) {

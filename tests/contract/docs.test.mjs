@@ -62,7 +62,7 @@ test('the handbook exposes the approved product, experience, system, and future 
   }
 });
 
-test('Sampada is the navigable future-possibilities backlog with tagged items', async () => {
+test('Sampada preserves both future possibilities and completed enhancements with status and tags', async () => {
   const future = manifest.sections.find((section) => section.title === 'Future possibilities');
   const sampada = future?.pages.find((page) => page.route === 'sampada');
   assert.deepEqual(sampada, {
@@ -71,9 +71,16 @@ test('Sampada is the navigable future-possibilities backlog with tagged items', 
     path: 'design/sampada.md'
   });
   const markdown = await readFile(path.join(projectRoot, 'docs', sampada.path), 'utf8');
-  const items = markdown.split(/^## \d+\. /m).slice(1);
+  assert.match(markdown, /^## To unfold$/m);
+  assert.match(markdown, /^## Done$/m);
+  const items = markdown.split(/^### \d+\. /m).slice(1);
   assert.ok(items.length > 0);
-  items.forEach((item, index) => assert.match(item, /^.+\n\n\*\*Tag:\*\* (Major|Minor)\s*$/m, `Sampada item ${index + 1} is missing its tag`));
+  items.forEach((item, index) => {
+    assert.match(item, /^.+\n\n\*\*Status:\*\* (To unfold|Done)\s*$/m, `Sampada item ${index + 1} is missing its status`);
+    assert.match(item, /^\*\*Tag:\*\* (Major|Minor)\s*$/m, `Sampada item ${index + 1} is missing its tag`);
+  });
+  assert.match(markdown, /^### 3\. Consistent chapter names\n\n\*\*Status:\*\* Done/m);
+  assert.match(markdown, /^### 9\. Global app-language preference\n\n\*\*Status:\*\* Done/m);
   assert.equal(markdown.includes('Treasure Trove'), false);
 });
 

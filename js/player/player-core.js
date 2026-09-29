@@ -11,6 +11,7 @@ import { AudioPlayer } from './audio-player.js';
 import { InlineEditor } from './editor.js';
 import { getExperience } from './renderers/registry.js';
 import { AboutDialog } from '../shared/about-dialog.js';
+import { I18n } from '../i18n/i18n.js';
 
 const state = {
   dataset: null,
@@ -37,6 +38,8 @@ let requestedLanguage = params.get('lang');
 const explicitLocationRequested = params.has('play') || params.has('sid') || params.has('lang');
 const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
 const clarityProjectId = document.querySelector('meta[name="clarity-project-id"]')?.content || '';
+const i18n = new I18n('en');
+const translate = (key, fallback, values = {}) => i18n.t(key, values) === key ? fallback : i18n.t(key, values);
 
 const profileStore = new ProfileStore();
 const eventBus = new EventBus({
@@ -50,13 +53,24 @@ eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
 eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
 eventBus.subscribe(new SentryAdapter());
 const pwa = new PwaManager({ appVersion });
-const aboutDialog = new AboutDialog({ version: appVersion });
+const aboutDialog = new AboutDialog({ version: appVersion, translate });
 const profileUI = new ProfileUI({
   store: profileStore,
   onSelected: selectProfile,
   onCreated: createProfile,
-  onChanged: handleProfileChange
+  onChanged: handleProfileChange,
+  translate,
+  onInterfaceLanguagePreview: setInterfaceLanguage
 });
+
+function setInterfaceLanguage(language) {
+  i18n.setLanguage(language);
+  aboutDialog.refresh();
+  if (state.dataset && state.renderer) {
+    render({ trackLocation: false, keepEditing: Boolean(state.editor?.active) });
+    syncFullscreenUi();
+  }
+}
 
 const audioPlayer = new AudioPlayer({
   audio: document.getElementById('audio'),
@@ -65,8 +79,9 @@ const audioPlayer = new AudioPlayer({
   pauseIcon: document.getElementById('pause-icon'),
   seek: document.getElementById('audio-seek'),
   time: document.getElementById('audio-time'),
-  onError: () => pwa.showStatus(navigator.onLine ? 'Audio is currently unavailable.' : 'This audio is not available offline yet.'),
-  onEvent: (name) => emitEvent(name, { context: verseContext() })
+  onError: () => pwa.showStatus(navigator.onLine ? i18n.t('audio.onlineError') : i18n.t('audio.offlineError')),
+  onEvent: (name) => emitEvent(name, { context: verseContext() }),
+  translate
 });
 
 const swipe = { active: false, x: 0, y: 0, startedAt: 0 };
@@ -105,6 +120,7 @@ function updateProfileUrl(profile) {
 async function activateProfile(profile) {
   if (state.activeProfile?.pid !== profile.pid) state.experienceResumes.clear();
   state.activeProfile = profile;
+  setInterfaceLanguage(profile.interfaceLanguage);
   updateProfileUrl(profile);
   await profileUI.renderPills(profile);
 }
@@ -138,7 +154,7 @@ async function handleProfileChange(profile, options = {}) {
   }
   showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
   if (state.dataset && state.profileReturnView === 'app') {
-    state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.language;
+    state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.contentLanguage;
     render();
   }
 }
@@ -146,7 +162,7 @@ async function handleProfileChange(profile, options = {}) {
 function goToExperienceSelection(profile = state.activeProfile, { source = 'home', track = true } = {}) {
   play = null;
   requestedSid = null;
-  requestedLanguage = profile?.language || 'en';
+  requestedLanguage = profile?.contentLanguage || 'en';
   const home = new URL(location.href);
   home.searchParams.delete('play');
   home.searchParams.delete('sid');
@@ -170,7 +186,7 @@ async function openProfileLocation(profile, { honorExplicit = false } = {}) {
     return startRequestedExperience();
   }
   const resume = await profileStore.getResume(profile.pid);
-  requestedLanguage = resume?.language || profile.language;
+  requestedLanguage = resume?.language || profile.contentLanguage;
   if (resume?.view === 'experience') {
     play = resume.experience;
     requestedSid = resume.sid;
@@ -246,7 +262,7 @@ async function startRequestedExperience() {
   if (chooserResume?.sid) chooserUrl.searchParams.set('sid', chooserResume.sid);
   else chooserUrl.searchParams.delete('sid');
   chooserUrl.searchParams.set('pid', state.activeProfile.pid);
-  const chooserLanguage = chooserResume?.language || (requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language);
+  const chooserLanguage = chooserResume?.language || (requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.contentLanguage);
   if (chooserLanguage === 'kn') chooserUrl.searchParams.set('lang', 'kn');
   else chooserUrl.searchParams.delete('lang');
   chooserLink.href = chooserUrl.href;
@@ -266,7 +282,7 @@ async function startRequestedExperience() {
     await startPlayer(await loadCollectionExperience(play, { version: appVersion }), experience);
   } catch (error) {
     emitEvent('data_load_failed', {
-      context: { experience: play, language: requestedLanguage || state.activeProfile.language },
+      context: { experience: play, language: requestedLanguage || state.activeProfile.contentLanguage },
       details: { source: 'automatic' }
     });
     showDataChooser(error.message);
@@ -277,7 +293,7 @@ async function startPlayer(dataset, experience, { workspace = null, sid = reques
   if (state.editor) state.editor.destroy();
   if (state.renderer) state.renderer.destroy();
   state.dataset = dataset;
-  state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
+  state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.contentLanguage;
   const requestedIndex = sid ? findSid(sid) : -1;
   if (state.locationSource === 'resume' && sid && requestedIndex < 0) {
     state.locationSource = null;
@@ -296,8 +312,9 @@ async function startPlayer(dataset, experience, { workspace = null, sid = reques
     currentRow,
     rerender: (options = {}) => render({ ...options, trackLocation: false }),
     workspace,
+    translate,
     onStateChange: ({ active, savedChanges, pendingDownload, workspace: hasWorkspace, savedRevision }) => {
-      document.querySelector('#edit-button .top-menu-label').textContent = active ? 'Leave edit mode' : 'Edit this shloka';
+      document.querySelector('#edit-button .top-menu-label').textContent = active ? i18n.t('menu.leaveEdit') : i18n.t('menu.edit');
       if (savedRevision > state.lastSavedRevision) {
         state.lastSavedRevision = savedRevision;
         state.downloadReminderDismissed = false;
@@ -305,7 +322,7 @@ async function startPlayer(dataset, experience, { workspace = null, sid = reques
       const reminder = document.getElementById('download-reminder');
       reminder.hidden = hasWorkspace || !savedChanges || state.downloadReminderDismissed;
       const action = document.getElementById('download-reminder-action');
-      action.textContent = pendingDownload ? '↓ Download edited language files' : '↓ Download again';
+      action.textContent = pendingDownload ? i18n.t('editor.download') : i18n.t('editor.downloadAgain');
     }
   });
 
@@ -364,10 +381,7 @@ function render(options = {}) {
   else chapterIcon.removeAttribute('src');
   document.getElementById('sid-label').textContent = row.sid;
   document.getElementById('position-label').textContent = (state.index + 1) + ' / ' + state.dataset.rows.length;
-  document.querySelector('#language-button .top-menu-label').textContent = state.language === 'kn'
-    ? 'Language (ಕನ್ನಡ)'
-    : 'Language (Eng)';
-  document.documentElement.lang = state.language;
+  document.querySelector('#language-button .top-menu-label').textContent = i18n.t('menu.contentLanguage', { language: state.language === 'kn' ? 'ಕನ್ನಡ' : 'English' });
   state.renderer.render(row, state.language);
   state.experienceResumes.set(play, {
     experience: play,
@@ -470,7 +484,7 @@ function setLanguage(language) {
   if (!state.editor.canNavigate()) return;
   state.language = language === 'kn' ? 'kn' : 'en';
   requestedLanguage = state.language;
-  state.activeProfile.language = state.language;
+  state.activeProfile.contentLanguage = state.language;
   profileStore.save(state.activeProfile).then((profile) => {
     state.activeProfile = profile;
     profileUI.renderPills(profile);
@@ -531,17 +545,17 @@ async function openCollectionsWorkspace() {
   const message = document.getElementById('workspace-error');
   const button = document.getElementById('open-collections-workspace');
   if (typeof window.showDirectoryPicker !== 'function') {
-    message.textContent = 'Direct folder saving is not supported by this browser. Use a current Chrome or Edge browser, or choose “Edit with downloads only”.';
+    message.textContent = i18n.t('workspace.unsupported');
     return;
   }
   button.disabled = true;
-  message.textContent = 'Opening and validating the collections folder…';
+  message.textContent = i18n.t('workspace.opening');
   try {
     const handle = await window.showDirectoryPicker({ id: 'gitaverse-collections', mode: 'readwrite' });
     const permission = { mode: 'readwrite' };
     if (handle.queryPermission && await handle.queryPermission(permission) !== 'granted') {
       if (!handle.requestPermission || await handle.requestPermission(permission) !== 'granted') {
-        throw new Error('Read and write access to the collections folder was not granted.');
+        throw new Error(i18n.t('workspace.permission'));
       }
     }
     const sid = currentRow().sid;
@@ -550,7 +564,7 @@ async function openCollectionsWorkspace() {
     await startPlayer(dataset, getExperience(play), { workspace, sid });
     state.editor.enter();
   } catch (error) {
-    if (error?.name !== 'AbortError') message.textContent = error.message || 'The selected collections folder could not be opened.';
+    if (error?.name !== 'AbortError') message.textContent = error.message || i18n.t('workspace.openFailed');
   } finally {
     button.disabled = false;
   }
@@ -566,7 +580,7 @@ function setMenuOpen(open) {
   const button = document.getElementById('menu-button');
   menu.hidden = !open;
   button.setAttribute('aria-expanded', open ? 'true' : 'false');
-  button.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  button.setAttribute('aria-label', open ? i18n.t('menu.close') : i18n.t('menu.open'));
   if (open) requestAnimationFrame(() => menuOptions()[0]?.focus());
   else if (menu.contains(document.activeElement)) button.focus();
 }
@@ -616,7 +630,7 @@ function chooseLanguage(language) {
 function goHome() {
   setMenuOpen(false);
   if (!state.editor.canNavigate()) return;
-  if (state.editor.pendingDownload && !window.confirm('Changes have not been downloaded. Are you sure you want to return Home?')) return;
+  if (state.editor.pendingDownload && !window.confirm(i18n.t('editor.returnHome'))) return;
   goToExperienceSelection();
 }
 
@@ -687,10 +701,10 @@ function updateDeviceLayout() {
 function syncFullscreenUi() {
   const active = Boolean(document.fullscreenElement || document.webkitFullscreenElement)
     || document.documentElement.classList.contains('immersive');
-  document.querySelector('#fullscreen-button .top-menu-label').textContent = active ? 'Exit fullscreen' : 'Fullscreen';
+  document.querySelector('#fullscreen-button .top-menu-label').textContent = active ? i18n.t('menu.exitFullscreen') : i18n.t('menu.fullscreen');
   const button = document.getElementById('footer-fullscreen-button');
-  button.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Enter fullscreen');
-  button.title = (active ? 'Exit fullscreen' : 'Fullscreen') + ' (F)';
+  button.setAttribute('aria-label', active ? i18n.t('fullscreen.exit') : i18n.t('fullscreen.enter'));
+  button.title = (active ? i18n.t('fullscreen.exit') : i18n.t('menu.fullscreen')) + ' (F)';
   button.querySelector('.fullscreen-enter-icon').toggleAttribute('hidden', active);
   button.querySelector('.fullscreen-exit-icon').toggleAttribute('hidden', !active);
 }
@@ -763,6 +777,7 @@ function bindEvents() {
     showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
   });
   document.getElementById('profile-form-cancel').addEventListener('click', () => {
+    setInterfaceLanguage(state.activeProfile?.interfaceLanguage || 'en');
     showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'chooser'));
   });
   document.getElementById('edit-button').addEventListener('click', requestEditMode);
@@ -770,7 +785,7 @@ function bindEvents() {
   document.getElementById('edit-download-only').addEventListener('click', enterDownloadOnlyEditMode);
   document.getElementById('download-reminder-action').addEventListener('click', () => state.editor.download());
   document.getElementById('download-reminder-close').addEventListener('click', () => {
-    if (state.editor.pendingDownload && !window.confirm('Changes have not been downloaded. Are you sure you want to dismiss this reminder?')) return;
+    if (state.editor.pendingDownload && !window.confirm(i18n.t('editor.dismissDownload'))) return;
     state.downloadReminderDismissed = true;
     document.getElementById('download-reminder').hidden = true;
   });
@@ -787,7 +802,7 @@ function bindEvents() {
   document.querySelectorAll('.overlay').forEach((overlay) => overlay.addEventListener('click', (event) => { if (event.target === overlay) closeOverlays(); }));
   document.getElementById('goto-form').addEventListener('submit', (event) => {
     event.preventDefault();
-    if (!goToSid(document.getElementById('goto-input').value)) document.getElementById('goto-error').textContent = 'That shloka ID was not found.';
+    if (!goToSid(document.getElementById('goto-input').value)) document.getElementById('goto-error').textContent = i18n.t('goto.notFound');
   });
   document.getElementById('chapter-list').addEventListener('click', (event) => {
     const button = event.target.closest('.chapter-button');

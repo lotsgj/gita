@@ -43,35 +43,37 @@
       <div class="profile-photo-field">
         <div id="profile-photo-preview"></div>
         <div class="profile-photo-actions">
-          <label class="secondary-button" for="profile-photo">Choose photo</label>
+          <label class="secondary-button" for="profile-photo" data-i18n="profile.choosePhoto">Choose photo</label>
           <input id="profile-photo" type="file" accept="image/*" hidden>
-          <button class="quiet-button" id="profile-photo-remove" type="button" hidden>Remove</button>
-          <small>Optional. Stored only on this device.</small>
+          <button class="quiet-button" id="profile-photo-remove" type="button" hidden data-i18n="profile.remove">Remove</button>
+          <small data-i18n="profile.photoNote">Optional. Stored only on this device.</small>
         </div>
       </div>
-      <label class="field-label" for="profile-name">Name</label>
+      <label class="field-label" for="profile-name" data-i18n="profile.name">Name</label>
       <input class="profile-input" id="profile-name" autocomplete="name" maxlength="60" required>
       <div class="profile-field-grid">
-        <div><label class="field-label" for="profile-dob">Date of birth</label><input class="profile-input" id="profile-dob" type="date" required></div>
-        <div><label class="field-label" for="profile-gender">Gender <small>(optional)</small></label><select class="profile-input" id="profile-gender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="nonbinary">Non-binary</option><option value="self-described">Self-described</option></select></div>
+        <div><label class="field-label" for="profile-dob" data-i18n="profile.dob">Date of birth</label><input class="profile-input" id="profile-dob" type="date" required></div>
+        <div><label class="field-label" for="profile-gender"><span data-i18n="profile.gender">Gender</span> <small data-i18n="profile.optional">(optional)</small></label><select class="profile-input" id="profile-gender"><option value="" data-i18n="profile.notSaid">Prefer not to say</option><option value="female" data-i18n="profile.female">Female</option><option value="male" data-i18n="profile.male">Male</option><option value="nonbinary" data-i18n="profile.nonbinary">Non-binary</option><option value="self-described" data-i18n="profile.selfDescribed">Self-described</option></select></div>
       </div>
-      <label class="field-label" for="profile-language">Preferred language</label>
-      <select class="profile-input" id="profile-language"><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
-      <label class="check-row"><input id="profile-default" type="checkbox" checked><span>Use this profile automatically on this device</span></label>
-      <p class="analytics-notice">We collect anonymised information to improve the product experience.</p>
+      <label class="field-label" for="profile-interface-language" data-i18n="profile.appLanguage">App language</label>
+      <select class="profile-input" id="profile-interface-language" required><option value="" data-i18n="profile.chooseLanguage">Choose your language</option><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
+      <label class="field-label" for="profile-content-language" data-i18n="profile.contentLanguage">Preferred Gita content language</label>
+      <select class="profile-input" id="profile-content-language" required><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
+      <label class="check-row"><input id="profile-default" type="checkbox" checked><span data-i18n="profile.default">Use this profile automatically on this device</span></label>
+      <p class="analytics-notice" data-i18n="profile.analytics">We collect anonymised information to improve the product experience.</p>
       <div class="form-error" id="profile-form-error" role="alert"></div>
-      <div class="profile-form-actions"><button class="quiet-button" id="profile-form-cancel" type="button" hidden>Cancel</button><button class="primary-button" type="submit">Save profile</button></div>
+      <div class="profile-form-actions"><button class="quiet-button" id="profile-form-cancel" type="button" hidden data-i18n="profile.cancel">Cancel</button><button class="primary-button" type="submit" data-i18n="profile.save">Save profile</button></div>
     </form>
-    <div class="landing-links"><button class="about-link" type="button" data-about>About Gitaverse</button><button class="about-link" type="button" data-install hidden>Install Gitaverse</button></div>
+    <div class="landing-links"><button class="about-link" type="button" data-about data-i18n="common.about">About Gitaverse</button><button class="about-link" type="button" data-install data-i18n="common.install" hidden>Install Gitaverse</button></div>
   </section>
 </main>
 
 <main id="profile-selection" class="profile-screen" data-clarity-mask="true" hidden>
   <section class="profile-selection-card">
-    <div class="profile-selection-head"><div><div class="status-mark">ॐ</div><h1 id="profile-selection-title">Who is using Gitaverse?</h1><p>Choose a profile to continue.</p></div><button class="quiet-button" id="profile-selection-back" type="button" hidden>Back</button></div>
+    <div class="profile-selection-head"><div><div class="status-mark">ॐ</div><h1 id="profile-selection-title">Who is using Gitaverse?</h1><p data-i18n="profile.choose">Choose a profile to continue.</p></div><button class="quiet-button" id="profile-selection-back" type="button" hidden data-i18n="profile.back">Back</button></div>
     <div class="profile-list" id="profile-list"></div>
-    <button class="add-profile-button" id="add-profile-button" type="button">＋ Add another profile</button>
-    <div class="landing-links"><button class="about-link" type="button" data-about>About Gitaverse</button><button class="about-link" type="button" data-install hidden>Install Gitaverse</button></div>
+    <button class="add-profile-button" id="add-profile-button" type="button" data-i18n="profile.add">＋ Add another profile</button>
+    <div class="landing-links"><button class="about-link" type="button" data-about data-i18n="common.about">About Gitaverse</button><button class="about-link" type="button" data-install data-i18n="common.install" hidden>Install Gitaverse</button></div>
   </section>
 </main>
 
@@ -79,37 +81,37 @@
   <button class="profile-pill landing-profile-pill" type="button" data-profile-pill data-clarity-mask="true"></button>
   <section class="chooser-card">
     <div class="status-mark">ॐ</div>
-    <h1>Choose an experience</h1>
-    <p>Read, reflect, and listen at your own pace.</p>
+    <h1 data-i18n="home.chooseExperience">Choose an experience</h1>
+    <p data-i18n="home.intro">Read, reflect, and listen at your own pace.</p>
     <div class="experience-list">
-      <a class="experience-link" id="gita-700-link" href="?play=gita-700"><span>Gita 700<br><small>Four-panel study experience</small></span><span>→</span></a>
-      <span class="experience-link disabled"><span>Gita Yoga<br><small>Experience to be designed</small></span><small>Coming later</small></span>
-      <span class="experience-link disabled"><span>Gita Sara<br><small>Experience to be designed</small></span><small>Coming later</small></span>
+      <a class="experience-link" id="gita-700-link" href="?play=gita-700"><span>Gita 700<br><small data-i18n="home.gita700Note">Four-panel study experience</small></span><span>→</span></a>
+      <span class="experience-link disabled"><span>Gita Yoga<br><small data-i18n="home.future">Experience to be designed</small></span><small data-i18n="home.coming">Coming later</small></span>
+      <span class="experience-link disabled"><span>Gita Sara<br><small data-i18n="home.future">Experience to be designed</small></span><small data-i18n="home.coming">Coming later</small></span>
     </div>
-    <div class="landing-links"><button class="about-link" type="button" data-about>About Gitaverse</button><button class="about-link" type="button" data-install hidden>Install Gitaverse</button></div>
+    <div class="landing-links"><button class="about-link" type="button" data-about data-i18n="common.about">About Gitaverse</button><button class="about-link" type="button" data-install data-i18n="common.install" hidden>Install Gitaverse</button></div>
   </section>
 </main>
 
 <main id="loading" class="loading" hidden>
-  <section class="status-card"><div class="status-mark">ॐ</div><h1>Opening the Gita</h1><p>Preparing the verses…</p></section>
+  <section class="status-card"><div class="status-mark">ॐ</div><h1 data-i18n="loading.title">Opening the Gita</h1><p data-i18n="loading.message">Preparing the verses…</p></section>
 </main>
 
 <main id="error" class="error" hidden>
-  <section class="status-card"><div class="status-mark">ॐ</div><h1>Unable to open the player</h1><p id="error-message"></p></section>
+  <section class="status-card"><div class="status-mark">ॐ</div><h1 data-i18n="error.title">Unable to open the player</h1><p id="error-message"></p></section>
 </main>
 
 <main id="data-chooser" class="chooser" hidden>
   <section class="chooser-card">
     <div class="status-mark">ॐ</div>
-    <h1>Unable to load the Gita collections</h1>
-    <p>Gitaverse loads its language and media catalogs from <strong>data/collections</strong>. If automatic loading is unavailable, choose that folder to continue locally.</p>
+    <h1 data-i18n="data.title">Unable to load the Gita collections</h1>
+    <p data-i18n="data.description">Gitaverse could not load its language and media collections automatically. Choose the local data/collections folder to continue.</p>
     <div class="file-actions">
-      <label class="file-button" for="collections-folder-input">Choose collections folder</label>
+      <label class="file-button" for="collections-folder-input" data-i18n="data.choose">Choose collections folder</label>
       <input id="collections-folder-input" type="file" webkitdirectory multiple hidden>
-      <button class="retry-button" id="retry-data-button" type="button">Try automatic loading again</button>
+      <button class="retry-button" id="retry-data-button" type="button" data-i18n="data.retry">Try automatic loading again</button>
     </div>
     <div class="file-error" id="file-error" role="alert"></div>
-    <p class="file-note">Selected files stay in this browser session and are not uploaded or modified.</p>
+    <p class="file-note" data-i18n="data.localNote">Selected files stay in this browser session and are not uploaded or modified.</p>
   </section>
 </main>
 
@@ -129,17 +131,17 @@
           <svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/></svg>
         </button>
         <div class="top-menu-panel" id="top-menu" hidden>
-          <button class="top-menu-item" id="chapters-button" type="button"><span class="top-menu-label">Chapters</span><span class="menu-shortcut">C</span></button>
-          <button class="top-menu-item" id="goto-button" type="button"><span class="top-menu-label">Go to shloka</span><span class="menu-shortcut">G</span></button>
-          <button class="top-menu-item" id="language-button" type="button"><span class="top-menu-label">Language (Eng)</span><span class="menu-shortcut">L</span></button>
-          <button class="top-menu-item" id="fullscreen-button" type="button"><span class="top-menu-label">Fullscreen</span><span class="menu-shortcut">F</span></button>
+          <button class="top-menu-item" id="chapters-button" type="button"><span class="top-menu-label" data-i18n="menu.chapters">Chapters</span><span class="menu-shortcut">C</span></button>
+          <button class="top-menu-item" id="goto-button" type="button"><span class="top-menu-label" data-i18n="menu.goto">Go to shloka</span><span class="menu-shortcut">G</span></button>
+          <button class="top-menu-item" id="language-button" type="button"><span class="top-menu-label">Content language (English)</span><span class="menu-shortcut">L</span></button>
+          <button class="top-menu-item" id="fullscreen-button" type="button"><span class="top-menu-label" data-i18n="menu.fullscreen">Fullscreen</span><span class="menu-shortcut">F</span></button>
           <div class="top-menu-divider"></div>
-          <button class="top-menu-item" id="edit-button" type="button"><span class="top-menu-label">Edit this shloka</span><span class="menu-shortcut">E</span></button>
-          <button class="top-menu-item" id="home-button" type="button"><span class="top-menu-label">Home</span><span class="menu-shortcut">A</span></button>
-          <button class="top-menu-item" id="help-button" type="button"><span class="top-menu-label">Help</span><span class="menu-shortcut">H</span></button>
+          <button class="top-menu-item" id="edit-button" type="button"><span class="top-menu-label" data-i18n="menu.edit">Edit this shloka</span><span class="menu-shortcut">E</span></button>
+          <button class="top-menu-item" id="home-button" type="button"><span class="top-menu-label" data-i18n="menu.home">Home</span><span class="menu-shortcut">A</span></button>
+          <button class="top-menu-item" id="help-button" type="button"><span class="top-menu-label" data-i18n="menu.help">Help</span><span class="menu-shortcut">H</span></button>
           <div class="top-menu-divider"></div>
-          <button class="top-menu-item" id="about-button" type="button"><span class="top-menu-label">About Gitaverse</span><span class="menu-shortcut">K</span></button>
-          <button class="top-menu-item" type="button" data-install hidden><span class="top-menu-label">Install Gitaverse</span></button>
+          <button class="top-menu-item" id="about-button" type="button"><span class="top-menu-label" data-i18n="common.about">About Gitaverse</span><span class="menu-shortcut">K</span></button>
+          <button class="top-menu-item" type="button" data-install hidden><span class="top-menu-label" data-i18n="common.install">Install Gitaverse</span></button>
         </div>
       </div>
       <button class="profile-pill topbar-profile-pill" type="button" data-profile-pill data-clarity-mask="true"></button>
@@ -178,26 +180,26 @@
 
 <div class="overlay" id="workspace-overlay" hidden>
   <section class="dialog workspace-dialog" role="dialog" aria-modal="true" aria-labelledby="workspace-title">
-    <header class="dialog-head"><h2 id="workspace-title">Open local collections</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <header class="dialog-head"><h2 id="workspace-title" data-i18n="workspace.title">Open local collections</h2><button class="icon-button close-dialog" type="button" aria-label="Close" data-i18n-aria="common.close">×</button></header>
     <div class="dialog-body">
       <p>Select this repository’s <code>data/collections</code> folder. Gitaverse will reload its collection data and save edited verse text directly to the relevant language master file.</p>
       <div class="file-actions">
-        <button class="file-button" id="open-collections-workspace" type="button">Open collections folder</button>
-        <button class="retry-button" id="edit-download-only" type="button">Edit with downloads only</button>
+        <button class="file-button" id="open-collections-workspace" type="button" data-i18n="workspace.open">Open collections folder</button>
+        <button class="retry-button" id="edit-download-only" type="button" data-i18n="workspace.downloadOnly">Edit with downloads only</button>
       </div>
       <div class="file-error" id="workspace-error" role="alert" aria-live="polite"></div>
-      <p class="file-note">The folder stays on your device. Gitaverse requests read and write access only after you choose it.</p>
+      <p class="file-note" data-i18n="workspace.note">The folder stays on your device. Gitaverse requests read and write access only after you choose it.</p>
     </div>
   </section>
 </div>
 
 <div class="overlay" id="goto-overlay" hidden>
   <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="goto-title">
-    <header class="dialog-head"><h2 id="goto-title">Go to a shloka</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <header class="dialog-head"><h2 id="goto-title" data-i18n="dialog.goto">Go to a shloka</h2><button class="icon-button close-dialog" type="button" aria-label="Close" data-i18n-aria="common.close">×</button></header>
     <div class="dialog-body">
       <form id="goto-form">
         <input class="goto-input" id="goto-input" autocomplete="off" spellcheck="false" placeholder="6.7" aria-label="Shloka ID">
-        <p class="dialog-note">Enter a stable shloka ID, such as 6.B, 6.7, or 6.E.</p>
+        <p class="dialog-note" data-i18n="goto.note">Enter a stable shloka ID, such as 6.B, 6.7, or 6.E.</p>
         <div class="dialog-error" id="goto-error"></div>
       </form>
     </div>
@@ -206,14 +208,14 @@
 
 <div class="overlay" id="chapters-overlay" hidden>
   <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="chapters-title">
-    <header class="dialog-head"><h2 id="chapters-title">Chapters</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <header class="dialog-head"><h2 id="chapters-title" data-i18n="dialog.chapters">Chapters</h2><button class="icon-button close-dialog" type="button" aria-label="Close" data-i18n-aria="common.close">×</button></header>
     <div class="dialog-body"><div class="chapter-list" id="chapter-list"></div></div>
   </section>
 </div>
 
 <div class="overlay" id="language-overlay" hidden>
   <section class="dialog language-dialog" role="dialog" aria-modal="true" aria-labelledby="language-title">
-    <header class="dialog-head"><h2 id="language-title">Choose language</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <header class="dialog-head"><h2 id="language-title" data-i18n="dialog.contentLanguage">Choose content language</h2><button class="icon-button close-dialog" type="button" aria-label="Close" data-i18n-aria="common.close">×</button></header>
     <div class="dialog-body language-options" id="language-options">
       <button class="language-option" type="button" data-language="en">English</button>
       <button class="language-option" type="button" data-language="kn">ಕನ್ನಡ</button>
@@ -223,22 +225,22 @@
 
 <div class="overlay" id="help-overlay" hidden>
   <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title">
-    <header class="dialog-head"><h2 id="help-title">Keyboard shortcuts</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <header class="dialog-head"><h2 id="help-title" data-i18n="dialog.shortcuts">Keyboard shortcuts</h2><button class="icon-button close-dialog" type="button" aria-label="Close" data-i18n-aria="common.close">×</button></header>
     <div class="dialog-body">
       <div class="shortcut-list">
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>←</kbd></div><div class="shortcut-description">Previous shloka</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>→</kbd></div><div class="shortcut-description">Next shloka</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>G</kbd></div><div class="shortcut-description">Go to a shloka</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>C</kbd></div><div class="shortcut-description">Open chapters</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>L</kbd></div><div class="shortcut-description">Choose language</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>A</kbd></div><div class="shortcut-description">Return to Home</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>P</kbd><kbd>Space</kbd></div><div class="shortcut-description">Play or pause audio</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>F</kbd></div><div class="shortcut-description">Enter or exit fullscreen</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>H</kbd></div><div class="shortcut-description">Open this help</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>K</kbd></div><div class="shortcut-description">Open About Gitaverse</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>M</kbd></div><div class="shortcut-description">Open or close menu</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>E</kbd></div><div class="shortcut-description">Enter or leave edit mode</div></div>
-        <div class="shortcut-row"><div class="shortcut-keys"><kbd>Esc</kbd></div><div class="shortcut-description">Close a dialog or exit fullscreen</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>←</kbd></div><div class="shortcut-description" data-i18n="help.previous">Previous shloka</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>→</kbd></div><div class="shortcut-description" data-i18n="help.next">Next shloka</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>G</kbd></div><div class="shortcut-description" data-i18n="help.goto">Go to a shloka</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>C</kbd></div><div class="shortcut-description" data-i18n="help.chapters">Open chapters</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>L</kbd></div><div class="shortcut-description" data-i18n="help.language">Choose content language</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>A</kbd></div><div class="shortcut-description" data-i18n="help.home">Return to Home</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>P</kbd><kbd>Space</kbd></div><div class="shortcut-description" data-i18n="help.play">Play or pause audio</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>F</kbd></div><div class="shortcut-description" data-i18n="help.fullscreen">Enter or exit fullscreen</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>H</kbd></div><div class="shortcut-description" data-i18n="help.help">Open this help</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>K</kbd></div><div class="shortcut-description" data-i18n="help.about">Open About Gitaverse</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>M</kbd></div><div class="shortcut-description" data-i18n="help.menu">Open or close menu</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>E</kbd></div><div class="shortcut-description" data-i18n="help.edit">Enter or leave edit mode</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>Esc</kbd></div><div class="shortcut-description" data-i18n="help.escape">Close a dialog or exit fullscreen</div></div>
       </div>
     </div>
   </section>
@@ -246,11 +248,11 @@
 
 <div class="overlay" id="profile-menu-overlay" data-clarity-mask="true" hidden>
   <section class="dialog profile-menu-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-menu-title">
-    <header class="dialog-head"><h2 id="profile-menu-title">Profile</h2><button class="icon-button close-dialog" type="button" aria-label="Close">×</button></header>
+    <header class="dialog-head"><h2 id="profile-menu-title" data-i18n="profile.title">Profile</h2><button class="icon-button close-dialog" type="button" aria-label="Close" data-i18n-aria="common.close">×</button></header>
     <div class="dialog-body profile-menu-options">
-      <button type="button" id="switch-profile-button">Switch profile</button>
-      <button type="button" id="edit-profile-button">Edit profile</button>
-      <button type="button" id="manage-profiles-button">Manage profiles</button>
+      <button type="button" id="switch-profile-button" data-i18n="profile.switch">Switch profile</button>
+      <button type="button" id="edit-profile-button" data-i18n="profile.edit">Edit profile</button>
+      <button type="button" id="manage-profiles-button" data-i18n="profile.manage">Manage profiles</button>
     </div>
   </section>
 </div>
@@ -277,8 +279,8 @@
 </div>
 
 <aside class="pwa-notice" id="pwa-update-notice" hidden role="status" aria-live="polite">
-  <span>A new Gitaverse version is ready.</span>
-  <button id="pwa-update-action" type="button">Update now</button>
+  <span data-i18n="pwa.ready">A new Gitaverse version is ready.</span>
+  <button id="pwa-update-action" type="button" data-i18n="pwa.update">Update now</button>
   <button class="pwa-notice-close" id="pwa-update-dismiss" type="button" aria-label="Dismiss update">×</button>
 </aside>
 

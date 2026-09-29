@@ -17,7 +17,7 @@ There is no durable analytics event queue in IndexedDB. Clarity receives events 
 
 ## Privacy context
 
-Clarity receives age band, grouped gender, profile language, content language, experience, application version, and display mode. Under-13 ages become unknown; invalid or missing birth dates become missing. Profile form surfaces are masked. Name, exact date of birth, photo, private content, and raw profile identity are not sent.
+Clarity receives age band, grouped gender, profile interface language, content language, experience, application version, and display mode. Under-13 ages become unknown; invalid or missing birth dates become missing. Profile form surfaces are masked. Name, exact date of birth, photo, private content, and raw profile identity are not sent.
 
 ## Engagement events
 

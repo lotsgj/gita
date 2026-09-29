@@ -28,4 +28,4 @@ The experience composes its full Sanskrit chant audio from a reusable audio coll
 
 ## Language
 
-English and Kannada are currently selectable. Sanskrit remains the canonical source panel; the other three panels use the chosen language data. A future global-language enhancement is tracked in [Sampada](../sampada.md).
+English and Kannada content are currently selectable. Sanskrit remains the canonical source panel; the other three panels use the independently chosen content language. The profile’s app language controls the surrounding Gitaverse interface and may differ from the content language.

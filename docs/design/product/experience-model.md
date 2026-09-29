@@ -19,7 +19,7 @@ The application entry is `player.html`. Important query parameters are:
 
 - `play=gita-700` — open an experience.
 - `sid=6.7` — open a stable verse directly.
-- `lang=kn` — choose Kannada; English is `en`.
+- `lang=kn` — choose Kannada content; English content is `en`. Interface language always comes from the profile.
 - `pid=<number>` — identify the selected local profile.
 
 An explicit URL location takes precedence over a saved resume location. Otherwise, the selected profile can return to its most recently recorded home or experience location.
