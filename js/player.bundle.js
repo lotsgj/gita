@@ -963,7 +963,7 @@ class AboutDialog {
 const COLLECTION_ROOT = 'data/collections';
 
 const MASTER_HEADERS = {
-  sa: ['cid', 'snum', 'sid', 'chapter_name', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'],
+  sa: ['cid', 'snum', 'sid', 'chapter_name', 'shloka_raw', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'],
   en: ['cid', 'snum', 'sid', 'chapter_name', 'transliteration', 'meaning', 'word_by_word_meaning'],
   kn: ['cid', 'snum', 'sid', 'chapter_name', 'transliteration', 'meaning', 'word_by_word_meaning']
 };
@@ -983,6 +983,10 @@ function parseCollectionTable(text, expectedHeaders, label = 'collection data') 
   if (!lines.length) throw new Error(label + ' is empty.');
   const headers = lines.shift().split('#');
   if (expectedHeaders && headers.join('#') !== expectedHeaders.join('#')) {
+    const legacySanskritHeaders = ['cid', 'snum', 'sid', 'chapter_name', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'];
+    if (expectedHeaders.includes('shloka_raw') && headers.join('#') === legacySanskritHeaders.join('#')) {
+      throw new Error(label + ' uses the legacy Sanskrit schema. Add shloka_raw between chapter_name and shloka.');
+    }
     throw new Error(label + ' header does not match its collection contract.');
   }
   const seen = new Set();
@@ -1081,6 +1085,7 @@ function normalizeCollectionData({ sa, en, kn, audioComposition, imageCompositio
       sid: sourceRow.sid,
       source: {
         chapterName: sourceRow.chapter_name,
+        shlokaRaw: sourceRow.shloka_raw,
         shloka: sourceRow.shloka,
         wordByWord: sourceRow.word_by_word,
         meaning: sourceRow.meaning,
@@ -1093,7 +1098,7 @@ function normalizeCollectionData({ sa, en, kn, audioComposition, imageCompositio
       media: { chantFullSaUrl, chapterIconUrl }
     };
   });
-  return { schemaVersion: 2, experience, rows };
+  return { schemaVersion: 3, experience, rows };
 }
 
 async function loadMediaCatalogs(type, composition, collectionField, headers, version) {
@@ -1294,7 +1299,7 @@ function serializeLanguageMaster(dataset, language) {
   if (!headers) throw new Error('Unsupported language master: ' + language + '.');
   const rows = dataset.rows.map((row) => {
     if (language === 'sa') {
-      return [row.cid, row.snum, row.sid, row.source.chapterName, row.source.shloka, row.source.wordByWord, row.source.meaning, row.source.wordByWordMeaning];
+      return [row.cid, row.snum, row.sid, row.source.chapterName, row.source.shlokaRaw, row.source.shloka, row.source.wordByWord, row.source.meaning, row.source.wordByWordMeaning];
     }
     const content = row.languages[language];
     return [row.cid, row.snum, row.sid, content.chapterName, content.transliteration, content.meaning, content.wordByWordMeaning];
@@ -1649,7 +1654,8 @@ class InlineEditor {
       const property = parts.pop();
       const target = parts.reduce((value, part) => value[part], row);
       const value = element.innerText.replace(/\r/g, '').replace(/\n$/, '');
-      if (target[property] !== value) {
+      const displayedTarget = String(target[property] ?? '').replace(/\r/g, '').replace(/\n$/, '');
+      if (displayedTarget !== value) {
         changes.push({ target, property, previous: target[property], value });
         target[property] = value;
         languages.add(field.startsWith('source.') ? 'sa' : field.split('.')[1]);

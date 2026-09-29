@@ -10,6 +10,15 @@ const kn = await parseTable('data/collections/verses/bhagavad-gita/master_kn.csv
 const audio = await parseTable('data/collections/experiences/gita-700/audio.csv');
 const images = await parseTable('data/collections/experiences/gita-700/images.csv');
 
+test('the Sanskrit master declares raw and display shloka fields in the collection contract order', () => {
+  assert.deepEqual(sa.headers, ['cid', 'snum', 'sid', 'chapter_name', 'shloka_raw', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning']);
+  for (const row of sa.rows) {
+    assert.ok(Object.hasOwn(row, 'shloka_raw'), `${row.sid} raw field`);
+    assert.ok(Object.hasOwn(row, 'shloka'), `${row.sid} display field`);
+    assert.equal(row.shloka_raw.includes('\n'), false, `${row.sid} raw shloka must not contain display line breaks`);
+  }
+});
+
 test('all language masters and Gita-700 compositions have every SID in canonical order', () => {
   for (const [label, dataset] of Object.entries({ sa, en, kn, audio, images })) {
     assert.equal(dataset.rows.length, 746, `${label} row count`);

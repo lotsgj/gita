@@ -20,10 +20,12 @@ Current type registries include verses, audio, images, video, and animations. Re
 
 The Bhagavad Gita verse catalog points to `master_sa.csv`, `master_en.csv`, and `master_kn.csv`. Each master contains every SID in the same canonical order, even when some content fields are empty.
 
-- Sanskrit: `cid`, `snum`, `sid`, `shloka`, `cname`, `meaning`, `word_by_word_meaning`.
-- English and Kannada: `cid`, `snum`, `sid`, `shloka_transliteration`, `cname`, `meaning`, `word_by_word_meaning`.
+- Sanskrit: `cid`, `snum`, `sid`, `chapter_name`, `shloka_raw`, `shloka`, `word_by_word`, `meaning`, `word_by_word_meaning`.
+- English and Kannada: `cid`, `snum`, `sid`, `chapter_name`, `transliteration`, `meaning`, `word_by_word_meaning`.
 
-`#` is prohibited in values because files are hash-delimited. Intentional line breaks are encoded as `\n`.
+`shloka_raw` preserves the unformatted Sanskrit source. `shloka` is the independently maintained presentation value and may contain intentional line breaks for rendering. The player displays `shloka`; it does not automatically regenerate one field from the other during loading or editing.
+
+`#` is prohibited in values because files are hash-delimited. Intentional line breaks are encoded as `\n`. Display line-break markers belong in `shloka`, not `shloka_raw`.
 
 ## Media
 

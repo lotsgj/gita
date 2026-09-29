@@ -65,16 +65,27 @@ async function fakeWritableCollections() {
 }
 
 test('the player builds its normalized model from collection data', () => {
-  assert.equal(dataset.schemaVersion, 2);
+  assert.equal(dataset.schemaVersion, 3);
   assert.equal(dataset.rows.length, 746);
   const verse = dataset.rows.find((row) => row.sid === '6.7');
+  assert.ok(verse.source.shlokaRaw);
   assert.ok(verse.source.shloka);
+  assert.equal(verse.source.shlokaRaw.includes('\n'), false);
+  assert.equal(verse.source.shloka.includes('\n'), true);
   assert.ok(verse.languages.en.transliteration);
   assert.ok(verse.languages.kn.meaning);
   assert.equal(verse.media.chantFullSaUrl, 'data/collections/audio/chanting-swami-brahmananda/sa/chapter-06/06-007.mp3');
   const chapter = dataset.rows.find((row) => row.sid === '6.B');
   assert.equal(chapter.media.chapterIconUrl, 'data/collections/images/gita-chapter-icons/chapter-06.svg');
   assert.equal(chapter.media.chantFullSaUrl, '');
+});
+
+test('the player identifies the legacy Sanskrit master schema clearly', () => {
+  const legacy = 'cid#snum#sid#chapter_name#shloka#word_by_word#meaning#word_by_word_meaning\n1#1#1.1##श्लोकम्###\n';
+  assert.throws(
+    () => parseCollectionTable(legacy, ['cid', 'snum', 'sid', 'chapter_name', 'shloka_raw', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'], 'master_sa.csv'),
+    /legacy Sanskrit schema.*shloka_raw between chapter_name and shloka/
+  );
 });
 
 test('the player language export exactly reproduces every split master', async () => {
@@ -131,6 +142,25 @@ test('a writable collections workspace updates only the affected language master
     assert.deepEqual(await workspace.saveLanguageMasters(writableDataset, ['en']), ['master_en.csv']);
     assert.match(local.contents.get('verses/bhagavad-gita/master_en.csv').toString('utf8'), /Direct workspace regression meaning/);
     assert.deepEqual(local.contents.get('verses/bhagavad-gita/master_sa.csv'), saBefore);
+  } finally {
+    URL.createObjectURL = originalCreateObjectUrl;
+  }
+});
+
+test('a Sanskrit workspace save preserves raw text while updating display text', async () => {
+  const local = await fakeWritableCollections();
+  const originalCreateObjectUrl = URL.createObjectURL;
+  URL.createObjectURL = (file) => 'blob:raw-preservation-test/' + file.testRelativePath;
+  try {
+    const { dataset: writableDataset, workspace } = await openWritableCollectionWorkspace('gita-700', local.handle);
+    const verse = writableDataset.rows.find((row) => row.sid === '6.7');
+    const rawBefore = verse.source.shlokaRaw;
+    verse.source.shloka = verse.source.shloka + '\n';
+    await workspace.saveLanguageMasters(writableDataset, ['sa']);
+    const saved = parseCollectionTable(local.contents.get('verses/bhagavad-gita/master_sa.csv').toString('utf8'));
+    const savedVerse = saved.rows.find((row) => row.sid === '6.7');
+    assert.equal(savedVerse.shloka_raw, rawBefore);
+    assert.equal(savedVerse.shloka, verse.source.shloka);
   } finally {
     URL.createObjectURL = originalCreateObjectUrl;
   }

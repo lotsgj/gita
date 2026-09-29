@@ -95,7 +95,8 @@ export class InlineEditor {
       const property = parts.pop();
       const target = parts.reduce((value, part) => value[part], row);
       const value = element.innerText.replace(/\r/g, '').replace(/\n$/, '');
-      if (target[property] !== value) {
+      const displayedTarget = String(target[property] ?? '').replace(/\r/g, '').replace(/\n$/, '');
+      if (displayedTarget !== value) {
         changes.push({ target, property, previous: target[property], value });
         target[property] = value;
         languages.add(field.startsWith('source.') ? 'sa' : field.split('.')[1]);

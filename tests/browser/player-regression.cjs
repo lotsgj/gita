@@ -184,7 +184,14 @@ async function run() {
     assert.equal(await meaning.getAttribute('contenteditable'), 'true');
     await meaning.fill('Regression edited meaning');
     await page.getByRole('button', { name: 'Save row' }).click();
-    await page.waitForFunction(() => Object.keys(window.__workspaceWrites || {}).length === 1);
+    await page.waitForFunction(() => Object.keys(window.__workspaceWrites || {}).length === 1, null, { timeout: 30000 }).catch(async (error) => {
+      const diagnostic = await page.evaluate(() => ({
+        writes: Object.keys(window.__workspaceWrites || {}),
+        status: document.querySelector('.edit-status')?.textContent,
+        workspaceError: document.getElementById('workspace-error')?.textContent
+      }));
+      throw new Error(error.message + '\nWorkspace diagnostic: ' + JSON.stringify(diagnostic));
+    });
     assert.equal(await meaning.innerText(), 'Regression edited meaning');
     assert.equal(await page.locator('#download-reminder').isVisible(), false);
     const workspaceWrites = await page.evaluate(() => ({ ...window.__workspaceWrites }));

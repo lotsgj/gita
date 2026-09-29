@@ -1,7 +1,7 @@
 export const COLLECTION_ROOT = 'data/collections';
 
 const MASTER_HEADERS = {
-  sa: ['cid', 'snum', 'sid', 'chapter_name', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'],
+  sa: ['cid', 'snum', 'sid', 'chapter_name', 'shloka_raw', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'],
   en: ['cid', 'snum', 'sid', 'chapter_name', 'transliteration', 'meaning', 'word_by_word_meaning'],
   kn: ['cid', 'snum', 'sid', 'chapter_name', 'transliteration', 'meaning', 'word_by_word_meaning']
 };
@@ -21,6 +21,10 @@ export function parseCollectionTable(text, expectedHeaders, label = 'collection 
   if (!lines.length) throw new Error(label + ' is empty.');
   const headers = lines.shift().split('#');
   if (expectedHeaders && headers.join('#') !== expectedHeaders.join('#')) {
+    const legacySanskritHeaders = ['cid', 'snum', 'sid', 'chapter_name', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'];
+    if (expectedHeaders.includes('shloka_raw') && headers.join('#') === legacySanskritHeaders.join('#')) {
+      throw new Error(label + ' uses the legacy Sanskrit schema. Add shloka_raw between chapter_name and shloka.');
+    }
     throw new Error(label + ' header does not match its collection contract.');
   }
   const seen = new Set();
@@ -119,6 +123,7 @@ export function normalizeCollectionData({ sa, en, kn, audioComposition, imageCom
       sid: sourceRow.sid,
       source: {
         chapterName: sourceRow.chapter_name,
+        shlokaRaw: sourceRow.shloka_raw,
         shloka: sourceRow.shloka,
         wordByWord: sourceRow.word_by_word,
         meaning: sourceRow.meaning,
@@ -131,7 +136,7 @@ export function normalizeCollectionData({ sa, en, kn, audioComposition, imageCom
       media: { chantFullSaUrl, chapterIconUrl }
     };
   });
-  return { schemaVersion: 2, experience, rows };
+  return { schemaVersion: 3, experience, rows };
 }
 
 async function loadMediaCatalogs(type, composition, collectionField, headers, version) {
@@ -332,7 +337,7 @@ export function serializeLanguageMaster(dataset, language) {
   if (!headers) throw new Error('Unsupported language master: ' + language + '.');
   const rows = dataset.rows.map((row) => {
     if (language === 'sa') {
-      return [row.cid, row.snum, row.sid, row.source.chapterName, row.source.shloka, row.source.wordByWord, row.source.meaning, row.source.wordByWordMeaning];
+      return [row.cid, row.snum, row.sid, row.source.chapterName, row.source.shlokaRaw, row.source.shloka, row.source.wordByWord, row.source.meaning, row.source.wordByWordMeaning];
     }
     const content = row.languages[language];
     return [row.cid, row.snum, row.sid, content.chapterName, content.transliteration, content.meaning, content.wordByWordMeaning];

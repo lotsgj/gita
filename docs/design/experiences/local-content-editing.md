@@ -11,7 +11,7 @@ The fallback, **Edit with downloads only**, supports browsers without writable f
 
 ## Editing behavior
 
-The four visible fields are editable. Save row validates that no value contains `#`, updates only the mapped fields, preserves all other records and fields, and writes only affected language masters. Cancel and navigation warn before discarding unsaved changes.
+The four visible fields are editable. Save row validates that no value contains `#`, updates only the mapped fields, preserves all other records and fields, and writes only affected language masters. The Sanskrit panel edits the normalized display `shloka`; its archival `shloka_raw` value remains unchanged. Cancel and navigation warn before discarding unsaved changes.
 
 In writable-folder mode, Save row writes directly to local collection files. In download-only mode, closing without download loses saved session edits. A before-unload warning protects dirty or pending-download work.
 
