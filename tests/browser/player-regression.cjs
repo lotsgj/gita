@@ -131,11 +131,14 @@ async function run() {
     await page.keyboard.press('c');
     assert.equal(await page.locator('.chapter-button').count(), 19);
     await page.locator('#chapters-overlay').waitFor({ state: 'visible' });
+    assert.match(await page.locator('.chapter-button[data-cid="D"]').innerText(), /^D\s+Dhyana$/);
+    assert.match(await page.locator('.chapter-button[data-cid="18"]').innerText(), /^18\s+Moksha Sannyasa Yoga$/);
     await page.waitForFunction(() => document.activeElement?.classList.contains('chapter-button'));
     await page.keyboard.press('Home');
     await page.waitForFunction(() => document.activeElement?.dataset.cid === 'D');
     await page.keyboard.press('Enter');
     assert.equal(await page.locator('#sid-label').innerText(), 'D.1');
+    assert.equal(await page.locator('#chapter-title').innerText(), 'D — Dhyana');
 
     await page.keyboard.press('h');
     assert.equal(await page.locator('#help-overlay').isVisible(), true);
@@ -200,6 +203,14 @@ async function run() {
 
     await page.goto(`${base}/player.html?pid=1`, { waitUntil: 'networkidle' });
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
+    await page.keyboard.press('a');
+    await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
+    assert.match(await page.locator('#gita-700-link').getAttribute('href'), /[?&]sid=6\.7(?:&|$)/, 'experience link must carry the saved SID');
+    await page.getByRole('link', { name: /Gita 700/ }).click();
+    await page.locator('#sid-label').waitFor();
+    assert.equal(await page.locator('#sid-label').innerText(), '6.7', 'experience selection must preserve the per-experience resume point');
     await page.keyboard.press('a');
     await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
 

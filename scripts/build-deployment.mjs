@@ -44,6 +44,24 @@ async function walk(directory) {
   return files;
 }
 
+async function assertAbsent(target, label) {
+  try {
+    await stat(target);
+  } catch (error) {
+    if (error.code === 'ENOENT') return;
+    throw error;
+  }
+  throw new Error(label + ' must not be included in the deployment output.');
+}
+
+function isDocumentationAsset(relative) {
+  return relative === 'docs.html'
+    || relative === 'css/docs.css'
+    || relative === 'js/docs.bundle.js'
+    || relative.startsWith('docs/')
+    || relative.startsWith('js/vendor/');
+}
+
 const major = (await readFile(path.join(root, 'APP_MAJOR_VERSION'), 'utf8')).trim();
 if (!/^[1-9]\d*$/.test(major)) throw new Error('APP_MAJOR_VERSION must contain one positive whole number.');
 
@@ -59,14 +77,17 @@ const builtAt = new Date().toISOString();
 const clarityProjectId = String(process.env.CLARITY_PROJECT_ID || '').trim();
 if (clarityProjectId && !/^[a-z0-9]+$/i.test(clarityProjectId)) throw new Error('CLARITY_PROJECT_ID must be alphanumeric.');
 
-run(process.execPath, ['scripts/build-player2.mjs']);
+run(process.execPath, ['scripts/build-player.mjs']);
 run(process.execPath, ['--check', 'js/player.bundle.js']);
+run(process.execPath, ['scripts/build-docs.mjs']);
+run(process.execPath, ['--check', 'js/docs.bundle.js']);
 run(process.execPath, ['--test',
   'tests/unit/event-bus.test.mjs',
-  'tests/unit/player2-collection-data.test.mjs',
-  'tests/unit/player2-renderer.test.mjs',
+  'tests/unit/player-collection-data.test.mjs',
+  'tests/unit/player-renderer.test.mjs',
   'tests/contract/collections.test.mjs',
-  'tests/contract/player2-isolation.test.mjs'
+  'tests/contract/docs.test.mjs',
+  'tests/contract/player-isolation.test.mjs'
 ]);
 
 await rm(output, { recursive: true, force: true });
@@ -85,6 +106,16 @@ if (!deployedHtml.includes(`<meta name="clarity-project-id" content="${clarityPr
 }
 
 await writeFile(path.join(output, 'player.html'), deployedHtml);
+const docsSourceHtml = await readFile(path.join(root, 'docs.html'), 'utf8');
+const deployedDocsHtml = docsSourceHtml
+  .replace('<meta name="app-version" content="dev">', `<meta name="app-version" content="${version}">`)
+  .replace('<meta name="clarity-project-id" content="">', `<meta name="clarity-project-id" content="${clarityProjectId}">`)
+  .replaceAll('?v=dev', `?v=${encodeURIComponent(version)}`);
+if (deployedDocsHtml === docsSourceHtml || deployedDocsHtml.includes('?v=dev') || deployedDocsHtml.includes('content="dev"')) {
+  throw new Error('docs.html does not contain the expected development version markers.');
+}
+if (!deployedDocsHtml.includes(`<meta name="clarity-project-id" content="${clarityProjectId}">`)) throw new Error('docs.html does not contain the expected Clarity project marker.');
+await writeFile(path.join(output, 'docs.html'), deployedDocsHtml);
 await cp(path.join(root, 'index.html'), path.join(output, 'index.html'));
 await cp(path.join(root, 'CNAME'), path.join(output, 'CNAME'));
 await cp(path.join(root, 'manifest.webmanifest'), path.join(output, 'manifest.webmanifest'));
@@ -95,12 +126,18 @@ await writeFile(path.join(output, 'service-worker.js'), serviceWorkerSource.repl
 await copyDirectory(path.join(root, 'css'), path.join(output, 'css'), (relative) => !relative.endsWith('.DS_Store'));
 await copyDirectory(path.join(root, 'assets'), path.join(output, 'assets'), (relative) => !relative.endsWith('.DS_Store'));
 await cp(path.join(root, 'js/player.bundle.js'), path.join(output, 'js/player.bundle.js'));
+await cp(path.join(root, 'js/docs.bundle.js'), path.join(output, 'js/docs.bundle.js'));
+await mkdir(path.join(output, 'js/vendor'), { recursive: true });
+await cp(path.join(root, 'js/vendor/MARKED-LICENSE.md'), path.join(output, 'js/vendor/MARKED-LICENSE.md'));
+await copyDirectory(path.join(root, 'docs'), path.join(output, 'docs'), (relative) => !relative.endsWith('.DS_Store'));
 await copyDirectory(path.join(root, 'data'), path.join(output, 'data'), (relative) => {
   return !relative.endsWith('.DS_Store') && relative !== 'app-version.json';
 });
 
 const versionMetadata = { version, major, build, commit, runId, builtAt, timeZone };
 await writeFile(path.join(output, 'data/app-version.json'), JSON.stringify(versionMetadata, null, 2) + '\n');
+
+await assertAbsent(path.join(output, 'x'), 'The archived x/ prototypes');
 
 const assets = {};
 for (const absolute of await walk(output)) {
@@ -114,17 +151,30 @@ for (const absolute of await walk(output)) {
 }
 
 const precache = Object.keys(assets).filter((relative) => {
+  if (isDocumentationAsset(relative)) return false;
   return relative === 'player.html'
     || relative === 'index.html'
     || relative === 'offline.html'
     || relative === 'manifest.webmanifest'
     || relative === 'data/app-version.json'
     || relative === 'js/player.bundle.js'
-    || relative.startsWith('css/')
+    || (relative.startsWith('css/') && relative !== 'css/docs.css')
     || relative.startsWith('assets/icons/')
     || relative.startsWith('data/collections/');
 });
 const assetManifest = { version, generatedAt: builtAt, assets, precache };
 await writeFile(path.join(output, 'asset-manifest.json'), JSON.stringify(assetManifest, null, 2) + '\n');
+
+if (Object.keys(assets).some((relative) => relative === 'x' || relative.startsWith('x/'))) {
+  throw new Error('The archived x/ prototypes must not appear in the deployment asset manifest.');
+}
+if (precache.some(isDocumentationAsset)) {
+  throw new Error('Rachana documentation must not increase the PWA precache.');
+}
+
+for (const required of ['docs.html', 'css/docs.css', 'js/docs.bundle.js', 'js/vendor/MARKED-LICENSE.md', 'docs/navigation.json', 'docs/welcome.md']) {
+  if (!assets[required]) throw new Error('Rachana deployment is missing ' + required + '.');
+  if (precache.includes(required)) throw new Error('Rachana documentation must not be part of the initial PWA precache: ' + required + '.');
+}
 
 console.log(`Built Gitaverse ${version} in dist/ (${Object.keys(assets).length} managed assets; ${precache.length} precached; audio cached on demand).`);

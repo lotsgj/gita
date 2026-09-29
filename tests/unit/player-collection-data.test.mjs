@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { loadCollectionExperienceFromFiles, normalizeCollectionData, openWritableCollectionWorkspace, parseCollectionTable, serializeLanguageMaster } from '../../js/player2/collection-data.js';
+import { loadCollectionExperienceFromFiles, normalizeCollectionData, openWritableCollectionWorkspace, parseCollectionTable, serializeLanguageMaster } from '../../js/player/collection-data.js';
 import { projectRoot } from '../helpers/collection-data.mjs';
 
 async function table(relative) {
@@ -64,7 +64,7 @@ async function fakeWritableCollections() {
   return { handle: directory(), contents };
 }
 
-test('player2 builds its normalized model from collection data', () => {
+test('the player builds its normalized model from collection data', () => {
   assert.equal(dataset.schemaVersion, 2);
   assert.equal(dataset.rows.length, 746);
   const verse = dataset.rows.find((row) => row.sid === '6.7');
@@ -77,14 +77,14 @@ test('player2 builds its normalized model from collection data', () => {
   assert.equal(chapter.media.chantFullSaUrl, '');
 });
 
-test('player2 language export exactly reproduces every split master', async () => {
+test('the player language export exactly reproduces every split master', async () => {
   for (const language of ['sa', 'en', 'kn']) {
     const expected = await readFile(path.join(projectRoot, `data/collections/verses/bhagavad-gita/master_${language}.csv`), 'utf8');
     assert.equal(serializeLanguageMaster(dataset, language), expected, language + ' export mismatch');
   }
 });
 
-test('player2 refuses shifted collection rows instead of joining by position', () => {
+test('the player refuses shifted collection rows instead of joining by position', () => {
   const shifted = { headers: en.headers, rows: en.rows.slice(1) };
   assert.throws(() => normalizeCollectionData({
     sa, en: shifted, kn, audioComposition, imageComposition,
@@ -94,7 +94,7 @@ test('player2 refuses shifted collection rows instead of joining by position', (
   }), /canonical SID count/);
 });
 
-test('player2 can load the selected collections folder for file-system use', async () => {
+test('the player can load the selected collections folder for file-system use', async () => {
   const collections = path.join(projectRoot, 'data/collections');
   const entries = await readdir(collections, { recursive: true, withFileTypes: true });
   const files = entries.filter((entry) => entry.isFile()).map((entry) => {

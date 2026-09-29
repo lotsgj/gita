@@ -1,0 +1,34 @@
+# Collections and media
+
+**Status:** Current  
+**Last updated:** 29 September 2026
+
+## Organization
+
+All active content lives under `data/collections`:
+
+```text
+data/collections/<type>/collection.csv
+data/collections/<type>/<collection>/catalog.csv
+data/collections/<type>/<collection>/<content>
+data/collections/experiences/<experience>/...
+```
+
+Current type registries include verses, audio, images, video, and animations. Registries locate a collection catalog; catalogs locate individual content. Experience files compose those reusable records for an experience-specific purpose.
+
+## Verse masters
+
+The Bhagavad Gita verse catalog points to `master_sa.csv`, `master_en.csv`, and `master_kn.csv`. Each master contains every SID in the same canonical order, even when some content fields are empty.
+
+- Sanskrit: `cid`, `snum`, `sid`, `shloka`, `cname`, `meaning`, `word_by_word_meaning`.
+- English and Kannada: `cid`, `snum`, `sid`, `shloka_transliteration`, `cname`, `meaning`, `word_by_word_meaning`.
+
+`#` is prohibited in values because files are hash-delimited. Intentional line breaks are encoded as `\n`.
+
+## Media
+
+Media is owned by reusable collections, not by an experience. Gita 700’s audio composition references a collection and order for the `chant_full_sa` purpose; its image composition references chapter icons. A catalog uses SID plus order as the unique identity, permitting multiple media records for one SID.
+
+## Validation
+
+The loader verifies required headers, unique/aligned SIDs, supported schema versions, catalog references, and media paths before producing normalized rows. HTTP, file chooser, and writable-workspace loading share the same normalization rules.

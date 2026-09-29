@@ -24,7 +24,14 @@ export const EVENT_NAMES = new Set([
   'audio_50',
   'audio_75',
   'audio_completed',
-  'audio_failed'
+  'audio_failed',
+  'rachana_opened',
+  'rachana_page_viewed',
+  'rachana_navigation_opened',
+  'rachana_profile_selected',
+  'rachana_about_opened',
+  'rachana_gitaverse_opened',
+  'rachana_document_failed'
 ]);
 
 export function validateEventInput(name, input = {}) {

@@ -79,3 +79,22 @@ test('Clarity receives only allowlisted analytics values', () => {
   assert.equal(JSON.stringify(calls).includes('must-not-be-sent'), false);
   assert.equal(JSON.stringify(calls).includes('99'), false);
 });
+
+test('Rachana events use the shared Clarity adapter without profile identifiers', () => {
+  const target = {};
+  const clarity = new ClarityAdapter({
+    projectId: 'test123',
+    target,
+    documentRef: { head: { appendChild() {} }, createElement: () => ({ dataset: {} }), querySelector: () => null }
+  });
+  clarity.handle({
+    event: 'rachana_page_viewed',
+    context: { ageBand: '35-44', genderGroup: 'not_said', profileLanguage: 'en', appVersion: '1.test', displayMode: 'browser', surface: 'rachana', documentationPage: 'gita-700' },
+    details: { route: 'gita-700' }, profileId: 7, anonymousProfileId: 'private-id'
+  });
+  const calls = target.clarity.q.map((args) => Array.from(args));
+  assert.ok(calls.some((call) => call[0] === 'set' && call[1] === 'surface' && call[2] === 'rachana'));
+  assert.ok(calls.some((call) => call[0] === 'set' && call[1] === 'rachana_page' && call[2] === 'gita-700'));
+  assert.ok(calls.some((call) => call[0] === 'event' && call[1] === 'rachana_page_viewed'));
+  assert.equal(JSON.stringify(calls).includes('private-id'), false);
+});

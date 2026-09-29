@@ -1,0 +1,62 @@
+{
+  "title": "Rachana",
+  "subtitle": "Gitaverse design details",
+  "defaultPage": "welcome",
+  "sections": [
+    {
+      "title": "Overview",
+      "pages": [
+        {
+          "title": "Welcome to Rachana",
+          "route": "welcome",
+          "path": "welcome.md"
+        },
+        {
+          "title": "Rachana documentation design",
+          "route": "rachana-design",
+          "path": "design/rachana.md"
+        }
+      ]
+    },
+    {
+      "title": "Product",
+      "pages": [
+        { "title": "Purpose and principles", "route": "purpose-and-principles", "path": "design/product/purpose-and-principles.md" },
+        { "title": "Experience model", "route": "experience-model", "path": "design/product/experience-model.md" },
+        { "title": "Terminology", "route": "terminology", "path": "design/product/terminology.md" }
+      ]
+    },
+    {
+      "title": "Experiences",
+      "pages": [
+        { "title": "Profiles and first use", "route": "profiles-and-first-use", "path": "design/experiences/profiles-and-first-use.md" },
+        { "title": "Home and experience selection", "route": "home-and-experience-selection", "path": "design/experiences/home-and-experience-selection.md" },
+        { "title": "Shared player", "route": "shared-player", "path": "design/experiences/shared-player.md" },
+        { "title": "Gita 700", "route": "gita-700", "path": "design/experiences/gita-700.md" },
+        { "title": "Local content editing", "route": "local-content-editing", "path": "design/experiences/local-content-editing.md" },
+        { "title": "Install, offline and updates", "route": "install-offline-and-updates", "path": "design/experiences/install-offline-and-updates.md" }
+      ]
+    },
+    {
+      "title": "System",
+      "pages": [
+        { "title": "Architecture overview", "route": "architecture-overview", "path": "design/system/architecture-overview.md" },
+        { "title": "Collections and media", "route": "collections-and-media", "path": "design/system/collections-and-media.md" },
+        { "title": "Profiles and local storage", "route": "profiles-and-local-storage", "path": "design/system/profiles-and-local-storage.md" },
+        { "title": "Events, analytics and resume", "route": "events-analytics-and-resume", "path": "design/system/events-analytics-and-resume.md" },
+        { "title": "PWA cache and updates", "route": "pwa-cache-and-updates", "path": "design/system/pwa-cache-and-updates.md" },
+        { "title": "Build, test and deployment", "route": "build-test-and-deployment", "path": "design/system/build-test-and-deployment.md" }
+      ]
+    },
+    {
+      "title": "Future possibilities",
+      "pages": [
+        {
+          "title": "Sampada",
+          "route": "sampada",
+          "path": "design/sampada.md"
+        }
+      ]
+    }
+  ]
+}

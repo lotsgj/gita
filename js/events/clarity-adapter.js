@@ -42,7 +42,9 @@ export class ClarityAdapter {
       experience: event.context.experience,
       content_language: event.context.language,
       app_version: event.context.appVersion,
-      display_mode: event.context.displayMode
+      display_mode: event.context.displayMode,
+      surface: event.context.surface,
+      rachana_page: event.context.documentationPage
     };
     Object.entries(tags).forEach(([key, value]) => this.setTag(key, value));
 
@@ -60,7 +62,9 @@ export class ClarityAdapter {
       'experience_selected', 'language_changed', 'home_opened', 'data_load_failed', 'profile_storage_failed',
       'verse_viewed', 'verse_engaged_10s', 'verse_engaged_30s', 'verse_engaged_60s',
       'audio_started', 'audio_resumed', 'audio_paused', 'audio_seeked', 'audio_25', 'audio_50',
-      'audio_75', 'audio_completed', 'audio_failed'
+      'audio_75', 'audio_completed', 'audio_failed',
+      'rachana_opened', 'rachana_page_viewed', 'rachana_navigation_opened', 'rachana_profile_selected',
+      'rachana_about_opened', 'rachana_gitaverse_opened', 'rachana_document_failed'
     ]);
     return allowed.has(event.event) ? event.event : null;
   }

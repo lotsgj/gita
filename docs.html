@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#243c5f">
+  <meta name="app-version" content="dev">
+  <meta name="clarity-project-id" content="">
+  <title>Rachana — Gitaverse design details</title>
+  <meta name="description" content="Rachana is the living product and design handbook for Gitaverse.">
+  <link rel="icon" href="assets/icons/icon-192.png" sizes="192x192">
+  <link rel="stylesheet" href="css/player.css?v=dev">
+  <link rel="stylesheet" href="css/docs.css?v=dev">
+</head>
+<body>
+  <header class="docs-header">
+    <button class="docs-menu-button" id="docs-menu-button" type="button" aria-label="Open documentation navigation" aria-expanded="false" aria-controls="docs-sidebar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <a class="docs-brand" href="docs.html" aria-label="Rachana home">
+      <span class="docs-mark" aria-hidden="true">ॐ</span>
+      <span><strong>Rachana</strong><small>Gitaverse design details</small></span>
+    </a>
+    <div class="docs-header-actions"><a class="docs-gitaverse-link" id="docs-gitaverse-link" href="player.html">Open Gitaverse</a><button class="profile-pill docs-profile-pill" id="docs-profile-pill" type="button" data-profile-pill data-clarity-mask="true">Profile</button></div>
+  </header>
+
+  <div class="docs-layout">
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Rachana navigation">
+      <nav id="docs-nav"></nav>
+      <button class="docs-about-button" id="docs-about-button" type="button">About Gitaverse</button>
+    </aside>
+    <button class="docs-nav-scrim" id="docs-nav-scrim" type="button" aria-label="Close documentation navigation" tabindex="-1" hidden></button>
+    <main class="docs-main" id="docs-main">
+      <article class="docs-article" id="docs-article" aria-live="polite" aria-busy="true">
+        <p class="docs-loading">Opening Rachana…</p>
+      </article>
+    </main>
+  </div>
+
+  <input id="docs-folder-input" type="file" webkitdirectory multiple hidden>
+
+  <main id="profile-setup" class="profile-screen docs-profile-layer" data-clarity-mask="true" hidden>
+    <section class="profile-form-card"><div class="status-mark">ॐ</div><h1 id="profile-form-title">Create your profile</h1><p id="profile-form-intro"></p>
+      <form id="profile-form"><div class="profile-photo-field"><div id="profile-photo-preview"></div><div class="profile-photo-actions"><label class="secondary-button" for="profile-photo">Choose photo</label><input id="profile-photo" type="file" accept="image/*" hidden><button class="quiet-button" id="profile-photo-remove" type="button" hidden>Remove</button><small>Optional. Stored only on this device.</small></div></div>
+        <label class="field-label" for="profile-name">Name</label><input class="profile-input" id="profile-name" autocomplete="name" maxlength="60" required>
+        <div class="profile-field-grid"><div><label class="field-label" for="profile-dob">Date of birth</label><input class="profile-input" id="profile-dob" type="date" required></div><div><label class="field-label" for="profile-gender">Gender <small>(optional)</small></label><select class="profile-input" id="profile-gender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="nonbinary">Non-binary</option><option value="self-described">Self-described</option></select></div></div>
+        <label class="field-label" for="profile-language">Preferred language</label><select class="profile-input" id="profile-language"><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
+        <label class="check-row"><input id="profile-default" type="checkbox" checked><span>Use this profile automatically on this device</span></label><p class="analytics-notice">We collect anonymised information to improve the product experience.</p><div class="form-error" id="profile-form-error" role="alert"></div><div class="profile-form-actions"><button class="quiet-button" id="profile-form-cancel" type="button">Cancel</button><button class="primary-button" type="submit">Save profile</button></div>
+      </form>
+    </section>
+  </main>
+  <main id="profile-selection" class="profile-screen docs-profile-layer" data-clarity-mask="true" hidden><section class="profile-selection-card"><div class="profile-selection-head"><div><div class="status-mark">ॐ</div><h1 id="profile-selection-title">Switch profile</h1><p>Choose a profile to continue.</p></div><button class="quiet-button" id="profile-selection-back" type="button">Back</button></div><div class="profile-list" id="profile-list"></div><button class="add-profile-button" id="add-profile-button" type="button">＋ Add another profile</button></section></main>
+  <div class="overlay" id="profile-menu-overlay" data-clarity-mask="true" hidden><section class="dialog profile-menu-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-menu-title"><header class="dialog-head"><h2 id="profile-menu-title">Profile</h2><button class="icon-button docs-overlay-close" type="button" aria-label="Close">×</button></header><div class="dialog-body profile-menu-options"><button type="button" id="switch-profile-button">Switch profile</button><button type="button" id="edit-profile-button">Edit profile</button><button type="button" id="manage-profiles-button">Manage profiles</button></div></section></div>
+
+  <noscript><p class="docs-noscript">Rachana needs JavaScript to display its Markdown documents.</p></noscript>
+  <script defer src="js/docs.bundle.js?v=dev"></script>
+</body>
+</html>

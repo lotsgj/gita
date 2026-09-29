@@ -42,8 +42,11 @@ jobs:
         env:
           CLARITY_PROJECT_ID: ${{ vars.CLARITY_PROJECT_ID }}
 
-      - name: Run Player 2 browser regression
+      - name: Run player browser regression
         run: npm run test:browser
+
+      - name: Run Rachana browser regression
+        run: npm run test:docs-browser
 
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'

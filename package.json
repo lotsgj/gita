@@ -9,9 +9,11 @@
     "test": "node --test tests/unit/*.test.mjs tests/contract/*.test.mjs",
     "test:unit": "node --test tests/unit/*.test.mjs",
     "test:contract": "node --test tests/contract/*.test.mjs",
-    "test:browser": "node tests/browser/player2-parity.cjs",
+    "test:browser": "node tests/browser/player-regression.cjs",
+    "test:docs-browser": "node tests/browser/docs.cjs",
     "test:events": "node --test tests/unit/event-bus.test.mjs",
-    "build:player2": "node scripts/build-player2.mjs",
+    "build:docs": "node scripts/build-docs.mjs",
+    "build:player": "node scripts/build-player.mjs",
     "build": "node scripts/build-deployment.mjs"
   }
 }

@@ -7,9 +7,10 @@ import { ClarityAdapter } from '../events/clarity-adapter.js';
 import { SentryAdapter } from '../events/sentry-adapter.js';
 import { profileAnalyticsContext } from '../events/profile-analytics.js';
 import { PwaManager } from '../pwa.js';
-import { AudioPlayer } from '../audio-player.js';
+import { AudioPlayer } from './audio-player.js';
 import { InlineEditor } from './editor.js';
 import { getExperience } from './renderers/registry.js';
+import { AboutDialog } from '../shared/about-dialog.js';
 
 const state = {
   dataset: null,
@@ -25,6 +26,7 @@ const state = {
   profileSelectionMode: 'initial',
   profileReturnView: 'chooser',
   locationSource: null,
+  experienceResumes: new Map(),
   appMetadata: { version: 'dev' }
 };
 
@@ -48,6 +50,7 @@ eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
 eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
 eventBus.subscribe(new SentryAdapter());
 const pwa = new PwaManager({ appVersion });
+const aboutDialog = new AboutDialog({ version: appVersion });
 const profileUI = new ProfileUI({
   store: profileStore,
   onSelected: selectProfile,
@@ -100,6 +103,7 @@ function updateProfileUrl(profile) {
 }
 
 async function activateProfile(profile) {
+  if (state.activeProfile?.pid !== profile.pid) state.experienceResumes.clear();
   state.activeProfile = profile;
   updateProfileUrl(profile);
   await profileUI.renderPills(profile);
@@ -235,11 +239,14 @@ async function checkPlayerVersion() {
 
 async function startRequestedExperience() {
   const chooserLink = document.getElementById('gita-700-link');
+  const chooserResume = state.experienceResumes.get('gita-700')
+    || await profileStore.getExperienceResume(state.activeProfile.pid, 'gita-700');
   const chooserUrl = new URL(location.href);
   chooserUrl.searchParams.set('play', 'gita-700');
-  chooserUrl.searchParams.delete('sid');
+  if (chooserResume?.sid) chooserUrl.searchParams.set('sid', chooserResume.sid);
+  else chooserUrl.searchParams.delete('sid');
   chooserUrl.searchParams.set('pid', state.activeProfile.pid);
-  const chooserLanguage = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language;
+  const chooserLanguage = chooserResume?.language || (requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.language);
   if (chooserLanguage === 'kn') chooserUrl.searchParams.set('lang', 'kn');
   else chooserUrl.searchParams.delete('lang');
   chooserLink.href = chooserUrl.href;
@@ -349,9 +356,7 @@ function render(options = {}) {
   if (!row) return;
   audioPlayer.setSource(audioSource(row));
   const chapterName = chapterNameFor(row.cid, state.language);
-  document.getElementById('chapter-title').textContent = row.cid === 'D'
-    ? 'D — Dhyana'
-    : row.cid + (chapterName ? ' — ' + chapterName : '');
+  document.getElementById('chapter-title').textContent = row.cid + (chapterName ? ' — ' + chapterName : '');
   const chapterIcon = document.getElementById('chapter-icon');
   const iconPath = chapterIconFor(row.cid);
   chapterIcon.hidden = !iconPath;
@@ -364,6 +369,12 @@ function render(options = {}) {
     : 'Language (Eng)';
   document.documentElement.lang = state.language;
   state.renderer.render(row, state.language);
+  state.experienceResumes.set(play, {
+    experience: play,
+    sid: row.sid,
+    language: state.language,
+    savedAt: new Date().toISOString()
+  });
   if (options.keepEditing && state.editor.active) state.renderer.setEditing(true);
   updateUrl();
   updateChapterSelection();
@@ -624,7 +635,7 @@ function buildChapterList() {
   const chapters = [];
   state.dataset.rows.forEach((row, index) => {
     if (!chapters.some((chapter) => chapter.cid === row.cid)) {
-      chapters.push({ cid: row.cid, index, en: chapterNameFor(row.cid, 'en'), kn: chapterNameFor(row.cid, 'kn'), sa: chapterNameFor(row.cid, 'sa') });
+      chapters.push({ cid: row.cid, index, en: chapterNameFor(row.cid, 'en'), kn: chapterNameFor(row.cid, 'kn') });
     }
   });
   const list = document.getElementById('chapter-list');
@@ -646,11 +657,11 @@ function buildChapterList() {
     }
     const number = document.createElement('span');
     number.className = 'chapter-number';
-    number.textContent = chapter.cid === 'D' ? 'ॐ' : chapter.cid;
+    number.textContent = chapter.cid;
     const name = document.createElement('span');
     name.className = 'chapter-name';
-    name.dataset.en = chapter.en || chapter.sa || 'Chapter ' + chapter.cid;
-    name.dataset.kn = chapter.kn || chapter.en || chapter.sa || 'Chapter ' + chapter.cid;
+    name.dataset.en = chapter.en;
+    name.dataset.kn = chapter.kn;
     button.append(number, name);
     list.appendChild(button);
   });
@@ -739,8 +750,8 @@ function bindEvents() {
   document.getElementById('footer-goto-button').addEventListener('click', () => openOverlay('goto-overlay'));
   document.getElementById('chapters-button').addEventListener('click', () => openOverlay('chapters-overlay'));
   document.getElementById('help-button').addEventListener('click', () => openOverlay('help-overlay'));
-  document.getElementById('about-button').addEventListener('click', () => openOverlay('about-overlay'));
-  document.querySelectorAll('[data-about]').forEach((button) => button.addEventListener('click', () => openOverlay('about-overlay')));
+  document.getElementById('about-button').addEventListener('click', (event) => aboutDialog.open(event.currentTarget));
+  document.querySelectorAll('[data-about]').forEach((button) => button.addEventListener('click', (event) => aboutDialog.open(event.currentTarget)));
   document.getElementById('language-button').addEventListener('click', () => openOverlay('language-overlay'));
   document.getElementById('home-button').addEventListener('click', goHome);
   document.querySelectorAll('[data-profile-pill]').forEach((button) => button.addEventListener('click', () => openOverlay('profile-menu-overlay')));

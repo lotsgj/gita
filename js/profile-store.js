@@ -114,22 +114,53 @@ export class ProfileStore {
     return (await requestResult(transaction.objectStore(RESUME_STORE).get(Number(pid)))) || null;
   }
 
+  async getExperienceResume(pid, experience) {
+    const record = await this.getResume(pid);
+    const experienceId = String(experience || '');
+    if (!record || !experienceId) return null;
+    const saved = record.experiences?.[experienceId];
+    if (saved?.sid) return { experience: experienceId, ...saved };
+    // Records created before per-experience resume points are still usable.
+    if (record.view === 'experience' && record.experience === experienceId && record.sid) {
+      return {
+        experience: experienceId,
+        sid: record.sid,
+        language: record.language,
+        savedAt: record.savedAt
+      };
+    }
+    return null;
+  }
+
   async saveResume(resume) {
     await this.open();
     if (!Number.isInteger(Number(resume.pid))) throw new Error('A resume point requires a profile ID.');
+    const pid = Number(resume.pid);
+    const transaction = this.database.transaction(RESUME_STORE, 'readwrite');
+    const store = transaction.objectStore(RESUME_STORE);
+    const existing = await requestResult(store.get(pid));
     const record = {
-      pid: Number(resume.pid),
+      ...(existing || {}),
+      pid,
       view: resume.view === 'experience' ? 'experience' : 'home',
       language: resume.language === 'kn' ? 'kn' : 'en',
-      savedAt: resume.savedAt || new Date().toISOString()
+      savedAt: resume.savedAt || new Date().toISOString(),
+      experiences: { ...(existing?.experiences || {}) }
     };
     if (record.view === 'experience') {
       record.experience = String(resume.experience || '');
       record.sid = String(resume.sid || '');
       if (!record.experience || !record.sid) throw new Error('An experience resume point requires an experience and SID.');
+      record.experiences[record.experience] = {
+        sid: record.sid,
+        language: record.language,
+        savedAt: record.savedAt
+      };
+    } else {
+      delete record.experience;
+      delete record.sid;
     }
-    const transaction = this.database.transaction(RESUME_STORE, 'readwrite');
-    transaction.objectStore(RESUME_STORE).put(record);
+    store.put(record);
     await transactionDone(transaction);
     return record;
   }

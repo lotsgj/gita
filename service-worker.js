@@ -8,6 +8,17 @@ function scopedUrl(path) {
   return new URL(path, self.registration.scope).href;
 }
 
+function isDocumentationRequest(url) {
+  const scopePath = new URL(self.registration.scope).pathname;
+  if (!url.pathname.startsWith(scopePath)) return false;
+  const relative = decodeURIComponent(url.pathname.slice(scopePath.length)).replace(/^\/+/, '');
+  return relative === 'docs.html'
+    || relative === 'css/docs.css'
+    || relative === 'js/docs.bundle.js'
+    || relative.startsWith('docs/')
+    || relative.startsWith('js/vendor/');
+}
+
 async function installShell() {
   const manifestResponse = await fetch(scopedUrl(`asset-manifest.json?build=${encodeURIComponent(BUILD_VERSION)}`), { cache: 'no-store' });
   if (!manifestResponse.ok) throw new Error('Could not load the Gitaverse asset manifest.');
@@ -90,6 +101,7 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  if (isDocumentationRequest(url)) return;
   if (/\.(mp3|m4a|ogg|wav)$/i.test(url.pathname)) event.respondWith(audioResponse(request));
   else event.respondWith(shellResponse(request));
 });

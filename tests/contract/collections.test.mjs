@@ -18,6 +18,16 @@ test('all language masters and Gita-700 compositions have every SID in canonical
   }
 });
 
+test('English and Kannada masters provide one consistent chapter name for every chapter', () => {
+  for (const [language, master] of Object.entries({ en, kn })) {
+    for (const cid of [...new Set(master.rows.map((row) => row.cid))]) {
+      const names = new Set(master.rows.filter((row) => row.cid === cid).map((row) => row.chapter_name));
+      assert.equal(names.size, 1, `master_${language}.csv chapter ${cid} must have one consistent chapter name`);
+      assert.ok([...names][0], `master_${language}.csv chapter ${cid} must have a chapter name`);
+    }
+  }
+});
+
 test('all media catalog keys are unique and resolve to files', async () => {
   const audioCatalog = await parseTable('data/collections/audio/chanting-swami-brahmananda/catalog.csv');
   const imageCatalog = await parseTable('data/collections/images/gita-chapter-icons/catalog.csv');

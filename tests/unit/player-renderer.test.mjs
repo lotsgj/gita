@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGita700Renderer } from '../../js/player2/renderers/gita-700.js';
+import { createGita700Renderer } from '../../js/player/renderers/gita-700.js';
 
 function element() {
   return { dataset: {}, textContent: '', classList: { toggle() {}, remove() {} }, style: {}, clientHeight: 0, clientWidth: 0 };
@@ -27,7 +27,7 @@ function rootFixture() {
 globalThis.requestAnimationFrame = (callback) => { callback(); return 1; };
 globalThis.matchMedia = () => ({ matches: false });
 
-test('player2 renderer reads the normalized semantic model', () => {
+test('the player renderer reads the normalized semantic model', () => {
   const root = rootFixture();
   const renderer = createGita700Renderer();
   renderer.mount(root);
