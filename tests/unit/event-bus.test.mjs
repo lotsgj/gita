@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventBus } from '../../js/events/event-bus.js';
 import { ResumeAdapter } from '../../js/events/resume-adapter.js';
+import { DiksoochiAdapter } from '../../js/events/diksoochi-adapter.js';
 import { ClarityAdapter } from '../../js/events/clarity-adapter.js';
 import { SentryAdapter } from '../../js/events/sentry-adapter.js';
 import { ageBand, profileAnalyticsContext } from '../../js/events/profile-analytics.js';
@@ -42,6 +43,19 @@ test('event schema rejects unknown and incomplete events', () => {
   const bus = new EventBus();
   assert.throws(() => bus.emit('unknown_event'), /Unknown Gitaverse event/);
   assert.throws(() => bus.emit('location_changed', { profileId: 7, context: { experience: 'gita-700' } }), /requires experience and sid/);
+});
+
+test('Diksoochi records only meaningful engagement thresholds without storing an event queue', async () => {
+  const records = [];
+  const adapter = new DiksoochiAdapter({ store: { async recordDiksoochiEngagement(record) { records.push(record); } } });
+  const bus = new EventBus({ appVersion: 'test-version' });
+  bus.subscribe(adapter);
+  bus.emit('verse_viewed', { profileId: 4, context: { experience: 'gita-700', sid: '8.3', chapter: '8' } });
+  const event = bus.emit('verse_engaged_10s', { profileId: 4, context: { experience: 'gita-700', sid: '8.3', chapter: '8' } });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(records, [{
+    pid: 4, experience: 'gita-700', sid: '8.3', chapter: '8', seconds: 10, occurredAt: event.occurredAt
+  }]);
 });
 
 test('profile analytics retains the privacy age-band decisions', () => {

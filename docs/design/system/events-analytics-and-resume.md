@@ -1,7 +1,7 @@
 # Events, analytics and resume
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 30 September 2026
 
 ## Event bus
 
@@ -10,10 +10,13 @@ The player emits validated, versioned events to a small first-party event bus. E
 ## Adapters
 
 - **Resume** listens to location changes and Home openings, then saves the current screen plus the last meaningful place for each experience and profile.
+- **Diksoochi** listens only to the 10-, 30- and 60-second visible verse-engagement thresholds and updates bounded profile-local per-SID aggregates used by Know.
 - **Clarity** loads only when a valid build-configured project ID is present. It attaches grouped context and maps approved events to Clarity custom events.
 - **Sentry** is an extension placeholder and is not configured as a live monitoring service.
 
 There is no durable analytics event queue in IndexedDB. Clarity receives events through its in-memory browser queue; failed delivery does not grow local storage.
+
+Diksoochi’s aggregates are independent user-state summaries, not queued Clarity events. Brief verse navigation does not create a Know record.
 
 ## Privacy context
 
@@ -27,4 +30,4 @@ Rachana uses the same bus and Clarity adapter for handbook opening, document vie
 
 ## Resume precedence
 
-An explicit `play`, `sid`, or `lang` request wins. Otherwise the chosen/default profile’s saved Home or experience location is restored. Going Home does not erase any experience point: selecting Gita 700 again, for example, restores its last SID and language. Every accepted navigation updates resumable state through the same event path used for analytics.
+An explicit `play`, `sid`, or `lang` request wins. Otherwise the chosen/default profile’s saved Diksoochi or experience location is restored. Going to Diksoochi does not erase any experience point: selecting Gita 700 again, for example, restores its last SID and language. Every accepted navigation updates resumable state through the same event path used for analytics.

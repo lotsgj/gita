@@ -20,11 +20,20 @@ const EN_MESSAGES = {
   'profile.defaultBadge': 'Default', 'profile.editAction': 'Edit', 'profile.makeDefault': 'Make default', 'profile.unsetDefault': 'Unset default', 'profile.delete': 'Delete',
   'home.chooseExperience': 'Choose an experience', 'home.intro': 'Read, reflect, and listen at your own pace.',
   'home.gita700Note': 'Four-panel study experience', 'home.future': 'Experience to be designed', 'home.coming': 'Coming later',
+  'diksoochi.title': 'Diksoochi', 'diksoochi.greeting': 'Namaste, {name}',
+  'diksoochi.know': 'Know', 'diksoochi.able': 'Able', 'diksoochi.use': 'Use',
+  'diksoochi.knowEmpty': 'Your map of the Gita will unfold here as you explore its chapters and spend time with its shlokas.',
+  'diksoochi.knowSummary': 'You have meaningfully explored {chapterText} and {shlokaText}.',
+  'diksoochi.chapterOne': '1 chapter', 'diksoochi.chapterMany': '{count} chapters', 'diksoochi.shlokaOne': '1 shloka', 'diksoochi.shlokaMany': '{count} shlokas',
+  'diksoochi.ableEmpty': 'Your growing ability to chant and interpret shlokas will unfold here.',
+  'diksoochi.useEmpty': 'This will unfold as you connect the Gita with choices, relationships, challenges and everyday life.',
+  'diksoochi.journey': 'Your journey', 'diksoochi.next': 'Continue your journey',
+  'diksoochi.resume': 'Resume Gita 700 · Shloka {sid}', 'diksoochi.begin': 'Begin with Gita 700', 'diksoochi.choose': 'Choose an experience',
   'common.about': 'About Gitaverse', 'common.install': 'Install Gitaverse', 'common.close': 'Close',
   'loading.title': 'Opening the Gita', 'loading.message': 'Preparing the verses…', 'error.title': 'Unable to open the player',
   'menu.chapters': 'Chapters', 'menu.goto': 'Go to shloka', 'menu.contentLanguage': 'Content language ({language})',
   'menu.fullscreen': 'Fullscreen', 'menu.exitFullscreen': 'Exit fullscreen', 'menu.edit': 'Edit this shloka', 'menu.leaveEdit': 'Leave edit mode',
-  'menu.home': 'Home', 'menu.help': 'Help', 'menu.open': 'Open menu', 'menu.close': 'Close menu',
+  'menu.home': 'Diksoochi', 'menu.help': 'Help', 'menu.open': 'Open menu', 'menu.close': 'Close menu',
   'dialog.contentLanguage': 'Choose content language', 'dialog.goto': 'Go to a shloka', 'dialog.chapters': 'Chapters', 'dialog.shortcuts': 'Keyboard shortcuts',
   'about.body': 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.',
   'about.version': 'Version',
@@ -33,7 +42,7 @@ const EN_MESSAGES = {
   'audio.shortcut': 'P or Space',
   'audio.onlineError': 'Audio is currently unavailable.', 'audio.offlineError': 'This audio is not available offline yet.',
   'help.previous': 'Previous shloka', 'help.next': 'Next shloka', 'help.goto': 'Go to a shloka', 'help.chapters': 'Open chapters',
-  'help.language': 'Choose content language', 'help.home': 'Return to Home', 'help.play': 'Play or pause audio', 'help.fullscreen': 'Enter or exit fullscreen',
+  'help.language': 'Choose content language', 'help.home': 'Return to Diksoochi', 'help.play': 'Play or pause audio', 'help.fullscreen': 'Enter or exit fullscreen',
   'help.help': 'Open this help', 'help.about': 'Open About Gitaverse', 'help.menu': 'Open or close menu', 'help.edit': 'Enter or leave edit mode', 'help.escape': 'Close a dialog or exit fullscreen',
   'data.title': 'Unable to load the Gita collections', 'data.description': 'Gitaverse could not load its language and media collections automatically. Choose the local data/collections folder to continue.',
   'data.choose': 'Choose collections folder', 'data.retry': 'Try automatic loading again', 'data.localNote': 'Selected files stay in this browser session and are not uploaded or modified.',
@@ -68,11 +77,20 @@ const KN_MESSAGES = {
   'profile.defaultBadge': 'ಪೂರ್ವನಿಯೋಜಿತ', 'profile.editAction': 'ಸಂಪಾದಿಸಿ', 'profile.makeDefault': 'ಪೂರ್ವನಿಯೋಜಿತವಾಗಿಸಿ', 'profile.unsetDefault': 'ಪೂರ್ವನಿಯೋಜಿತ ತೆಗೆದುಹಾಕಿ', 'profile.delete': 'ಅಳಿಸಿ',
   'home.chooseExperience': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ', 'home.intro': 'ನಿಮ್ಮ ವೇಗದಲ್ಲಿ ಓದಿ, ಚಿಂತಿಸಿ ಮತ್ತು ಆಲಿಸಿ.',
   'home.gita700Note': 'ನಾಲ್ಕು ಫಲಕಗಳ ಅಧ್ಯಯನ ಅನುಭವ', 'home.future': 'ಅನುಭವವನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಬೇಕಿದೆ', 'home.coming': 'ಮುಂದೆ ಬರಲಿದೆ',
+  'diksoochi.title': 'ದಿಕ್ಸೂಚಿ', 'diksoochi.greeting': 'ನಮಸ್ತೆ, {name}',
+  'diksoochi.know': 'ತಿಳಿದಿದೆ', 'diksoochi.able': 'ಸಾಧ್ಯವಾಗಿದೆ', 'diksoochi.use': 'ಬಳಸಬಲ್ಲೆ',
+  'diksoochi.knowEmpty': 'ಅಧ್ಯಾಯಗಳನ್ನು ಅನ್ವೇಷಿಸಿ ಶ್ಲೋಕಗಳೊಂದಿಗೆ ಸಮಯ ಕಳೆದಂತೆ ನಿಮ್ಮ ಗೀತೆಯ ನಕ್ಷೆ ಇಲ್ಲಿ ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ.',
+  'diksoochi.knowSummary': 'ನೀವು ಅರ್ಥಪೂರ್ಣವಾಗಿ {chapterText} ಮತ್ತು {shlokaText} ಅನ್ವೇಷಿಸಿದ್ದೀರಿ.',
+  'diksoochi.chapterOne': '1 ಅಧ್ಯಾಯ', 'diksoochi.chapterMany': '{count} ಅಧ್ಯಾಯಗಳು', 'diksoochi.shlokaOne': '1 ಶ್ಲೋಕ', 'diksoochi.shlokaMany': '{count} ಶ್ಲೋಕಗಳನ್ನು',
+  'diksoochi.ableEmpty': 'ಶ್ಲೋಕಗಳನ್ನು ಪಠಿಸುವ ಮತ್ತು ಅರ್ಥೈಸುವ ನಿಮ್ಮ ಬೆಳೆಯುತ್ತಿರುವ ಸಾಮರ್ಥ್ಯ ಇಲ್ಲಿ ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ.',
+  'diksoochi.useEmpty': 'ಗೀತೆಯನ್ನು ಆಯ್ಕೆಗಳು, ಸಂಬಂಧಗಳು, ಸವಾಲುಗಳು ಮತ್ತು ದೈನಂದಿನ ಜೀವನದೊಂದಿಗೆ ಜೋಡಿಸಿದಂತೆ ಇದು ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ.',
+  'diksoochi.journey': 'ನಿಮ್ಮ ಪಯಣ', 'diksoochi.next': 'ನಿಮ್ಮ ಪ್ರಯಾಣ ಮುಂದುವರಿಸಿ',
+  'diksoochi.resume': 'ಗೀತಾ 700 ಮುಂದುವರಿಸಿ · ಶ್ಲೋಕ {sid}', 'diksoochi.begin': 'ಗೀತಾ 700ರಿಂದ ಆರಂಭಿಸಿ', 'diksoochi.choose': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
   'common.about': 'Gitaverse ಕುರಿತು', 'common.install': 'Gitaverse ಸ್ಥಾಪಿಸಿ', 'common.close': 'ಮುಚ್ಚಿ',
   'loading.title': 'ಗೀತೆಯನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ', 'loading.message': 'ಶ್ಲೋಕಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ…', 'error.title': 'ಪ್ಲೇಯರ್ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ',
   'menu.chapters': 'ಅಧ್ಯಾಯಗಳು', 'menu.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'menu.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ({language})',
   'menu.fullscreen': 'ಪೂರ್ಣ ಪರದೆ', 'menu.exitFullscreen': 'ಪೂರ್ಣ ಪರದೆಯಿಂದ ಹೊರಗೆ', 'menu.edit': 'ಈ ಶ್ಲೋಕ ಸಂಪಾದಿಸಿ', 'menu.leaveEdit': 'ಸಂಪಾದನೆ ಮುಗಿಸಿ',
-  'menu.home': 'ಮುಖಪುಟ', 'menu.help': 'ಸಹಾಯ', 'menu.open': 'ಮೆನು ತೆರೆಯಿರಿ', 'menu.close': 'ಮೆನು ಮುಚ್ಚಿ',
+  'menu.home': 'ದಿಕ್ಸೂಚಿ', 'menu.help': 'ಸಹಾಯ', 'menu.open': 'ಮೆನು ತೆರೆಯಿರಿ', 'menu.close': 'ಮೆನು ಮುಚ್ಚಿ',
   'dialog.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'dialog.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'dialog.chapters': 'ಅಧ್ಯಾಯಗಳು', 'dialog.shortcuts': 'ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್‌ಕಟ್‌ಗಳು',
   'about.body': 'Gitaverse ಗೀತಾಜ್ಯೋತಿಯ ಶ್ಲೋಕ ಮತ್ತು ಪಠಣ ಅನುಭವ—ಭಗವದ್ಗೀತೆಯನ್ನು ಆಲಿಸಲು, ಅಧ್ಯಯನ ಮಾಡಲು ಮತ್ತು ಅದರ ಸಮೀಪದಲ್ಲಿರಲು ಸರಳ ಸ್ಥಳ.',
   'about.version': 'ಆವೃತ್ತಿ',
@@ -81,7 +99,7 @@ const KN_MESSAGES = {
   'audio.shortcut': 'P ಅಥವಾ Space',
   'audio.onlineError': 'ಆಡಿಯೊ ಈಗ ಲಭ್ಯವಿಲ್ಲ.', 'audio.offlineError': 'ಈ ಆಡಿಯೊ ಇನ್ನೂ ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ.',
   'help.previous': 'ಹಿಂದಿನ ಶ್ಲೋಕ', 'help.next': 'ಮುಂದಿನ ಶ್ಲೋಕ', 'help.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'help.chapters': 'ಅಧ್ಯಾಯಗಳನ್ನು ತೆರೆಯಿರಿ',
-  'help.language': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'help.home': 'ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ', 'help.play': 'ಆಡಿಯೊ ಪ್ಲೇ ಅಥವಾ ವಿರಾಮ', 'help.fullscreen': 'ಪೂರ್ಣ ಪರದೆಗೆ ಹೋಗಿ ಅಥವಾ ಹೊರಬನ್ನಿ',
+  'help.language': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'help.home': 'ದಿಕ್ಸೂಚಿಗೆ ಹಿಂತಿರುಗಿ', 'help.play': 'ಆಡಿಯೊ ಪ್ಲೇ ಅಥವಾ ವಿರಾಮ', 'help.fullscreen': 'ಪೂರ್ಣ ಪರದೆಗೆ ಹೋಗಿ ಅಥವಾ ಹೊರಬನ್ನಿ',
   'help.help': 'ಈ ಸಹಾಯ ತೆರೆಯಿರಿ', 'help.about': 'Gitaverse ಕುರಿತು ತೆರೆಯಿರಿ', 'help.menu': 'ಮೆನು ತೆರೆಯಿರಿ ಅಥವಾ ಮುಚ್ಚಿ', 'help.edit': 'ಸಂಪಾದನೆಗೆ ಹೋಗಿ ಅಥವಾ ಹೊರಬನ್ನಿ', 'help.escape': 'ಸಂವಾದ ಮುಚ್ಚಿ ಅಥವಾ ಪೂರ್ಣ ಪರದೆಯಿಂದ ಹೊರಬನ್ನಿ',
   'data.title': 'ಗೀತಾ ಸಂಗ್ರಹಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ', 'data.description': 'Gitaverse ಭಾಷೆ ಮತ್ತು ಮಾಧ್ಯಮ ಸಂಗ್ರಹಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮುಂದುವರಿಸಲು ಸ್ಥಳೀಯ data/collections ಫೋಲ್ಡರ್ ಆಯ್ಕೆಮಾಡಿ.',
   'data.choose': 'ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ಆಯ್ಕೆಮಾಡಿ', 'data.retry': 'ಸ್ವಯಂಚಾಲಿತ ಲೋಡ್ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ', 'data.localNote': 'ಆಯ್ಕೆಮಾಡಿದ ಫೈಲ್‌ಗಳು ಈ ಬ್ರೌಸರ್ ಅವಧಿಯಲ್ಲೇ ಇರುತ್ತವೆ; ಅಪ್‌ಲೋಡ್ ಅಥವಾ ಬದಲಾವಣೆ ಆಗುವುದಿಲ್ಲ.',
@@ -124,10 +142,11 @@ class I18n {
 
 // Source: js/profile-store.js
 const PROFILE_DB_NAME = 'gitaverse-profiles';
-const PROFILE_DB_VERSION = 3;
+const PROFILE_DB_VERSION = 4;
 const PROFILE_STORE = 'profiles';
 const SETTINGS_STORE = 'settings';
 const RESUME_STORE = 'resumePoints';
+const DIKSOOCHI_ENGAGEMENT_STORE = 'diksoochiEngagement';
 
 function requestResult(request) {
   return new Promise((resolve, reject) => {
@@ -158,6 +177,10 @@ function openProfileDatabase() {
       }
       if (!database.objectStoreNames.contains(RESUME_STORE)) {
         database.createObjectStore(RESUME_STORE, { keyPath: 'pid' });
+      }
+      if (!database.objectStoreNames.contains(DIKSOOCHI_ENGAGEMENT_STORE)) {
+        const engagement = database.createObjectStore(DIKSOOCHI_ENGAGEMENT_STORE, { keyPath: 'key' });
+        engagement.createIndex('pid', 'pid', { unique: false });
       }
       if (event.oldVersion < 3 && database.objectStoreNames.contains(PROFILE_STORE)) {
         const profiles = transaction.objectStore(PROFILE_STORE);
@@ -242,12 +265,20 @@ class ProfileStore {
 
   async remove(pid) {
     await this.open();
-    const transaction = this.database.transaction([PROFILE_STORE, SETTINGS_STORE, RESUME_STORE], 'readwrite');
+    const transaction = this.database.transaction([PROFILE_STORE, SETTINGS_STORE, RESUME_STORE, DIKSOOCHI_ENGAGEMENT_STORE], 'readwrite');
     transaction.objectStore(PROFILE_STORE).delete(Number(pid));
     const settings = transaction.objectStore(SETTINGS_STORE);
     const defaultPid = await requestResult(settings.get('defaultPid'));
     if (defaultPid && Number(defaultPid.value) === Number(pid)) settings.delete('defaultPid');
     transaction.objectStore(RESUME_STORE).delete(Number(pid));
+    const engagement = transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid');
+    const engagementCursor = engagement.openKeyCursor(IDBKeyRange.only(Number(pid)));
+    engagementCursor.onsuccess = () => {
+      const cursor = engagementCursor.result;
+      if (!cursor) return;
+      transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).delete(cursor.primaryKey);
+      cursor.continue();
+    };
     await transactionDone(transaction);
   }
 
@@ -323,6 +354,35 @@ class ProfileStore {
     if (pid == null) store.delete('defaultPid');
     else store.put({ key: 'defaultPid', value: Number(pid) });
     await transactionDone(transaction);
+  }
+
+  async recordDiksoochiEngagement({ pid, experience, sid, chapter, seconds, occurredAt }) {
+    await this.open();
+    const profileId = Number(pid);
+    if (!Number.isInteger(profileId) || !experience || !sid || !chapter) return;
+    const key = `${profileId}:${experience}:${sid}`;
+    const transaction = this.database.transaction(DIKSOOCHI_ENGAGEMENT_STORE, 'readwrite');
+    const store = transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE);
+    const existing = await requestResult(store.get(key));
+    store.put({
+      ...(existing || {}), key, pid: profileId, experience, sid, chapter,
+      firstMeaningfulAt: existing?.firstMeaningfulAt || occurredAt,
+      lastMeaningfulAt: occurredAt,
+      meaningfulVisitCount: (existing?.meaningfulVisitCount || 0) + (seconds === 10 ? 1 : 0),
+      maxEngagementSeconds: Math.max(existing?.maxEngagementSeconds || 0, seconds)
+    });
+    await transactionDone(transaction);
+  }
+
+  async getDiksoochiSummary(pid) {
+    await this.open();
+    const transaction = this.database.transaction(DIKSOOCHI_ENGAGEMENT_STORE, 'readonly');
+    const rows = await requestResult(transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid').getAll(Number(pid)));
+    const meaningful = rows.filter((row) => row.meaningfulVisitCount > 0 || row.maxEngagementSeconds >= 10);
+    return {
+      chapters: new Set(meaningful.map((row) => `${row.experience}:${row.chapter}`)).size,
+      shlokas: new Set(meaningful.map((row) => `${row.experience}:${row.sid}`)).size
+    };
   }
 }
 
@@ -722,6 +782,30 @@ class ResumeAdapter {
       view: 'experience',
       experience: event.context.experience,
       sid: event.context.sid
+    });
+  }
+}
+
+// Source: js/events/diksoochi-adapter.js
+class DiksoochiAdapter {
+  constructor({ store }) {
+    this.id = 'diksoochi';
+    this.store = store;
+  }
+
+  accepts(event) {
+    return /^verse_engaged_(10|30|60)s$/.test(event.event);
+  }
+
+  handle(event) {
+    const seconds = Number(event.event.match(/(10|30|60)/)?.[1]);
+    return this.store.recordDiksoochiEngagement({
+      pid: event.profileId,
+      experience: event.context.experience,
+      sid: event.context.sid,
+      chapter: event.context.chapter,
+      seconds,
+      occurredAt: event.occurredAt
     });
   }
 }
@@ -1766,7 +1850,7 @@ const state = {
   lastSavedRevision: 0,
   activeProfile: null,
   profileSelectionMode: 'initial',
-  profileReturnView: 'chooser',
+  profileReturnView: 'diksoochi',
   locationSource: null,
   experienceResumes: new Map(),
   appMetadata: { version: 'dev' }
@@ -1791,6 +1875,7 @@ const eventBus = new EventBus({
   })
 });
 eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
+eventBus.subscribe(new DiksoochiAdapter({ store: profileStore }));
 eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
 eventBus.subscribe(new SentryAdapter());
 const pwa = new PwaManager({ appVersion });
@@ -1843,13 +1928,13 @@ function emitEvent(name, { context = {}, details = {}, profile = state.activePro
 }
 
 function showOnly(id) {
-  ['profile-setup', 'profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
+  ['profile-setup', 'profile-selection', 'diksoochi', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
     document.getElementById(name).hidden = name !== id;
   });
 }
 
 function visibleView() {
-  return ['profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'chooser';
+  return ['profile-selection', 'diksoochi', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'diksoochi';
 }
 
 function updateProfileUrl(profile) {
@@ -1893,10 +1978,14 @@ async function handleProfileChange(profile, options = {}) {
     await profileUI.showSelection({ switching: true });
     return showOnly('profile-selection');
   }
-  showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
   if (state.dataset && state.profileReturnView === 'app') {
+    showOnly('app');
     state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.contentLanguage;
     render();
+  } else {
+    play = null;
+    requestedSid = null;
+    await startRequestedExperience();
   }
 }
 
@@ -1907,6 +1996,7 @@ function goToExperienceSelection(profile = state.activeProfile, { source = 'home
   const home = new URL(location.href);
   home.searchParams.delete('play');
   home.searchParams.delete('sid');
+  home.searchParams.set('view', 'diksoochi');
   if (requestedLanguage === 'kn') home.searchParams.set('lang', 'kn');
   else home.searchParams.delete('lang');
   if (profile) home.searchParams.set('pid', profile.pid);
@@ -2000,6 +2090,7 @@ async function startRequestedExperience() {
     || await profileStore.getExperienceResume(state.activeProfile.pid, 'gita-700');
   const chooserUrl = new URL(location.href);
   chooserUrl.searchParams.set('play', 'gita-700');
+  chooserUrl.searchParams.delete('view');
   if (chooserResume?.sid) chooserUrl.searchParams.set('sid', chooserResume.sid);
   else chooserUrl.searchParams.delete('sid');
   chooserUrl.searchParams.set('pid', state.activeProfile.pid);
@@ -2007,7 +2098,22 @@ async function startRequestedExperience() {
   if (chooserLanguage === 'kn') chooserUrl.searchParams.set('lang', 'kn');
   else chooserUrl.searchParams.delete('lang');
   chooserLink.href = chooserUrl.href;
-  if (!play) return showOnly('chooser');
+  const continueLink = document.getElementById('continue-journey-link');
+  continueLink.href = chooserUrl.href;
+  continueLink.textContent = chooserResume?.sid
+    ? i18n.t('diksoochi.resume', { sid: chooserResume.sid })
+    : i18n.t('diksoochi.begin');
+  if (!play) {
+    const summary = await profileStore.getDiksoochiSummary(state.activeProfile.pid);
+    document.getElementById('diksoochi-greeting').textContent = i18n.t('diksoochi.greeting', { name: state.activeProfile.name });
+    document.getElementById('diksoochi-know-summary').textContent = summary.shlokas
+      ? i18n.t('diksoochi.knowSummary', {
+          chapterText: i18n.t(summary.chapters === 1 ? 'diksoochi.chapterOne' : 'diksoochi.chapterMany', { count: summary.chapters }),
+          shlokaText: i18n.t(summary.shlokas === 1 ? 'diksoochi.shlokaOne' : 'diksoochi.shlokaMany', { count: summary.shlokas })
+        })
+      : i18n.t('diksoochi.knowEmpty');
+    return showOnly('diksoochi');
+  }
 
   const experience = getExperience(play);
   if (!experience || !experience.available) {
@@ -2515,11 +2621,11 @@ function bindEvents() {
   document.getElementById('edit-profile-button').addEventListener('click', () => openProfileForm(state.activeProfile));
   document.getElementById('add-profile-button').addEventListener('click', () => openProfileForm());
   document.getElementById('profile-selection-back').addEventListener('click', () => {
-    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'diksoochi');
   });
   document.getElementById('profile-form-cancel').addEventListener('click', () => {
     setInterfaceLanguage(state.activeProfile?.interfaceLanguage || 'en');
-    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'chooser'));
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'diksoochi'));
   });
   document.getElementById('edit-button').addEventListener('click', requestEditMode);
   document.getElementById('open-collections-workspace').addEventListener('click', openCollectionsWorkspace);

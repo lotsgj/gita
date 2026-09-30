@@ -3,6 +3,7 @@ import { ProfileStore } from '../profile-store.js';
 import { ProfileUI } from '../profile-ui.js';
 import { EventBus } from '../events/event-bus.js';
 import { ResumeAdapter } from '../events/resume-adapter.js';
+import { DiksoochiAdapter } from '../events/diksoochi-adapter.js';
 import { ClarityAdapter } from '../events/clarity-adapter.js';
 import { SentryAdapter } from '../events/sentry-adapter.js';
 import { profileAnalyticsContext } from '../events/profile-analytics.js';
@@ -25,7 +26,7 @@ const state = {
   lastSavedRevision: 0,
   activeProfile: null,
   profileSelectionMode: 'initial',
-  profileReturnView: 'chooser',
+  profileReturnView: 'diksoochi',
   locationSource: null,
   experienceResumes: new Map(),
   appMetadata: { version: 'dev' }
@@ -50,6 +51,7 @@ const eventBus = new EventBus({
   })
 });
 eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
+eventBus.subscribe(new DiksoochiAdapter({ store: profileStore }));
 eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
 eventBus.subscribe(new SentryAdapter());
 const pwa = new PwaManager({ appVersion });
@@ -102,13 +104,13 @@ function emitEvent(name, { context = {}, details = {}, profile = state.activePro
 }
 
 function showOnly(id) {
-  ['profile-setup', 'profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
+  ['profile-setup', 'profile-selection', 'diksoochi', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
     document.getElementById(name).hidden = name !== id;
   });
 }
 
 function visibleView() {
-  return ['profile-selection', 'chooser', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'chooser';
+  return ['profile-selection', 'diksoochi', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'diksoochi';
 }
 
 function updateProfileUrl(profile) {
@@ -152,10 +154,14 @@ async function handleProfileChange(profile, options = {}) {
     await profileUI.showSelection({ switching: true });
     return showOnly('profile-selection');
   }
-  showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
   if (state.dataset && state.profileReturnView === 'app') {
+    showOnly('app');
     state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.contentLanguage;
     render();
+  } else {
+    play = null;
+    requestedSid = null;
+    await startRequestedExperience();
   }
 }
 
@@ -166,6 +172,7 @@ function goToExperienceSelection(profile = state.activeProfile, { source = 'home
   const home = new URL(location.href);
   home.searchParams.delete('play');
   home.searchParams.delete('sid');
+  home.searchParams.set('view', 'diksoochi');
   if (requestedLanguage === 'kn') home.searchParams.set('lang', 'kn');
   else home.searchParams.delete('lang');
   if (profile) home.searchParams.set('pid', profile.pid);
@@ -259,6 +266,7 @@ async function startRequestedExperience() {
     || await profileStore.getExperienceResume(state.activeProfile.pid, 'gita-700');
   const chooserUrl = new URL(location.href);
   chooserUrl.searchParams.set('play', 'gita-700');
+  chooserUrl.searchParams.delete('view');
   if (chooserResume?.sid) chooserUrl.searchParams.set('sid', chooserResume.sid);
   else chooserUrl.searchParams.delete('sid');
   chooserUrl.searchParams.set('pid', state.activeProfile.pid);
@@ -266,7 +274,22 @@ async function startRequestedExperience() {
   if (chooserLanguage === 'kn') chooserUrl.searchParams.set('lang', 'kn');
   else chooserUrl.searchParams.delete('lang');
   chooserLink.href = chooserUrl.href;
-  if (!play) return showOnly('chooser');
+  const continueLink = document.getElementById('continue-journey-link');
+  continueLink.href = chooserUrl.href;
+  continueLink.textContent = chooserResume?.sid
+    ? i18n.t('diksoochi.resume', { sid: chooserResume.sid })
+    : i18n.t('diksoochi.begin');
+  if (!play) {
+    const summary = await profileStore.getDiksoochiSummary(state.activeProfile.pid);
+    document.getElementById('diksoochi-greeting').textContent = i18n.t('diksoochi.greeting', { name: state.activeProfile.name });
+    document.getElementById('diksoochi-know-summary').textContent = summary.shlokas
+      ? i18n.t('diksoochi.knowSummary', {
+          chapterText: i18n.t(summary.chapters === 1 ? 'diksoochi.chapterOne' : 'diksoochi.chapterMany', { count: summary.chapters }),
+          shlokaText: i18n.t(summary.shlokas === 1 ? 'diksoochi.shlokaOne' : 'diksoochi.shlokaMany', { count: summary.shlokas })
+        })
+      : i18n.t('diksoochi.knowEmpty');
+    return showOnly('diksoochi');
+  }
 
   const experience = getExperience(play);
   if (!experience || !experience.available) {
@@ -774,11 +797,11 @@ function bindEvents() {
   document.getElementById('edit-profile-button').addEventListener('click', () => openProfileForm(state.activeProfile));
   document.getElementById('add-profile-button').addEventListener('click', () => openProfileForm());
   document.getElementById('profile-selection-back').addEventListener('click', () => {
-    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'chooser');
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'diksoochi');
   });
   document.getElementById('profile-form-cancel').addEventListener('click', () => {
     setInterfaceLanguage(state.activeProfile?.interfaceLanguage || 'en');
-    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'chooser'));
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'diksoochi'));
   });
   document.getElementById('edit-button').addEventListener('click', requestEditMode);
   document.getElementById('open-collections-workspace').addEventListener('click', openCollectionsWorkspace);

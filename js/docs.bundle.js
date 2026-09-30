@@ -80,10 +80,11 @@ const marked = g;
 
 // Source: js/profile-store.js
 const PROFILE_DB_NAME = 'gitaverse-profiles';
-const PROFILE_DB_VERSION = 3;
+const PROFILE_DB_VERSION = 4;
 const PROFILE_STORE = 'profiles';
 const SETTINGS_STORE = 'settings';
 const RESUME_STORE = 'resumePoints';
+const DIKSOOCHI_ENGAGEMENT_STORE = 'diksoochiEngagement';
 
 function requestResult(request) {
   return new Promise((resolve, reject) => {
@@ -114,6 +115,10 @@ function openProfileDatabase() {
       }
       if (!database.objectStoreNames.contains(RESUME_STORE)) {
         database.createObjectStore(RESUME_STORE, { keyPath: 'pid' });
+      }
+      if (!database.objectStoreNames.contains(DIKSOOCHI_ENGAGEMENT_STORE)) {
+        const engagement = database.createObjectStore(DIKSOOCHI_ENGAGEMENT_STORE, { keyPath: 'key' });
+        engagement.createIndex('pid', 'pid', { unique: false });
       }
       if (event.oldVersion < 3 && database.objectStoreNames.contains(PROFILE_STORE)) {
         const profiles = transaction.objectStore(PROFILE_STORE);
@@ -198,12 +203,20 @@ class ProfileStore {
 
   async remove(pid) {
     await this.open();
-    const transaction = this.database.transaction([PROFILE_STORE, SETTINGS_STORE, RESUME_STORE], 'readwrite');
+    const transaction = this.database.transaction([PROFILE_STORE, SETTINGS_STORE, RESUME_STORE, DIKSOOCHI_ENGAGEMENT_STORE], 'readwrite');
     transaction.objectStore(PROFILE_STORE).delete(Number(pid));
     const settings = transaction.objectStore(SETTINGS_STORE);
     const defaultPid = await requestResult(settings.get('defaultPid'));
     if (defaultPid && Number(defaultPid.value) === Number(pid)) settings.delete('defaultPid');
     transaction.objectStore(RESUME_STORE).delete(Number(pid));
+    const engagement = transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid');
+    const engagementCursor = engagement.openKeyCursor(IDBKeyRange.only(Number(pid)));
+    engagementCursor.onsuccess = () => {
+      const cursor = engagementCursor.result;
+      if (!cursor) return;
+      transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).delete(cursor.primaryKey);
+      cursor.continue();
+    };
     await transactionDone(transaction);
   }
 
@@ -279,6 +292,35 @@ class ProfileStore {
     if (pid == null) store.delete('defaultPid');
     else store.put({ key: 'defaultPid', value: Number(pid) });
     await transactionDone(transaction);
+  }
+
+  async recordDiksoochiEngagement({ pid, experience, sid, chapter, seconds, occurredAt }) {
+    await this.open();
+    const profileId = Number(pid);
+    if (!Number.isInteger(profileId) || !experience || !sid || !chapter) return;
+    const key = `${profileId}:${experience}:${sid}`;
+    const transaction = this.database.transaction(DIKSOOCHI_ENGAGEMENT_STORE, 'readwrite');
+    const store = transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE);
+    const existing = await requestResult(store.get(key));
+    store.put({
+      ...(existing || {}), key, pid: profileId, experience, sid, chapter,
+      firstMeaningfulAt: existing?.firstMeaningfulAt || occurredAt,
+      lastMeaningfulAt: occurredAt,
+      meaningfulVisitCount: (existing?.meaningfulVisitCount || 0) + (seconds === 10 ? 1 : 0),
+      maxEngagementSeconds: Math.max(existing?.maxEngagementSeconds || 0, seconds)
+    });
+    await transactionDone(transaction);
+  }
+
+  async getDiksoochiSummary(pid) {
+    await this.open();
+    const transaction = this.database.transaction(DIKSOOCHI_ENGAGEMENT_STORE, 'readonly');
+    const rows = await requestResult(transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid').getAll(Number(pid)));
+    const meaningful = rows.filter((row) => row.meaningfulVisitCount > 0 || row.maxEngagementSeconds >= 10);
+    return {
+      chapters: new Set(meaningful.map((row) => `${row.experience}:${row.chapter}`)).size,
+      shlokas: new Set(meaningful.map((row) => `${row.experience}:${row.sid}`)).size
+    };
   }
 }
 

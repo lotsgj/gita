@@ -38,7 +38,7 @@ async function createProfile(page, name = 'Regression Profile') {
   await page.getByLabel('Date of birth', { exact: true }).fill('1990-01-01');
   await page.getByLabel('App language', { exact: true }).selectOption('en');
   await page.getByRole('button', { name: 'Save profile' }).click();
-  await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
+  await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
 }
 
 async function run() {
@@ -91,7 +91,18 @@ async function run() {
     await page.goto(`${base}/player.html?play=gita-700&sid=6.7&lang=kn`, { waitUntil: 'networkidle' });
     assert.equal(await page.getByLabel('App language', { exact: true }).inputValue(), '', 'first profile must require an explicit app language');
     await createProfile(page);
-    await page.getByRole('link', { name: /Gita 700/ }).click();
+    assert.equal(await page.locator('.diksoochi-dimension').count(), 3);
+    assert.match(await page.locator('#diksoochi-know-summary').innerText(), /will unfold here/);
+    assert.equal(await page.getByRole('heading', { name: 'Your journey', exact: true }).isVisible(), true);
+    assert.equal(await page.locator('.diksoochi-flute').isVisible(), true);
+    assert.equal(await page.locator('.diksoochi-flute img').evaluate((image) => getComputedStyle(image).animationIterationCount), 'infinite');
+    assert.equal(await page.getByText('A personal compass, not a test.').count(), 0);
+    const landingOrder = await page.evaluate(() => {
+      const ids = ['.diksoochi-next', '.diksoochi-experiences', '.diksoochi-journey'];
+      return ids.map((selector) => document.querySelector(selector).getBoundingClientRect().top);
+    });
+    assert.ok(landingOrder[0] < landingOrder[1] && landingOrder[1] < landingOrder[2], 'Diksoochi action and journey sections must follow the approved order');
+    await page.locator('#gita-700-link').click();
     await assert.doesNotReject(() => page.locator('#sid-label').waitFor());
     assert.equal(await page.locator('#sid-label').innerText(), '1.B');
 
@@ -215,15 +226,30 @@ async function run() {
     await page.goto(`${base}/player.html?pid=1`, { waitUntil: 'networkidle' });
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
     await page.keyboard.press('a');
-    await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
+    await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
+    await page.evaluate(() => new Promise((resolve, reject) => {
+      const request = indexedDB.open('gitaverse-profiles');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const database = request.result;
+        const transaction = database.transaction('diksoochiEngagement', 'readwrite');
+        transaction.objectStore('diksoochiEngagement').put({
+          key: '1:gita-700:6.7', pid: 1, experience: 'gita-700', sid: '6.7', chapter: '6',
+          firstMeaningfulAt: new Date().toISOString(), lastMeaningfulAt: new Date().toISOString(), meaningfulVisitCount: 1, maxEngagementSeconds: 10
+        });
+        transaction.oncomplete = () => { database.close(); resolve(); };
+        transaction.onerror = () => reject(transaction.error);
+      };
+    }));
     await page.reload({ waitUntil: 'networkidle' });
-    await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
+    await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
+    assert.equal(await page.locator('#diksoochi-know-summary').innerText(), 'You have meaningfully explored 1 chapter and 1 shloka.');
     assert.match(await page.locator('#gita-700-link').getAttribute('href'), /[?&]sid=6\.7(?:&|$)/, 'experience link must carry the saved SID');
-    await page.getByRole('link', { name: /Gita 700/ }).click();
+    await page.locator('#gita-700-link').click();
     await page.locator('#sid-label').waitFor();
     assert.equal(await page.locator('#sid-label').innerText(), '6.7', 'experience selection must preserve the per-experience resume point');
     await page.keyboard.press('a');
-    await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
+    await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
 
     await page.locator('[data-profile-pill]').first().click();
     await page.getByRole('button', { name: 'Edit profile' }).click();
@@ -239,7 +265,7 @@ async function run() {
     await page.locator('[data-profile-pill]').first().click();
     await page.getByRole('button', { name: 'Switch profile' }).click();
     await page.locator('.profile-select').filter({ hasText: 'Regression Profile' }).click();
-    await page.getByRole('heading', { name: 'Choose an experience' }).waitFor();
+    await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
     assert.match(await page.locator('[data-profile-pill]').first().getAttribute('aria-label'), /Regression Profile/);
     await page.locator('[data-profile-pill]').first().click();
     await page.getByRole('button', { name: 'Manage profiles' }).click();
@@ -258,6 +284,8 @@ async function run() {
     const mobilePage = await mobile.newPage();
     await mobilePage.goto(`${base}/player.html?play=gita-700&sid=6.7`, { waitUntil: 'networkidle' });
     await createProfile(mobilePage, 'Mobile Regression');
+    const diksoochiCards = await mobilePage.locator('.diksoochi-dimension').evaluateAll((cards) => cards.map((card) => card.getBoundingClientRect().top));
+    assert.ok(diksoochiCards.every((top, index) => index === 0 || top > diksoochiCards[index - 1]), 'mobile Diksoochi dimensions must stack vertically');
     await mobilePage.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
     const boxes = await mobilePage.locator('.gita-700-panel').evaluateAll((panels) => panels.map((panel) => panel.getBoundingClientRect().top));
     assert.ok(boxes.every((top, index) => index === 0 || top > boxes[index - 1]), 'mobile panels must stack vertically');
@@ -327,6 +355,7 @@ async function run() {
     await languagePage.getByLabel('App language', { exact: true }).selectOption('kn');
     await languagePage.getByLabel('ಆದ್ಯತೆಯ ಗೀತಾ ವಿಷಯ ಭಾಷೆ', { exact: true }).selectOption('en');
     await languagePage.getByRole('button', { name: 'ಪ್ರೊಫೈಲ್ ಉಳಿಸಿ' }).click();
+    await languagePage.getByRole('heading', { name: 'ದಿಕ್ಸೂಚಿ', exact: true }).waitFor();
     await languagePage.getByRole('heading', { name: 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ' }).waitFor();
     await languagePage.locator('#gita-700-link').click();
     await languagePage.locator('#sid-label').waitFor();
@@ -344,7 +373,7 @@ async function run() {
     const fileUrl = pathToFileURL(path.join(root, 'player.html')).href + '?play=gita-700&sid=6.7';
     await filePage.goto(fileUrl, { waitUntil: 'domcontentloaded' });
     await createProfile(filePage, 'File Regression');
-    await filePage.getByRole('link', { name: /Gita 700/ }).click();
+    await filePage.locator('#gita-700-link').click();
     await filePage.locator('#data-chooser').waitFor({ state: 'visible' });
     await filePage.locator('#collections-folder-input').setInputFiles(path.join(root, 'data/collections'));
     await filePage.locator('#sid-label').waitFor();

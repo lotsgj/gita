@@ -24,8 +24,9 @@
   button, input { font: inherit; }
   button { color: inherit; }
   [hidden] { display: none !important; }
+  .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-  .loading, .error, .chooser {
+  .loading, .error, .chooser, .diksoochi {
     min-height: 100vh;
     display: grid;
     place-items: center;
@@ -64,6 +65,22 @@
   .experience-link:hover { border-color: rgba(183, 93, 42, .48); }
   .experience-link small { color: var(--muted); }
   .experience-link.disabled { opacity: .48; pointer-events: none; }
+  .diksoochi { min-height: 100vh; padding: clamp(72px, 9vw, 96px) clamp(18px, 5vw, 56px) 32px; align-items: start; }
+  .diksoochi-shell { width: min(1040px, 100%); margin: 0 auto; }
+  .diksoochi-head { text-align: center; }
+  .diksoochi-head p { margin: 0; color: var(--muted); line-height: 1.55; }
+  #diksoochi-greeting { color: var(--saffron); font-size: 13px; font-weight: 650; }
+  .diksoochi-flute { margin-top: 12px !important; }
+  .diksoochi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 12px; }
+  .diksoochi-dimension { min-height: 170px; padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: rgba(255,253,248,.9); box-shadow: var(--shadow); }
+  .diksoochi-dimension h3, .diksoochi-next h2, .diksoochi-experiences > h2, .diksoochi-journey > h2 { margin: 0 0 10px; font: 500 22px Georgia, serif; }
+  .diksoochi-dimension h3 { color: var(--indigo); }
+  .diksoochi-dimension p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+  .diksoochi-next, .diksoochi-experiences, .diksoochi-journey { margin-top: 28px; }
+  .continue-journey-link { display: flex; align-items: center; justify-content: space-between; min-height: 58px; padding: 14px 18px; border-radius: 16px; background: var(--indigo); color: white; text-decoration: none; }
+  .continue-journey-link::after { content: '→'; font-size: 20px; }
+  .diksoochi-experiences .experience-list { grid-template-columns: repeat(3, 1fr); margin-top: 12px; }
+  .diksoochi .landing-links { margin-top: 22px; }
 
   .profile-screen {
     min-height: 100vh; padding: 28px; display: grid; place-items: center;
@@ -164,6 +181,14 @@
   @keyframes about-note-one { 0% { opacity:0; transform:translate(0,5px) scale(.55) rotate(-8deg); } 35% { opacity:1; } 100% { opacity:0; transform:translate(10px,-19px) scale(1.12) rotate(10deg); } }
   @keyframes about-note-two { 0% { opacity:0; transform:translate(-1px,5px) scale(.5) rotate(5deg); } 35% { opacity:1; } 100% { opacity:0; transform:translate(18px,-12px) scale(1.06) rotate(18deg); } }
   @keyframes about-note-three { 0% { opacity:0; transform:translate(0,4px) scale(.5); } 35% { opacity:.95; } 100% { opacity:0; transform:translate(5px,-27px) scale(1.02) rotate(-10deg); } }
+  .diksoochi-flute img { animation: diksoochi-flute-lilt 4.8s ease-in-out infinite; }
+  .diksoochi-flute .about-note-one { animation: diksoochi-note-one 4.8s ease-out infinite; }
+  .diksoochi-flute .about-note-two { animation: diksoochi-note-two 4.8s .12s ease-out infinite; }
+  .diksoochi-flute .about-note-three { animation: diksoochi-note-three 4.8s .24s ease-out infinite; }
+  @keyframes diksoochi-flute-lilt { 0%,28%,100% { transform: translateY(0) rotate(0); } 11% { transform: translateY(-2px) rotate(-4deg); } }
+  @keyframes diksoochi-note-one { 0%,28%,100% { opacity:0; transform:translate(0,5px) scale(.55) rotate(-8deg); } 9% { opacity:1; } 24% { opacity:0; transform:translate(10px,-19px) scale(1.12) rotate(10deg); } }
+  @keyframes diksoochi-note-two { 0%,28%,100% { opacity:0; transform:translate(-1px,5px) scale(.5) rotate(5deg); } 10% { opacity:1; } 25% { opacity:0; transform:translate(18px,-12px) scale(1.06) rotate(18deg); } }
+  @keyframes diksoochi-note-three { 0%,28%,100% { opacity:0; transform:translate(0,4px) scale(.5); } 11% { opacity:.95; } 26% { opacity:0; transform:translate(5px,-27px) scale(1.02) rotate(-10deg); } }
   .about-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 20px 0 17px; }
   .about-links a { padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: white; color: var(--indigo); font-size: 11px; text-decoration: none; }
   .about-links a:hover, .about-links a:focus-visible { border-color: rgba(183,93,42,.5); background: var(--saffron-soft); outline: none; }
@@ -354,6 +379,9 @@
   }
 
   @media (max-width: 760px) {
+    .diksoochi { padding: 68px 14px 24px; }
+    .diksoochi-grid, .diksoochi-experiences .experience-list { grid-template-columns: 1fr; }
+    .diksoochi-dimension { min-height: 0; }
     .chapter-context { gap: 6px; }
     .chapter-icon { width: 27px; height: 27px; flex-basis: 27px; }
     #app { height: auto; min-height: 100vh; padding: 9px; }
@@ -404,5 +432,6 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
     #about-overlay:not([hidden]) .about-flute img, .about-flute:hover img,
-    #about-overlay:not([hidden]) .about-note, .about-flute:hover .about-note { animation: none; }
+    #about-overlay:not([hidden]) .about-note, .about-flute:hover .about-note,
+    .diksoochi-flute img, .diksoochi-flute .about-note { animation: none; }
   }

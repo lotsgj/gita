@@ -1,7 +1,7 @@
 # Sampada — Treasure trove of Gitaverse enhancements
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 30 September 2026
 
 Sampada keeps both future possibilities and completed enhancements. Items retain their number after completion so decisions and delivery history remain traceable.
 
@@ -12,29 +12,15 @@ Sampada keeps both future possibilities and completed enhancements. Items retain
 
 ## To unfold
 
-### 1. Diksoochi — Know · Able · Use
+### 1. Diksoochi — Able · Use
 
 **Status:** To unfold
 
 **Tag:** Major
 
-Create a calm, profile-specific Gita compass rather than a scorecard or competitive analytics dashboard. It should be accessible from the experience-selection page and the player menu, open as a full page, and return the user to the place from which it was opened.
+Complete the remaining Able and Use dimensions of the calm, profile-specific Gita compass. The Diksoochi landing, embedded experience selection, continuation action and Know dimension are delivered. The remaining dimensions require explicit user input rather than inferred behavior.
 
 Do not calculate one overall score. Present each dimension as a simple, encouraging sentence. When reliable data is unavailable, do not display zero; explain that this part of the relationship will unfold with future activity or experiences.
-
-#### Know
-
-Purpose: **I can find my way through the Gita.**
-
-- Show the number of chapters meaningfully explored and shlokas with which the user has spent meaningful time.
-- Optionally show shlokas that are becoming familiar landmarks.
-- Count meaningful reading, listening or interaction—not brief navigation through a shloka.
-- Offer **Continue exploring**, returning to the last meaningfully visited shloka.
-- Empty state: “Your map of the Gita will unfold here as you explore its chapters and spend time with its shlokas.”
-
-Example:
-
-> You have explored **9 chapters** and spent meaningful time with **84 shlokas**.
 
 #### Able
 
@@ -79,9 +65,8 @@ Include the reassurance:
 
 #### Suggested delivery order
 
-1. Activate Know using trustworthy engagement data already available.
-2. Add the self-assessment controls required for Able.
-3. Add private reflection and follow-up experiences required for Use.
+1. Add the self-assessment controls required for Able.
+2. Add private reflection and follow-up experiences required for Use.
 
 ### 2. I WISH — Share feedback with Sudhama
 
@@ -151,6 +136,16 @@ Create a feature, provisionally named **Bhetal**, that helps the user reflect, q
 Create **Sadguru**, an experience for studying interpretations from Prabhuji and other respected acharyas. Preserve the source and attribution of every interpretation, let the user choose whose interpretation to explore, and keep commentary distinct from the canonical shloka text and translation.
 
 ## Done
+
+### 10. Diksoochi foundation and Know
+
+**Status:** Done
+
+**Tag:** Major
+
+**Completed:** 30 September 2026
+
+Diksoochi is the profile landing experience and contains Choose an experience. It presents Know, Able and Use, gives one resume-or-begin recommendation, and uses bounded profile-local engagement aggregates for Know. Ten seconds of visible engagement is the minimum meaningful threshold. Able and Use remain explicit unfolding states until their user-input experiences are delivered.
 
 ### 3. Consistent chapter names
 

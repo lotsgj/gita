@@ -77,17 +77,36 @@
   </section>
 </main>
 
-<main id="chooser" class="chooser" hidden>
+<main id="diksoochi" class="diksoochi" hidden>
   <button class="profile-pill landing-profile-pill" type="button" data-profile-pill data-clarity-mask="true"></button>
-  <section class="chooser-card">
-    <div class="status-mark">ॐ</div>
-    <h1 data-i18n="home.chooseExperience">Choose an experience</h1>
-    <p data-i18n="home.intro">Read, reflect, and listen at your own pace.</p>
+  <section class="diksoochi-shell">
+    <header class="diksoochi-head">
+      <p id="diksoochi-greeting"></p>
+      <h1 class="sr-only" data-i18n="diksoochi.title">Diksoochi</h1>
+      <div class="about-flute diksoochi-flute" aria-hidden="true">
+        <img src="assets/images/krishna-flute.svg" alt="">
+        <i class="about-note about-note-one">♪</i>
+        <i class="about-note about-note-two">♫</i>
+        <i class="about-note about-note-three">♩</i>
+      </div>
+    </header>
+    <section class="diksoochi-next"><h2 data-i18n="diksoochi.next">Continue your journey</h2><a id="continue-journey-link" class="continue-journey-link" href="?play=gita-700"></a></section>
+    <section class="diksoochi-experiences">
+      <h2 data-i18n="diksoochi.choose">Choose an experience</h2>
     <div class="experience-list">
       <a class="experience-link" id="gita-700-link" href="?play=gita-700"><span>Gita 700<br><small data-i18n="home.gita700Note">Four-panel study experience</small></span><span>→</span></a>
       <span class="experience-link disabled"><span>Gita Yoga<br><small data-i18n="home.future">Experience to be designed</small></span><small data-i18n="home.coming">Coming later</small></span>
       <span class="experience-link disabled"><span>Gita Sara<br><small data-i18n="home.future">Experience to be designed</small></span><small data-i18n="home.coming">Coming later</small></span>
     </div>
+    </section>
+    <section class="diksoochi-journey">
+      <h2 data-i18n="diksoochi.journey">Your journey</h2>
+      <div class="diksoochi-grid">
+        <article class="diksoochi-dimension"><h3 data-i18n="diksoochi.know">Know</h3><p id="diksoochi-know-summary" data-i18n="diksoochi.knowEmpty">Your map of the Gita will unfold here as you explore its chapters and spend time with its shlokas.</p></article>
+        <article class="diksoochi-dimension"><h3 data-i18n="diksoochi.able">Able</h3><p data-i18n="diksoochi.ableEmpty">Your growing ability to chant and interpret shlokas will unfold here.</p></article>
+        <article class="diksoochi-dimension"><h3 data-i18n="diksoochi.use">Use</h3><p data-i18n="diksoochi.useEmpty">This will unfold as you connect the Gita with choices, relationships, challenges and everyday life.</p></article>
+      </div>
+    </section>
     <div class="landing-links"><button class="about-link" type="button" data-about data-i18n="common.about">About Gitaverse</button><button class="about-link" type="button" data-install data-i18n="common.install" hidden>Install Gitaverse</button></div>
   </section>
 </main>

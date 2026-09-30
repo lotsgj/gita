@@ -10,6 +10,7 @@ const sources = [
   'js/events/profile-analytics.js',
   'js/events/event-bus.js',
   'js/events/resume-adapter.js',
+  'js/events/diksoochi-adapter.js',
   'js/events/clarity-adapter.js',
   'js/events/sentry-adapter.js',
   'js/pwa.js',
