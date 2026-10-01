@@ -42,6 +42,8 @@ const EN_MESSAGES = {
   'dialog.contentLanguage': 'Choose content language', 'dialog.goto': 'Go to a shloka', 'dialog.chapters': 'Chapters', 'dialog.shortcuts': 'Keyboard shortcuts',
   'about.body': 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.',
   'about.version': 'Version',
+  'about.history': 'Version history', 'about.back': '← Back to About', 'about.historyLoading': 'Loading version history…',
+  'about.currentBuild': 'Current Gitaverse build', 'about.seen': 'Seen on this device', 'about.installed': 'Installed on this device',
   'pwa.ready': 'A new Gitaverse version is ready.', 'pwa.update': 'Update now',
   'audio.play': 'Play audio', 'audio.pause': 'Pause audio', 'audio.unavailable': 'Audio unavailable', 'audio.none': 'No audio',
   'audio.shortcut': 'P or Space',
@@ -106,6 +108,8 @@ const KN_MESSAGES = {
   'dialog.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'dialog.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'dialog.chapters': 'ಅಧ್ಯಾಯಗಳು', 'dialog.shortcuts': 'ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್‌ಕಟ್‌ಗಳು',
   'about.body': 'Gitaverse ಗೀತಾಜ್ಯೋತಿಯ ಶ್ಲೋಕ ಮತ್ತು ಪಠಣ ಅನುಭವ—ಭಗವದ್ಗೀತೆಯನ್ನು ಆಲಿಸಲು, ಅಧ್ಯಯನ ಮಾಡಲು ಮತ್ತು ಅದರ ಸಮೀಪದಲ್ಲಿರಲು ಸರಳ ಸ್ಥಳ.',
   'about.version': 'ಆವೃತ್ತಿ',
+  'about.history': 'ಆವೃತ್ತಿ ಇತಿಹಾಸ', 'about.back': '← Gitaverse ಕುರಿತುಗೆ ಹಿಂತಿರುಗಿ', 'about.historyLoading': 'ಆವೃತ್ತಿ ಇತಿಹಾಸ ಲೋಡ್ ಆಗುತ್ತಿದೆ…',
+  'about.currentBuild': 'ಪ್ರಸ್ತುತ Gitaverse ಬಿಲ್ಡ್', 'about.seen': 'ಈ ಸಾಧನದಲ್ಲಿ ಕಂಡದ್ದು', 'about.installed': 'ಈ ಸಾಧನದಲ್ಲಿ ಸ್ಥಾಪಿಸಿದ್ದು',
   'pwa.ready': 'Gitaverse ನ ಹೊಸ ಆವೃತ್ತಿ ಸಿದ್ಧವಾಗಿದೆ.', 'pwa.update': 'ಈಗ ನವೀಕರಿಸಿ',
   'audio.play': 'ಆಡಿಯೊ ಪ್ಲೇ ಮಾಡಿ', 'audio.pause': 'ಆಡಿಯೊ ವಿರಾಮಗೊಳಿಸಿ', 'audio.unavailable': 'ಆಡಿಯೊ ಲಭ್ಯವಿಲ್ಲ', 'audio.none': 'ಆಡಿಯೊ ಇಲ್ಲ',
   'audio.shortcut': 'P ಅಥವಾ Space',
@@ -151,6 +155,84 @@ class I18n {
     root.querySelectorAll('[data-i18n]').forEach((element) => { element.textContent = this.t(element.dataset.i18n); });
     root.querySelectorAll('[data-i18n-aria]').forEach((element) => element.setAttribute('aria-label', this.t(element.dataset.i18nAria)));
     root.querySelectorAll('[data-i18n-title]').forEach((element) => element.setAttribute('title', this.t(element.dataset.i18nTitle)));
+  }
+}
+
+// Source: js/version-history.js
+const DB_NAME = 'gitaverse-version-history';
+const DB_VERSION = 1;
+const STORE = 'versions';
+
+function versionHistoryRequestResult(request) {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('Version history storage is unavailable.'));
+  });
+}
+
+function openDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(STORE)) request.result.createObjectStore(STORE, { keyPath: 'version' });
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('Version history storage is unavailable.'));
+  });
+}
+
+function validateVersionHistory(records) {
+  if (!Array.isArray(records)) throw new Error('Version history must be an array.');
+  const seen = new Set();
+  records.forEach((record, index) => {
+    if (!record || typeof record !== 'object' || Array.isArray(record)) throw new Error(`Version history record ${index + 1} is invalid.`);
+    if (!/^\d+\.\d{2}[A-Z][a-z]{2}\d{4}-\d{6}$/.test(record.version || '')) throw new Error(`Version history record ${index + 1} has an invalid version.`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(record.date || '')) throw new Error(`Version history record ${index + 1} has an invalid date.`);
+    if (!String(record.message || '').trim()) throw new Error(`Version history record ${index + 1} has no change message.`);
+    if (seen.has(record.version)) throw new Error(`Version history contains duplicate version ${record.version}.`);
+    seen.add(record.version);
+  });
+  return records;
+}
+
+function versionTimestamp(version) {
+  const match = String(version).match(/\.(\d{2})([A-Z][a-z]{2})(\d{4})-(\d{2})(\d{2})(\d{2})$/);
+  if (!match) return 0;
+  const month = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(match[2]);
+  return Date.UTC(Number(match[3]), month, Number(match[1]), Number(match[4]), Number(match[5]), Number(match[6]));
+}
+
+function mergeVersionHistory(deployed = [], local = [], currentVersion = '') {
+  const merged = new Map();
+  deployed.forEach((record) => merged.set(record.version, { ...record }));
+  local.forEach((record) => merged.set(record.version, { ...(merged.get(record.version) || {}), ...record }));
+  if (currentVersion && !merged.has(currentVersion)) {
+    merged.set(currentVersion, { version: currentVersion, date: new Date().toISOString().slice(0, 10), message: 'Current Gitaverse build' });
+  }
+  return Array.from(merged.values()).sort((left, right) => {
+    const dateOrder = String(right.date || '').localeCompare(String(left.date || ''));
+    return dateOrder || versionTimestamp(right.version) - versionTimestamp(left.version);
+  });
+}
+
+class VersionHistoryStore {
+  constructor() { this.database = null; }
+  async open() { if (!this.database) this.database = await openDatabase(); return this; }
+  async recordSeen(version, at = new Date().toISOString()) { return this.record(version, 'dateSeen', at); }
+  async recordInstalled(version, at = new Date().toISOString()) { return this.record(version, 'dateInstalled', at); }
+  async record(version, field, at) {
+    if (!version || version === 'dev') return null;
+    await this.open();
+    const transaction = this.database.transaction(STORE, 'readwrite');
+    const store = transaction.objectStore(STORE);
+    const existing = await versionHistoryRequestResult(store.get(version)) || { version };
+    if (!existing[field]) existing[field] = at;
+    store.put(existing);
+    return existing;
+  }
+  async list() {
+    await this.open();
+    return versionHistoryRequestResult(this.database.transaction(STORE, 'readonly').objectStore(STORE).getAll());
   }
 }
 
@@ -667,6 +749,11 @@ const EVENT_NAMES = new Set([
   'home_opened',
   'data_load_failed',
   'profile_storage_failed',
+  'pwa_update_available',
+  'pwa_update_accepted',
+  'pwa_update_dismissed',
+  'pwa_update_completed',
+  'pwa_update_failed',
   'verse_viewed',
   'verse_engaged_10s',
   'verse_engaged_30s',
@@ -877,7 +964,14 @@ class ClarityAdapter {
   }
 
   accepts(event) {
-    return this.enabled && Boolean(event.context.ageBand);
+    return this.enabled && (Boolean(event.context.ageBand) || event.event.startsWith('pwa_update_'));
+  }
+
+  initialize({ appVersion, displayMode }) {
+    if (!this.enabled) return;
+    this.start();
+    this.setTag('app_version', appVersion);
+    this.setTag('display_mode', displayMode);
   }
 
   start() {
@@ -914,6 +1008,11 @@ class ClarityAdapter {
       rachana_page: event.context.documentationPage
     };
     Object.entries(tags).forEach(([key, value]) => this.setTag(key, value));
+    if (event.event.startsWith('pwa_update_')) {
+      this.setTag('update_from_version', event.details.fromVersion);
+      this.setTag('update_to_version', event.details.toVersion);
+      this.setTag('update_result', event.details.result || event.details.stage);
+    }
 
     const eventName = this.eventName(event);
     if (eventName) this.target.clarity('event', eventName);
@@ -927,6 +1026,7 @@ class ClarityAdapter {
     const allowed = new Set([
       'app_opened', 'profile_created', 'profile_selected', 'profile_updated', 'profile_switched',
       'experience_selected', 'language_changed', 'home_opened', 'data_load_failed', 'profile_storage_failed',
+      'pwa_update_available', 'pwa_update_accepted', 'pwa_update_dismissed', 'pwa_update_completed', 'pwa_update_failed',
       'verse_viewed', 'verse_engaged_10s', 'verse_engaged_30s', 'verse_engaged_60s',
       'audio_started', 'audio_resumed', 'audio_paused', 'audio_seeked', 'audio_25', 'audio_50',
       'audio_75', 'audio_completed', 'audio_failed',
@@ -955,11 +1055,15 @@ class SentryAdapter {
 
 // Source: js/pwa.js
 class PwaManager {
-  constructor({ appVersion }) {
+  constructor({ appVersion, onEvent = () => {}, onInstalled = () => {} }) {
     this.appVersion = appVersion;
     this.registration = null;
     this.installPrompt = null;
     this.reloading = false;
+    this.onEvent = onEvent;
+    this.onInstalled = onInstalled;
+    this.waitingVersion = '';
+    this.notifiedVersion = '';
     this.updateNotice = document.getElementById('pwa-update-notice');
     this.statusNotice = document.getElementById('pwa-status-notice');
     this.installButtons = Array.from(document.querySelectorAll('[data-install]'));
@@ -978,11 +1082,15 @@ class PwaManager {
     });
     this.installButtons.forEach((button) => button.addEventListener('click', () => this.install()));
     document.getElementById('pwa-update-action').addEventListener('click', () => this.applyUpdate());
-    document.getElementById('pwa-update-dismiss').addEventListener('click', () => { this.updateNotice.hidden = true; });
+    document.getElementById('pwa-update-dismiss').addEventListener('click', () => {
+      this.updateNotice.hidden = true;
+      this.onEvent('pwa_update_dismissed', { fromVersion: this.appVersion, toVersion: this.waitingVersion || null });
+    });
   }
 
   async start() {
     if (this.appVersion === 'dev' || !('serviceWorker' in navigator)) return;
+    this.completePendingUpdate();
     try {
       this.registration = await navigator.serviceWorker.register('service-worker.js', { scope: '/', updateViaCache: 'none' });
       if (this.registration.waiting && navigator.serviceWorker.controller) this.showUpdate();
@@ -990,6 +1098,7 @@ class PwaManager {
         const worker = this.registration.installing;
         worker?.addEventListener('statechange', () => {
           if (worker.state === 'installed' && navigator.serviceWorker.controller) this.showUpdate();
+          if (worker.state === 'redundant') this.onEvent('pwa_update_failed', { fromVersion: this.appVersion, stage: 'installation' });
         });
       });
       navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -998,20 +1107,53 @@ class PwaManager {
         location.reload();
       });
       await this.registration.update();
-    } catch (_) {
+    } catch (error) {
+      this.onEvent('pwa_update_failed', { fromVersion: this.appVersion, stage: 'registration', reason: error?.name || 'error' });
       // The regular online player remains available if PWA setup is unsupported or interrupted.
     }
   }
 
-  showUpdate() {
+  async resolveWaitingVersion() {
+    try {
+      const response = await fetch(`data/app-version.json?update=${Date.now()}`, { cache: 'no-store' });
+      if (response.ok) {
+        const version = String((await response.json()).version || '');
+        return version === this.appVersion ? '' : version;
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  async showUpdate() {
+    this.waitingVersion = await this.resolveWaitingVersion();
     this.updateNotice.hidden = false;
+    const identity = this.waitingVersion || 'waiting-worker';
+    if (this.notifiedVersion !== identity) {
+      this.notifiedVersion = identity;
+      this.onEvent('pwa_update_available', { fromVersion: this.appVersion, toVersion: this.waitingVersion || null });
+    }
   }
 
   applyUpdate() {
     const worker = this.registration?.waiting;
     if (!worker) return;
+    const marker = { fromVersion: this.appVersion, toVersion: this.waitingVersion || null, acceptedAt: new Date().toISOString() };
+    try { sessionStorage.setItem('gitaverse-pending-update', JSON.stringify(marker)); } catch (_) {}
+    this.onEvent('pwa_update_accepted', marker);
     document.getElementById('pwa-update-action').disabled = true;
     worker.postMessage({ type: 'SKIP_WAITING' });
+  }
+
+  completePendingUpdate() {
+    let marker = null;
+    try {
+      marker = JSON.parse(sessionStorage.getItem('gitaverse-pending-update') || 'null');
+      sessionStorage.removeItem('gitaverse-pending-update');
+    } catch (_) {}
+    if (!marker) return;
+    const details = { fromVersion: marker.fromVersion || null, toVersion: this.appVersion, result: 'completed' };
+    this.onEvent('pwa_update_completed', details);
+    Promise.resolve(this.onInstalled(this.appVersion)).catch(() => {});
   }
 
   async install() {
@@ -1033,24 +1175,107 @@ class PwaManager {
 
 // Source: js/shared/about-dialog.js
 class AboutDialog {
-  constructor({ version = 'dev', onOpen = () => {}, translate = (key, fallback) => fallback } = {}) {
+  constructor({ version = 'dev', onOpen = () => {}, translate = (key, fallback) => fallback, historyStore = null } = {}) {
     this.version = version;
     this.onOpen = onOpen;
     this.translate = translate;
+    this.historyStore = historyStore;
     this.overlay = this.ensureMarkup();
+    this.ensureHistoryMarkup();
     this.overlay.querySelector('[data-about-version]').textContent = version;
     this.refresh();
     this.overlay.querySelector('[data-about-close]').addEventListener('click', () => this.close());
+    this.overlay.querySelector('[data-version-history-open]').addEventListener('click', () => this.showHistory());
+    this.overlay.querySelector('[data-version-history-back]').addEventListener('click', () => this.showAbout());
     this.overlay.addEventListener('click', (event) => { if (event.target === this.overlay) this.close(); });
   }
 
   refresh() {
     this.overlay.querySelector('#about-title').textContent = this.translate('common.about', 'About Gitaverse');
-    this.overlay.querySelector('.about-body > p').textContent = this.translate('about.body', 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.');
+    this.overlay.querySelector('.about-main > p').textContent = this.translate('about.body', 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.');
     const version = this.overlay.querySelector('.about-version');
     const value = version.querySelector('[data-about-version]');
     version.replaceChildren(document.createTextNode(this.translate('about.version', 'Version') + ' '), value);
     this.overlay.querySelector('[data-about-close]').setAttribute('aria-label', this.translate('common.close', 'Close'));
+    this.overlay.querySelector('[data-version-history-open]').textContent = this.translate('about.history', 'Version history');
+    this.overlay.querySelector('[data-version-history-back]').textContent = this.translate('about.back', '← Back to About');
+    this.overlay.querySelector('[data-version-history-title]').textContent = this.translate('about.history', 'Version history');
+  }
+
+  ensureHistoryMarkup() {
+    const body = this.overlay.querySelector('.about-body');
+    let main = body.querySelector('.about-main');
+    if (!main) {
+      main = document.createElement('div');
+      main.className = 'about-main';
+      Array.from(body.children).forEach((child) => main.appendChild(child));
+      body.appendChild(main);
+    }
+    if (!main.querySelector('[data-version-history-open]')) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'about-history-link';
+      button.dataset.versionHistoryOpen = '';
+      main.appendChild(button);
+    }
+    if (!body.querySelector('.about-history')) {
+      const history = document.createElement('section');
+      history.className = 'about-history';
+      history.hidden = true;
+      history.innerHTML = '<button type="button" class="about-history-back" data-version-history-back></button><h2 data-version-history-title></h2><div class="about-history-list" data-version-history-list></div>';
+      body.appendChild(history);
+    }
+  }
+
+  async showHistory() {
+    const list = this.overlay.querySelector('[data-version-history-list]');
+    this.overlay.querySelector('.about-main').hidden = true;
+    this.overlay.querySelector('.about-history').hidden = false;
+    list.textContent = this.translate('about.historyLoading', 'Loading version history…');
+    let deployed = [];
+    try {
+      const response = await fetch(`data/version-history.json?v=${encodeURIComponent(this.version)}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error('History unavailable.');
+      deployed = validateVersionHistory(await response.json());
+    } catch (_) {}
+    let local = [];
+    try { local = this.historyStore ? await this.historyStore.list() : []; } catch (_) {}
+    this.renderHistory(mergeVersionHistory(deployed, local, this.version));
+    requestAnimationFrame(() => this.overlay.querySelector('[data-version-history-back]')?.focus());
+  }
+
+  renderHistory(records) {
+    const list = this.overlay.querySelector('[data-version-history-list]');
+    list.textContent = '';
+    records.forEach((record) => {
+      const item = document.createElement('article');
+      item.className = 'about-history-item';
+      const title = document.createElement('h3');
+      title.textContent = record.version;
+      const date = document.createElement('time');
+      date.dateTime = record.date || '';
+      date.textContent = record.date ? new Intl.DateTimeFormat(document.documentElement.lang === 'kn' ? 'kn-IN' : 'en-IN', { dateStyle: 'long' }).format(new Date(`${record.date}T00:00:00`)) : '';
+      const message = document.createElement('p');
+      message.textContent = record.message || this.translate('about.currentBuild', 'Current Gitaverse build');
+      item.append(title, date, message);
+      if (record.dateSeen) {
+        const seen = document.createElement('small');
+        seen.textContent = `${this.translate('about.seen', 'Seen on this device')}: ${new Date(record.dateSeen).toLocaleString()}`;
+        item.appendChild(seen);
+      }
+      if (record.dateInstalled) {
+        const installed = document.createElement('small');
+        installed.textContent = `${this.translate('about.installed', 'Installed on this device')}: ${new Date(record.dateInstalled).toLocaleString()}`;
+        item.appendChild(installed);
+      }
+      list.appendChild(item);
+    });
+  }
+
+  showAbout() {
+    this.overlay.querySelector('.about-history').hidden = true;
+    this.overlay.querySelector('.about-main').hidden = false;
+    requestAnimationFrame(() => this.overlay.querySelector('[data-version-history-open]')?.focus());
   }
 
   ensureMarkup() {
@@ -1069,12 +1294,12 @@ class AboutDialog {
     overlay.innerHTML = `
       <section class="dialog about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-title">
         <button class="icon-button about-close" type="button" data-about-close aria-label="Close">×</button>
-        <div class="about-body">
+        <div class="about-body"><div class="about-main">
           <div class="about-flute" aria-hidden="true"><img src="assets/images/krishna-flute.svg" alt=""><i class="about-note about-note-one">♪</i><i class="about-note about-note-two">♫</i><i class="about-note about-note-three">♩</i></div>
           <h2 id="about-title">About Gitaverse</h2>
           <p>Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.</p>
           <div class="about-links"><a href="https://gitajyoti.org/" target="_blank" rel="noopener">Gita Jyoti</a><a href="https://lightoftheself.org/" target="_blank" rel="noopener">Light of the Self Foundation</a></div>
-          <p class="about-version">Version <span data-about-version>dev</span></p>
+          <p class="about-version">Version <span data-about-version>dev</span></p></div>
         </div>
       </section>`;
     document.body.appendChild(overlay);
@@ -1082,6 +1307,7 @@ class AboutDialog {
   }
 
   open(opener = document.activeElement) {
+    this.showAbout();
     this.refresh();
     this.opener = opener;
     this.overlay.hidden = false;
@@ -1092,6 +1318,7 @@ class AboutDialog {
   close({ restoreFocus = true } = {}) {
     if (this.overlay.hidden) return false;
     this.overlay.hidden = true;
+    this.showAbout();
     if (restoreFocus) this.opener?.focus?.();
     return true;
   }
@@ -1987,6 +2214,7 @@ const i18n = new I18n('en');
 const translate = (key, fallback, values = {}) => i18n.t(key, values) === key ? fallback : i18n.t(key, values);
 
 const profileStore = new ProfileStore();
+const versionHistoryStore = new VersionHistoryStore();
 const eventBus = new EventBus({
   appVersion,
   contextProvider: () => ({
@@ -1996,10 +2224,16 @@ const eventBus = new EventBus({
 });
 eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
 eventBus.subscribe(new DiksoochiAdapter({ store: profileStore }));
-eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
+const clarityAdapter = new ClarityAdapter({ projectId: clarityProjectId });
+eventBus.subscribe(clarityAdapter);
 eventBus.subscribe(new SentryAdapter());
-const pwa = new PwaManager({ appVersion });
-const aboutDialog = new AboutDialog({ version: appVersion, translate });
+clarityAdapter.initialize({ appVersion, displayMode: matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser' });
+const pwa = new PwaManager({
+  appVersion,
+  onEvent: (name, details) => emitEvent(name, { details, profile: state.activeProfile }),
+  onInstalled: (version) => versionHistoryStore.recordInstalled(version)
+});
+const aboutDialog = new AboutDialog({ version: appVersion, translate, historyStore: versionHistoryStore });
 const profileUI = new ProfileUI({
   store: profileStore,
   onSelected: selectProfile,
@@ -3172,6 +3406,7 @@ function bindEvents() {
 }
 
 bindEvents();
+versionHistoryStore.recordSeen(appVersion).catch(() => {});
 pwa.start();
 checkPlayerVersion().then((current) => { if (current) initializeProfiles(); });
 

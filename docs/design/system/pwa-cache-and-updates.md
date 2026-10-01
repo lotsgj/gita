@@ -1,7 +1,7 @@
 # PWA cache and updates
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 1 October 2026
 
 ## Build-time cache manifest
 
@@ -12,6 +12,10 @@ This content-hash/build-version approach lets unchanged URL assets be reused by 
 ## Runtime strategy
 
 Navigation and asset requests use service-worker policies appropriate to the app shell and versioned deployment. The update manager watches registration lifecycle changes and offers an explicit reload when a waiting worker is ready.
+
+The compact deployed version history is part of the shell cache. A separate IndexedDB database records one row per exact version with immutable `dateSeen` and, after confirmed service-worker activation/reload, `dateInstalled`. About merges deployed and local records by version, falls back to local/current data if the deployed file is unavailable, and displays newest first.
+
+Clarity is initialized with `app_version` and display mode. Update events carry applicable source and target versions; notification events are deduplicated per waiting version. Update acceptance does not imply success—the post-reload completion event is authoritative.
 
 ## Cache boundaries
 

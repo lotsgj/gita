@@ -1,7 +1,7 @@
 # Events, analytics and resume
 
 **Status:** Current  
-**Last updated:** 30 September 2026
+**Last updated:** 1 October 2026
 
 ## Event bus
 
@@ -25,6 +25,8 @@ Clarity receives age band, grouped gender, profile interface language, content l
 ## Engagement events
 
 Current mappings cover app/profile/experience actions, language and navigation, verse views and time thresholds, and audio start, resume, pause, seek, quartiles, completion, and failure.
+
+PWA mappings cover update available, accepted, dismissed, completed and failed. `app_version` and display mode are initialized as Clarity session tags even before a profile event. PWA lifecycle events may run without profile context and carry only applicable source/target versions plus completion result or failure stage. The same waiting version produces only one available event per page session.
 
 Rachana uses the same bus and Clarity adapter for handbook opening, document views, navigation opening, profile selection, About, Open Gitaverse, and document failures. Its Clarity tags identify `surface=rachana` and the stable documentation route. Markdown content and local profile identifiers are excluded.
 

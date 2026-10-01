@@ -1,7 +1,7 @@
 # Install, offline and updates
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 1 October 2026
 
 ## Installation
 
@@ -16,5 +16,7 @@ Rachana documentation is intentionally outside the PWA cache boundary. It opens 
 ## Updates
 
 Every deployment has an application version and asset manifest. When a new service worker is installed, the application announces that a new Gitaverse version is ready. Accepting the update activates it and reloads the application. Desktop browsers may surface the notice only after the installed app is closed and reopened because service-worker lifecycle timing is browser-controlled.
+
+Gitaverse emits privacy-safe lifecycle events when an update becomes available, is accepted, is dismissed, completes after reload, or fails. A session marker connects acceptance in the old build with confirmed completion in the new build. About exposes the exact deployed build history and device-local seen/installed dates.
 
 See [PWA cache and updates](../system/pwa-cache-and-updates.md).

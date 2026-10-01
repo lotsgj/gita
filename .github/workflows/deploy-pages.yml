@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -37,6 +37,18 @@ jobs:
         shell: bash
         run: echo "GITAVERSE_BUILD_ID=$(TZ=Asia/Kolkata date +'%d%b%Y-%H%M%S')" >> "$GITHUB_ENV"
 
+      - name: Load persistent version history
+        shell: bash
+        run: |
+          git fetch origin deployment-history || true
+          if git show origin/deployment-history:version-history.json > "$RUNNER_TEMP/version-history.json" 2>/dev/null; then
+            echo "Loaded deployment history"
+          else
+            cp version-history.json "$RUNNER_TEMP/version-history.json"
+          fi
+          echo "VERSION_HISTORY_FILE=$RUNNER_TEMP/version-history.json" >> "$GITHUB_ENV"
+          echo "GITAVERSE_CHANGE_MESSAGE=$(git log -1 --pretty=%s)" >> "$GITHUB_ENV"
+
       - name: Build and validate deployment
         run: node scripts/build-deployment.mjs
         env:
@@ -47,6 +59,23 @@ jobs:
 
       - name: Run Rachana browser regression
         run: npm run test:docs-browser
+
+      - name: Persist version history
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          history_dir="$RUNNER_TEMP/deployment-history"
+          if git show-ref --verify --quiet refs/remotes/origin/deployment-history; then
+            git worktree add -B deployment-history "$history_dir" origin/deployment-history
+          else
+            git worktree add -b deployment-history "$history_dir" HEAD
+          fi
+          cp dist/data/version-history.json "$history_dir/version-history.json"
+          git -C "$history_dir" config user.name "github-actions[bot]"
+          git -C "$history_dir" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$history_dir" add version-history.json
+          git -C "$history_dir" commit -m "Record Gitaverse $GITAVERSE_BUILD_ID"
+          git -C "$history_dir" push origin deployment-history
 
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'

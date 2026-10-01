@@ -1,7 +1,7 @@
 # Build, test and deployment
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 1 October 2026
 
 ## Source and generated files
 
@@ -11,9 +11,11 @@ Maintainable JavaScript lives under `js/player`, `js/events`, `js/docs`, and sha
 
 The application version is `major.minor`. The major value is repository-controlled. GitHub Actions supplies the build identifier in `ddMMMccyy-HHmmss` form and injects deployment configuration such as `CLARITY_PROJECT_ID`. Source pages retain development placeholders; the deployment build writes production values into the output.
 
+Each successful deployment appends `{version, date, message}` to `version-history.json`. The array is stored oldest first on the persistent `deployment-history` branch; About sorts it newest first, using the timestamp inside equal-date version IDs as a secondary key. The workflow rejects malformed or duplicate version records. The change message is the deployment commit subject; Git history remains the detailed troubleshooting record.
+
 ## Deployment
 
-GitHub Actions checks out the repository, installs dependencies, runs tests and the deployment build, uploads the generated site artifact, and deploys it to GitHub Pages. GitHub Pages serves the generated artifact rather than the working-tree root. `index.html` routes the bare domain to `player.html`.
+GitHub Actions checks out the repository, loads persistent version history, installs dependencies, runs tests and the deployment build, persists the appended history, uploads the generated site artifact, and deploys it to GitHub Pages. GitHub Pages serves the generated artifact rather than the working-tree root. `index.html` routes the bare domain to `player.html`.
 
 The build copies an explicit allowlist and fails if archived `x` content enters output or the asset manifest. Documentation ships for direct browser access but is excluded from PWA precache.
 

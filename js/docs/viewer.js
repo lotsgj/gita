@@ -5,6 +5,7 @@ import { EventBus } from '../events/event-bus.js';
 import { ClarityAdapter } from '../events/clarity-adapter.js';
 import { profileAnalyticsContext } from '../events/profile-analytics.js';
 import { AboutDialog } from '../shared/about-dialog.js';
+import { VersionHistoryStore } from '../version-history.js';
 
 const DOCUMENT_ROOT = 'docs/';
 const article = document.getElementById('docs-article');
@@ -22,11 +23,14 @@ const localObjectUrls = new Map();
 let activeProfile = null;
 
 const profileStore = new ProfileStore();
+const versionHistoryStore = new VersionHistoryStore();
 const eventBus = new EventBus({
   appVersion,
   contextProvider: () => ({ surface: 'rachana', documentationPage: activeRoute || 'unavailable', displayMode: matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser' })
 });
-eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
+const clarityAdapter = new ClarityAdapter({ projectId: clarityProjectId });
+eventBus.subscribe(clarityAdapter);
+clarityAdapter.initialize({ appVersion, displayMode: matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser' });
 
 function emitRachanaEvent(name, details = {}) {
   return eventBus.emit(name, {
@@ -37,7 +41,8 @@ function emitRachanaEvent(name, details = {}) {
   });
 }
 
-const aboutDialog = new AboutDialog({ version: appVersion, onOpen: () => emitRachanaEvent('rachana_about_opened') });
+const aboutDialog = new AboutDialog({ version: appVersion, onOpen: () => emitRachanaEvent('rachana_about_opened'), historyStore: versionHistoryStore });
+versionHistoryStore.recordSeen(appVersion).catch(() => {});
 
 function closeProfileViews() {
   document.getElementById('profile-setup').hidden = true;

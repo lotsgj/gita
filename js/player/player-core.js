@@ -14,6 +14,7 @@ import { InlineEditor } from './editor.js';
 import { getExperience } from './renderers/registry.js';
 import { AboutDialog } from '../shared/about-dialog.js';
 import { I18n } from '../i18n/i18n.js';
+import { VersionHistoryStore } from '../version-history.js';
 
 const state = {
   dataset: null,
@@ -52,6 +53,7 @@ const i18n = new I18n('en');
 const translate = (key, fallback, values = {}) => i18n.t(key, values) === key ? fallback : i18n.t(key, values);
 
 const profileStore = new ProfileStore();
+const versionHistoryStore = new VersionHistoryStore();
 const eventBus = new EventBus({
   appVersion,
   contextProvider: () => ({
@@ -61,10 +63,16 @@ const eventBus = new EventBus({
 });
 eventBus.subscribe(new ResumeAdapter({ store: profileStore }));
 eventBus.subscribe(new DiksoochiAdapter({ store: profileStore }));
-eventBus.subscribe(new ClarityAdapter({ projectId: clarityProjectId }));
+const clarityAdapter = new ClarityAdapter({ projectId: clarityProjectId });
+eventBus.subscribe(clarityAdapter);
 eventBus.subscribe(new SentryAdapter());
-const pwa = new PwaManager({ appVersion });
-const aboutDialog = new AboutDialog({ version: appVersion, translate });
+clarityAdapter.initialize({ appVersion, displayMode: matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser' });
+const pwa = new PwaManager({
+  appVersion,
+  onEvent: (name, details) => emitEvent(name, { details, profile: state.activeProfile }),
+  onInstalled: (version) => versionHistoryStore.recordInstalled(version)
+});
+const aboutDialog = new AboutDialog({ version: appVersion, translate, historyStore: versionHistoryStore });
 const profileUI = new ProfileUI({
   store: profileStore,
   onSelected: selectProfile,
@@ -1237,5 +1245,6 @@ function bindEvents() {
 }
 
 bindEvents();
+versionHistoryStore.recordSeen(appVersion).catch(() => {});
 pwa.start();
 checkPlayerVersion().then((current) => { if (current) initializeProfiles(); });

@@ -35,6 +35,8 @@ export const KN_MESSAGES = {
   'dialog.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'dialog.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'dialog.chapters': 'ಅಧ್ಯಾಯಗಳು', 'dialog.shortcuts': 'ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್‌ಕಟ್‌ಗಳು',
   'about.body': 'Gitaverse ಗೀತಾಜ್ಯೋತಿಯ ಶ್ಲೋಕ ಮತ್ತು ಪಠಣ ಅನುಭವ—ಭಗವದ್ಗೀತೆಯನ್ನು ಆಲಿಸಲು, ಅಧ್ಯಯನ ಮಾಡಲು ಮತ್ತು ಅದರ ಸಮೀಪದಲ್ಲಿರಲು ಸರಳ ಸ್ಥಳ.',
   'about.version': 'ಆವೃತ್ತಿ',
+  'about.history': 'ಆವೃತ್ತಿ ಇತಿಹಾಸ', 'about.back': '← Gitaverse ಕುರಿತುಗೆ ಹಿಂತಿರುಗಿ', 'about.historyLoading': 'ಆವೃತ್ತಿ ಇತಿಹಾಸ ಲೋಡ್ ಆಗುತ್ತಿದೆ…',
+  'about.currentBuild': 'ಪ್ರಸ್ತುತ Gitaverse ಬಿಲ್ಡ್', 'about.seen': 'ಈ ಸಾಧನದಲ್ಲಿ ಕಂಡದ್ದು', 'about.installed': 'ಈ ಸಾಧನದಲ್ಲಿ ಸ್ಥಾಪಿಸಿದ್ದು',
   'pwa.ready': 'Gitaverse ನ ಹೊಸ ಆವೃತ್ತಿ ಸಿದ್ಧವಾಗಿದೆ.', 'pwa.update': 'ಈಗ ನವೀಕರಿಸಿ',
   'audio.play': 'ಆಡಿಯೊ ಪ್ಲೇ ಮಾಡಿ', 'audio.pause': 'ಆಡಿಯೊ ವಿರಾಮಗೊಳಿಸಿ', 'audio.unavailable': 'ಆಡಿಯೊ ಲಭ್ಯವಿಲ್ಲ', 'audio.none': 'ಆಡಿಯೊ ಇಲ್ಲ',
   'audio.shortcut': 'P ಅಥವಾ Space',

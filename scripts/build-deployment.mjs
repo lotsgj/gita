@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { validateVersionHistory } from '../js/version-history.js';
 
 const root = process.cwd();
 const output = path.join(root, 'dist');
@@ -76,6 +77,13 @@ const runId = process.env.GITHUB_RUN_ID || 'local';
 const builtAt = new Date().toISOString();
 const clarityProjectId = String(process.env.CLARITY_PROJECT_ID || '').trim();
 if (clarityProjectId && !/^[a-z0-9]+$/i.test(clarityProjectId)) throw new Error('CLARITY_PROJECT_ID must be alphanumeric.');
+const historySource = process.env.VERSION_HISTORY_FILE || path.join(root, 'version-history.json');
+let versionHistory = validateVersionHistory(JSON.parse(await readFile(historySource, 'utf8')));
+if (versionHistory.some((record) => record.version === version)) throw new Error(`Version history already contains ${version}.`);
+const dateParts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date()).map(({ type, value }) => [type, value]));
+const changeMessage = String(process.env.GITAVERSE_CHANGE_MESSAGE || execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf8' })).trim().split(/\r?\n/)[0];
+versionHistory = [...versionHistory, { version, date: `${dateParts.year}-${dateParts.month}-${dateParts.day}`, message: changeMessage || 'Gitaverse update' }];
+validateVersionHistory(versionHistory);
 
 run(process.execPath, ['scripts/build-player.mjs']);
 run(process.execPath, ['--check', 'js/player.bundle.js']);
@@ -83,6 +91,8 @@ run(process.execPath, ['scripts/build-docs.mjs']);
 run(process.execPath, ['--check', 'js/docs.bundle.js']);
 run(process.execPath, ['--test',
   'tests/unit/i18n.test.mjs',
+  'tests/unit/version-history.test.mjs',
+  'tests/unit/pwa.test.mjs',
   'tests/unit/event-bus.test.mjs',
   'tests/unit/player-collection-data.test.mjs',
   'tests/unit/player-renderer.test.mjs',
@@ -137,6 +147,7 @@ await copyDirectory(path.join(root, 'data'), path.join(output, 'data'), (relativ
 
 const versionMetadata = { version, major, build, commit, runId, builtAt, timeZone };
 await writeFile(path.join(output, 'data/app-version.json'), JSON.stringify(versionMetadata, null, 2) + '\n');
+await writeFile(path.join(output, 'data/version-history.json'), JSON.stringify(versionHistory, null, 2) + '\n');
 
 await assertAbsent(path.join(output, 'x'), 'The archived x/ prototypes');
 
@@ -158,6 +169,7 @@ const precache = Object.keys(assets).filter((relative) => {
     || relative === 'offline.html'
     || relative === 'manifest.webmanifest'
     || relative === 'data/app-version.json'
+    || relative === 'data/version-history.json'
     || relative === 'js/player.bundle.js'
     || (relative.startsWith('css/') && relative !== 'css/docs.css')
     || relative.startsWith('assets/icons/')

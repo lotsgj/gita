@@ -65,6 +65,9 @@ async function run() {
     await page.getByRole('button', { name: 'About Gitaverse' }).click();
     await page.getByRole('heading', { name: 'About Gitaverse' }).waitFor();
     assert.equal(await page.locator('#about-overlay').isVisible(), true);
+    await page.getByRole('button', { name: 'Version history' }).click();
+    await page.locator('.about-history-item').first().waitFor();
+    await page.getByRole('button', { name: '← Back to About' }).click();
     await page.getByRole('button', { name: 'Close' }).click();
 
     await page.getByRole('link', { name: 'Rachana documentation design' }).click();

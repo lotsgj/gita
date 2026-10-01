@@ -163,7 +163,15 @@ async function run() {
     assert.equal(await page.locator('#help-overlay').isVisible(), false);
     await page.keyboard.press('k');
     assert.equal(await page.locator('#about-overlay').isVisible(), true);
-    assert.notEqual(await page.locator('#about-version').innerText(), 'dev');
+    const deployedVersion = await page.locator('#about-version').innerText();
+    assert.notEqual(deployedVersion, 'dev');
+    await page.getByRole('button', { name: 'Version history' }).click();
+    await page.locator('.about-history-item').first().waitFor();
+    assert.equal(await page.locator('.about-history-item h3').first().innerText(), deployedVersion);
+    assert.ok((await page.locator('.about-history-item p').first().innerText()).length > 0);
+    assert.match(await page.locator('.about-history-item').first().innerText(), /Seen on this device/);
+    await page.getByRole('button', { name: '← Back to About' }).click();
+    assert.equal(await page.getByRole('heading', { name: 'About Gitaverse' }).isVisible(), true);
     await page.keyboard.press('Escape');
 
     await page.locator('#footer-fullscreen-button').click();

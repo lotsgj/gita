@@ -10,7 +10,14 @@ export class ClarityAdapter {
   }
 
   accepts(event) {
-    return this.enabled && Boolean(event.context.ageBand);
+    return this.enabled && (Boolean(event.context.ageBand) || event.event.startsWith('pwa_update_'));
+  }
+
+  initialize({ appVersion, displayMode }) {
+    if (!this.enabled) return;
+    this.start();
+    this.setTag('app_version', appVersion);
+    this.setTag('display_mode', displayMode);
   }
 
   start() {
@@ -47,6 +54,11 @@ export class ClarityAdapter {
       rachana_page: event.context.documentationPage
     };
     Object.entries(tags).forEach(([key, value]) => this.setTag(key, value));
+    if (event.event.startsWith('pwa_update_')) {
+      this.setTag('update_from_version', event.details.fromVersion);
+      this.setTag('update_to_version', event.details.toVersion);
+      this.setTag('update_result', event.details.result || event.details.stage);
+    }
 
     const eventName = this.eventName(event);
     if (eventName) this.target.clarity('event', eventName);
@@ -60,6 +72,7 @@ export class ClarityAdapter {
     const allowed = new Set([
       'app_opened', 'profile_created', 'profile_selected', 'profile_updated', 'profile_switched',
       'experience_selected', 'language_changed', 'home_opened', 'data_load_failed', 'profile_storage_failed',
+      'pwa_update_available', 'pwa_update_accepted', 'pwa_update_dismissed', 'pwa_update_completed', 'pwa_update_failed',
       'verse_viewed', 'verse_engaged_10s', 'verse_engaged_30s', 'verse_engaged_60s',
       'audio_started', 'audio_resumed', 'audio_paused', 'audio_seeked', 'audio_25', 'audio_50',
       'audio_75', 'audio_completed', 'audio_failed',

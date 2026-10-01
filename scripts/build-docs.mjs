@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 const markedSource = await readFile('js/vendor/marked.esm.js', 'utf8');
 const sources = [
+  'js/version-history.js',
   'js/profile-store.js',
   'js/profile-ui.js',
   'js/events/event-schema.js',

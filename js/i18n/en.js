@@ -35,6 +35,8 @@ export const EN_MESSAGES = {
   'dialog.contentLanguage': 'Choose content language', 'dialog.goto': 'Go to a shloka', 'dialog.chapters': 'Chapters', 'dialog.shortcuts': 'Keyboard shortcuts',
   'about.body': 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.',
   'about.version': 'Version',
+  'about.history': 'Version history', 'about.back': '← Back to About', 'about.historyLoading': 'Loading version history…',
+  'about.currentBuild': 'Current Gitaverse build', 'about.seen': 'Seen on this device', 'about.installed': 'Installed on this device',
   'pwa.ready': 'A new Gitaverse version is ready.', 'pwa.update': 'Update now',
   'audio.play': 'Play audio', 'audio.pause': 'Pause audio', 'audio.unavailable': 'Audio unavailable', 'audio.none': 'No audio',
   'audio.shortcut': 'P or Space',

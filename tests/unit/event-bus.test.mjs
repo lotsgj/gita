@@ -82,6 +82,7 @@ test('Clarity receives only allowlisted analytics values', () => {
       querySelector: () => null
     }
   });
+  clarity.initialize({ appVersion: '1.test', displayMode: 'standalone' });
   clarity.handle({
     event: 'verse_viewed',
     context: { ageBand: '25-34', genderGroup: 'female', profileLanguage: 'kn', experience: 'gita-700', language: 'kn', appVersion: '1.test', displayMode: 'browser' },
@@ -90,8 +91,26 @@ test('Clarity receives only allowlisted analytics values', () => {
   const calls = target.clarity.q.map((args) => Array.from(args));
   assert.equal(scripts[0].src, 'https://www.clarity.ms/tag/test123');
   assert.ok(calls.some((call) => call[0] === 'event' && call[1] === 'verse_viewed'));
+  assert.ok(calls.some((call) => call[0] === 'set' && call[1] === 'app_version' && call[2] === '1.test'));
   assert.equal(JSON.stringify(calls).includes('must-not-be-sent'), false);
   assert.equal(JSON.stringify(calls).includes('99'), false);
+});
+
+test('Clarity captures the privacy-safe PWA update lifecycle without a profile', () => {
+  const target = {};
+  const clarity = new ClarityAdapter({
+    projectId: 'test123', target,
+    documentRef: { head: { appendChild() {} }, createElement: () => ({ dataset: {} }), querySelector: () => null }
+  });
+  clarity.handle({
+    event: 'pwa_update_completed',
+    context: { appVersion: '1.01Oct2026-090000', displayMode: 'standalone' },
+    details: { fromVersion: '1.01Oct2026-080000', toVersion: '1.01Oct2026-090000', result: 'completed' }
+  });
+  const calls = target.clarity.q.map((args) => Array.from(args));
+  assert.ok(calls.some((call) => call[0] === 'event' && call[1] === 'pwa_update_completed'));
+  assert.ok(calls.some((call) => call[0] === 'set' && call[1] === 'update_from_version' && call[2] === '1.01Oct2026-080000'));
+  assert.ok(calls.some((call) => call[0] === 'set' && call[1] === 'update_to_version' && call[2] === '1.01Oct2026-090000'));
 });
 
 test('Rachana events use the shared Clarity adapter without profile identifiers', () => {
