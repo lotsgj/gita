@@ -208,6 +208,7 @@ class ProfileStore {
     const settings = transaction.objectStore(SETTINGS_STORE);
     const defaultPid = await requestResult(settings.get('defaultPid'));
     if (defaultPid && Number(defaultPid.value) === Number(pid)) settings.delete('defaultPid');
+    settings.delete(`journeyView:${Number(pid)}`);
     transaction.objectStore(RESUME_STORE).delete(Number(pid));
     const engagement = transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid');
     const engagementCursor = engagement.openKeyCursor(IDBKeyRange.only(Number(pid)));
@@ -294,6 +295,22 @@ class ProfileStore {
     await transactionDone(transaction);
   }
 
+  async getJourneyView(pid) {
+    await this.open();
+    if (!Number.isInteger(Number(pid))) return null;
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readonly');
+    const setting = await requestResult(transaction.objectStore(SETTINGS_STORE).get(`journeyView:${Number(pid)}`));
+    return ['cards', 'table'].includes(setting?.value) ? setting.value : null;
+  }
+
+  async setJourneyView(pid, view) {
+    await this.open();
+    if (!Number.isInteger(Number(pid)) || !['cards', 'table'].includes(view)) return;
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readwrite');
+    transaction.objectStore(SETTINGS_STORE).put({ key: `journeyView:${Number(pid)}`, value: view });
+    await transactionDone(transaction);
+  }
+
   async recordDiksoochiEngagement({ pid, experience, sid, chapter, seconds, occurredAt }) {
     await this.open();
     const profileId = Number(pid);
@@ -318,9 +335,27 @@ class ProfileStore {
     const rows = await requestResult(transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid').getAll(Number(pid)));
     const meaningful = rows.filter((row) => row.meaningfulVisitCount > 0 || row.maxEngagementSeconds >= 10);
     return {
-      chapters: new Set(meaningful.map((row) => `${row.experience}:${row.chapter}`)).size,
-      shlokas: new Set(meaningful.map((row) => `${row.experience}:${row.sid}`)).size
+      chapters: new Set(meaningful.map((row) => row.chapter)).size,
+      shlokas: new Set(meaningful.map((row) => row.sid)).size
     };
+  }
+
+  async getDiksoochiDetails(pid) {
+    await this.open();
+    const transaction = this.database.transaction(DIKSOOCHI_ENGAGEMENT_STORE, 'readonly');
+    const rows = await requestResult(transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid').getAll(Number(pid)));
+    const bySid = new Map();
+    rows.filter((row) => row.meaningfulVisitCount > 0 || row.maxEngagementSeconds >= 10).forEach((row) => {
+      const existing = bySid.get(row.sid) || { sid: row.sid, chapter: row.chapter, count: 0 };
+      existing.count += Number(row.meaningfulVisitCount || (row.maxEngagementSeconds >= 10 ? 1 : 0));
+      bySid.set(row.sid, existing);
+    });
+    return Array.from(bySid.values()).sort((left, right) => {
+      const chapterDifference = Number(left.chapter) - Number(right.chapter);
+      if (chapterDifference) return chapterDifference;
+      const order = (value) => value === 'B' ? -1 : value === 'E' ? Number.MAX_SAFE_INTEGER : Number(value);
+      return order(left.sid.split('.').pop()) - order(right.sid.split('.').pop());
+    });
   }
 }
 
@@ -426,7 +461,7 @@ class ProfileUI {
     document.getElementById('profile-selection-back').hidden = !switching;
   }
 
-  async showForm(profile = null) {
+  async showForm(profile = null, { focusPreferences = false } = {}) {
     this.editingPid = profile?.pid || null;
     this.photo = profile?.photo || '';
     const formTitle = document.getElementById('profile-form-title');
@@ -446,6 +481,11 @@ class ProfileUI {
     document.getElementById('profile-form-cancel').hidden = !profile;
     document.getElementById('profile-form-error').textContent = '';
     this.renderPhotoPreview(profile);
+    requestAnimationFrame(() => {
+      const target = focusPreferences ? document.getElementById('profile-preferences-section') : document.getElementById('profile-name');
+      target?.scrollIntoView({ block: focusPreferences ? 'center' : 'nearest', behavior: 'smooth' });
+      target?.focus({ preventScroll: true });
+    });
   }
 
   renderPhotoPreview(profile = null) {
@@ -904,8 +944,8 @@ function updateProfileContext(profile) {
   }
 }
 
-async function showProfileForm(profile = null) {
-  await profileUI.showForm(profile);
+async function showProfileForm(profile = null, { focusPreferences = false } = {}) {
+  await profileUI.showForm(profile, { focusPreferences });
   document.getElementById('profile-dob').max = new Date().toISOString().slice(0, 10);
   closeProfileViews();
   document.getElementById('profile-setup').hidden = false;
@@ -1247,8 +1287,8 @@ document.getElementById('docs-profile-pill').addEventListener('click', () => {
   if (!activeProfile) return showProfileForm();
   document.getElementById('profile-menu-overlay').hidden = false;
 });
-document.getElementById('switch-profile-button').addEventListener('click', showProfileSelection);
-document.getElementById('manage-profiles-button').addEventListener('click', showProfileSelection);
+document.getElementById('profile-preferences-button').addEventListener('click', () => showProfileForm(activeProfile, { focusPreferences: true }));
+document.getElementById('switch-manage-profiles-button').addEventListener('click', showProfileSelection);
 document.getElementById('edit-profile-button').addEventListener('click', () => showProfileForm(activeProfile));
 document.getElementById('add-profile-button').addEventListener('click', () => showProfileForm());
 document.getElementById('profile-selection-back').addEventListener('click', closeProfileViews);

@@ -236,7 +236,17 @@ export async function loadCollectionExperienceFromFiles(experienceId, fileList) 
     if (!objectUrls.has(url)) objectUrls.set(url, URL.createObjectURL(file));
     return objectUrls.get(url);
   };
-  return loadCollectionExperienceWithReader(experienceId, { text, resolveMediaUrl });
+  try {
+    const dataset = await loadCollectionExperienceWithReader(experienceId, { text, resolveMediaUrl });
+    dataset.release = () => {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+      objectUrls.clear();
+    };
+    return dataset;
+  } catch (error) {
+    objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    throw error;
+  }
 }
 
 function relativeCollectionPath(url) {

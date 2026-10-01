@@ -94,6 +94,10 @@ export class AudioPlayer {
     else this.audio.pause();
   }
 
+  pause() {
+    if (!this.audio.paused) this.audio.pause();
+  }
+
   stop() {
     this.audio.pause();
     this.audio.currentTime = 0;

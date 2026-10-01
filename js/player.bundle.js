@@ -16,6 +16,7 @@ const EN_MESSAGES = {
   'profile.choosePhoto': 'Choose photo', 'profile.remove': 'Remove', 'profile.photoNote': 'Optional. Stored only on this device.',
   'profile.default': 'Use this profile automatically on this device', 'profile.analytics': 'We collect anonymised information to improve the product experience.',
   'profile.cancel': 'Cancel', 'profile.save': 'Save profile', 'profile.title': 'Profile', 'profile.switch': 'Switch profile', 'profile.manage': 'Manage profiles',
+  'profile.preferences': 'My preferences', 'profile.details': 'Profile details', 'profile.viewEdit': 'View / edit profile', 'profile.switchManage': 'Switch / manage profiles',
   'profile.who': 'Who is using Gitaverse?', 'profile.choose': 'Choose a profile to continue.', 'profile.add': '＋ Add another profile', 'profile.back': 'Back',
   'profile.defaultBadge': 'Default', 'profile.editAction': 'Edit', 'profile.makeDefault': 'Make default', 'profile.unsetDefault': 'Unset default', 'profile.delete': 'Delete',
   'home.chooseExperience': 'Choose an experience', 'home.intro': 'Read, reflect, and listen at your own pace.',
@@ -23,17 +24,21 @@ const EN_MESSAGES = {
   'diksoochi.title': 'Diksoochi', 'diksoochi.greeting': 'Namaste, {name}',
   'diksoochi.know': 'Know', 'diksoochi.able': 'Able', 'diksoochi.use': 'Use',
   'diksoochi.knowEmpty': 'Your map of the Gita will unfold here as you explore its chapters and spend time with its shlokas.',
-  'diksoochi.knowSummary': 'You have meaningfully explored {chapterText} and {shlokaText}.',
+  'diksoochi.knowSummary': 'You have explored {chapterText} and {shlokaText}.',
   'diksoochi.chapterOne': '1 chapter', 'diksoochi.chapterMany': '{count} chapters', 'diksoochi.shlokaOne': '1 shloka', 'diksoochi.shlokaMany': '{count} shlokas',
   'diksoochi.ableEmpty': 'Your growing ability to chant and interpret shlokas will unfold here.',
   'diksoochi.useEmpty': 'This will unfold as you connect the Gita with choices, relationships, challenges and everyday life.',
   'diksoochi.journey': 'Your journey', 'diksoochi.next': 'Continue your journey',
+  'diksoochi.journeyEmpty': 'Your journey details will be updated here.',
+  'diksoochi.details': 'Details', 'diksoochi.cards': 'Cards', 'diksoochi.table': 'Table', 'diksoochi.viewLabel': 'Journey view', 'diksoochi.cardView': 'Card view', 'diksoochi.tableView': 'Table view',
+  'diksoochi.shloka': 'Shloka', 'diksoochi.sanskritShloka': 'Sanskrit shloka', 'diksoochi.meaning': 'Meaning', 'diksoochi.count': 'Count',
+  'diksoochi.countNote': 'Count shows meaningful engagements with each shloka.',
   'diksoochi.resume': 'Resume Gita 700 · Shloka {sid}', 'diksoochi.begin': 'Begin with Gita 700', 'diksoochi.choose': 'Choose an experience',
-  'common.about': 'About Gitaverse', 'common.install': 'Install Gitaverse', 'common.close': 'Close',
+  'common.about': 'About Gitaverse', 'common.install': 'Install Gitaverse', 'common.close': 'Close', 'common.back': '← Back',
   'loading.title': 'Opening the Gita', 'loading.message': 'Preparing the verses…', 'error.title': 'Unable to open the player',
   'menu.chapters': 'Chapters', 'menu.goto': 'Go to shloka', 'menu.contentLanguage': 'Content language ({language})',
   'menu.fullscreen': 'Fullscreen', 'menu.exitFullscreen': 'Exit fullscreen', 'menu.edit': 'Edit this shloka', 'menu.leaveEdit': 'Leave edit mode',
-  'menu.home': 'Diksoochi', 'menu.help': 'Help', 'menu.open': 'Open menu', 'menu.close': 'Close menu',
+  'menu.home': 'Diksoochi / Home', 'menu.journey': 'Your journey', 'menu.help': 'Help', 'menu.open': 'Open menu', 'menu.close': 'Close menu',
   'dialog.contentLanguage': 'Choose content language', 'dialog.goto': 'Go to a shloka', 'dialog.chapters': 'Chapters', 'dialog.shortcuts': 'Keyboard shortcuts',
   'about.body': 'Gitaverse is a verse and chanting experience from Gita Jyoti—a simple space to listen to, study and remain close to the Bhagavad Gita.',
   'about.version': 'Version',
@@ -42,10 +47,12 @@ const EN_MESSAGES = {
   'audio.shortcut': 'P or Space',
   'audio.onlineError': 'Audio is currently unavailable.', 'audio.offlineError': 'This audio is not available offline yet.',
   'help.previous': 'Previous shloka', 'help.next': 'Next shloka', 'help.goto': 'Go to a shloka', 'help.chapters': 'Open chapters',
-  'help.language': 'Choose content language', 'help.home': 'Return to Diksoochi', 'help.play': 'Play or pause audio', 'help.fullscreen': 'Enter or exit fullscreen',
+  'help.language': 'Choose content language', 'help.home': 'Return to Diksoochi / Home', 'help.journey': 'Open Your journey', 'help.play': 'Play or pause audio', 'help.fullscreen': 'Enter or exit fullscreen',
   'help.help': 'Open this help', 'help.about': 'Open About Gitaverse', 'help.menu': 'Open or close menu', 'help.edit': 'Enter or leave edit mode', 'help.escape': 'Close a dialog or exit fullscreen',
   'data.title': 'Unable to load the Gita collections', 'data.description': 'Gitaverse could not load its language and media collections automatically. Choose the local data/collections folder to continue.',
   'data.choose': 'Choose collections folder', 'data.retry': 'Try automatic loading again', 'data.localNote': 'Selected files stay in this browser session and are not uploaded or modified.',
+  'collections.title': 'Local collections', 'collections.message': 'Choose this repository’s data/collections folder to use Gitaverse locally.',
+  'collections.load': 'Load collections', 'collections.readyTitle': 'Local collections ready', 'collections.readyMessage': 'Using: {name}', 'collections.change': 'Change collections', 'collections.invalid': 'The selected collections folder could not be loaded.',
   'workspace.title': 'Open local collections', 'workspace.open': 'Open collections folder', 'workspace.downloadOnly': 'Edit with downloads only',
   'workspace.note': 'The folder stays on your device. Gitaverse requests read and write access only after you choose it.',
   'workspace.unsupported': 'Direct folder saving is not supported by this browser. Use a current Chrome or Edge browser, or choose “Edit with downloads only”.',
@@ -73,6 +80,7 @@ const KN_MESSAGES = {
   'profile.choosePhoto': 'ಚಿತ್ರ ಆಯ್ಕೆಮಾಡಿ', 'profile.remove': 'ತೆಗೆದುಹಾಕಿ', 'profile.photoNote': 'ಐಚ್ಛಿಕ. ಈ ಸಾಧನದಲ್ಲೇ ಉಳಿಯುತ್ತದೆ.',
   'profile.default': 'ಈ ಸಾಧನದಲ್ಲಿ ಈ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಬಳಸಿ', 'profile.analytics': 'ಉತ್ಪನ್ನ ಅನುಭವವನ್ನು ಉತ್ತಮಗೊಳಿಸಲು ನಾವು ಅನಾಮಧೇಯ ಮಾಹಿತಿಯನ್ನು ಸಂಗ್ರಹಿಸುತ್ತೇವೆ.',
   'profile.cancel': 'ರದ್ದುಮಾಡಿ', 'profile.save': 'ಪ್ರೊಫೈಲ್ ಉಳಿಸಿ', 'profile.title': 'ಪ್ರೊಫೈಲ್', 'profile.switch': 'ಪ್ರೊಫೈಲ್ ಬದಲಿಸಿ', 'profile.manage': 'ಪ್ರೊಫೈಲ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಿ',
+  'profile.preferences': 'ನನ್ನ ಆದ್ಯತೆಗಳು', 'profile.details': 'ಪ್ರೊಫೈಲ್ ವಿವರಗಳು', 'profile.viewEdit': 'ಪ್ರೊಫೈಲ್ ನೋಡಿ / ಸಂಪಾದಿಸಿ', 'profile.switchManage': 'ಪ್ರೊಫೈಲ್ ಬದಲಿಸಿ / ನಿರ್ವಹಿಸಿ',
   'profile.who': 'Gitaverse ಅನ್ನು ಯಾರು ಬಳಸುತ್ತಿದ್ದಾರೆ?', 'profile.choose': 'ಮುಂದುವರಿಸಲು ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ.', 'profile.add': '＋ ಮತ್ತೊಂದು ಪ್ರೊಫೈಲ್ ಸೇರಿಸಿ', 'profile.back': 'ಹಿಂದೆ',
   'profile.defaultBadge': 'ಪೂರ್ವನಿಯೋಜಿತ', 'profile.editAction': 'ಸಂಪಾದಿಸಿ', 'profile.makeDefault': 'ಪೂರ್ವನಿಯೋಜಿತವಾಗಿಸಿ', 'profile.unsetDefault': 'ಪೂರ್ವನಿಯೋಜಿತ ತೆಗೆದುಹಾಕಿ', 'profile.delete': 'ಅಳಿಸಿ',
   'home.chooseExperience': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ', 'home.intro': 'ನಿಮ್ಮ ವೇಗದಲ್ಲಿ ಓದಿ, ಚಿಂತಿಸಿ ಮತ್ತು ಆಲಿಸಿ.',
@@ -80,17 +88,21 @@ const KN_MESSAGES = {
   'diksoochi.title': 'ದಿಕ್ಸೂಚಿ', 'diksoochi.greeting': 'ನಮಸ್ತೆ, {name}',
   'diksoochi.know': 'ತಿಳಿದಿದೆ', 'diksoochi.able': 'ಸಾಧ್ಯವಾಗಿದೆ', 'diksoochi.use': 'ಬಳಸಬಲ್ಲೆ',
   'diksoochi.knowEmpty': 'ಅಧ್ಯಾಯಗಳನ್ನು ಅನ್ವೇಷಿಸಿ ಶ್ಲೋಕಗಳೊಂದಿಗೆ ಸಮಯ ಕಳೆದಂತೆ ನಿಮ್ಮ ಗೀತೆಯ ನಕ್ಷೆ ಇಲ್ಲಿ ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ.',
-  'diksoochi.knowSummary': 'ನೀವು ಅರ್ಥಪೂರ್ಣವಾಗಿ {chapterText} ಮತ್ತು {shlokaText} ಅನ್ವೇಷಿಸಿದ್ದೀರಿ.',
+  'diksoochi.knowSummary': 'ನೀವು {chapterText} ಮತ್ತು {shlokaText} ಅನ್ವೇಷಿಸಿದ್ದೀರಿ.',
   'diksoochi.chapterOne': '1 ಅಧ್ಯಾಯ', 'diksoochi.chapterMany': '{count} ಅಧ್ಯಾಯಗಳು', 'diksoochi.shlokaOne': '1 ಶ್ಲೋಕ', 'diksoochi.shlokaMany': '{count} ಶ್ಲೋಕಗಳನ್ನು',
   'diksoochi.ableEmpty': 'ಶ್ಲೋಕಗಳನ್ನು ಪಠಿಸುವ ಮತ್ತು ಅರ್ಥೈಸುವ ನಿಮ್ಮ ಬೆಳೆಯುತ್ತಿರುವ ಸಾಮರ್ಥ್ಯ ಇಲ್ಲಿ ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ.',
   'diksoochi.useEmpty': 'ಗೀತೆಯನ್ನು ಆಯ್ಕೆಗಳು, ಸಂಬಂಧಗಳು, ಸವಾಲುಗಳು ಮತ್ತು ದೈನಂದಿನ ಜೀವನದೊಂದಿಗೆ ಜೋಡಿಸಿದಂತೆ ಇದು ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ.',
   'diksoochi.journey': 'ನಿಮ್ಮ ಪಯಣ', 'diksoochi.next': 'ನಿಮ್ಮ ಪ್ರಯಾಣ ಮುಂದುವರಿಸಿ',
+  'diksoochi.journeyEmpty': 'ನಿಮ್ಮ ಪಯಣದ ವಿವರಗಳನ್ನು ಇಲ್ಲಿ ನವೀಕರಿಸಲಾಗುತ್ತದೆ.',
+  'diksoochi.details': 'ವಿವರಗಳು', 'diksoochi.cards': 'ಕಾರ್ಡ್‌ಗಳು', 'diksoochi.table': 'ಪಟ್ಟಿ', 'diksoochi.viewLabel': 'ಪಯಣದ ನೋಟ', 'diksoochi.cardView': 'ಕಾರ್ಡ್ ನೋಟ', 'diksoochi.tableView': 'ಪಟ್ಟಿ ನೋಟ',
+  'diksoochi.shloka': 'ಶ್ಲೋಕ', 'diksoochi.sanskritShloka': 'ಸಂಸ್ಕೃತ ಶ್ಲೋಕ', 'diksoochi.meaning': 'ಅರ್ಥ', 'diksoochi.count': 'ಎಣಿಕೆ',
+  'diksoochi.countNote': 'ಪ್ರತಿ ಶ್ಲೋಕದ ಅರ್ಥಪೂರ್ಣ ತೊಡಗಿಸಿಕೊಳ್ಳುವಿಕೆಗಳನ್ನು ಎಣಿಕೆ ತೋರಿಸುತ್ತದೆ.',
   'diksoochi.resume': 'ಗೀತಾ 700 ಮುಂದುವರಿಸಿ · ಶ್ಲೋಕ {sid}', 'diksoochi.begin': 'ಗೀತಾ 700ರಿಂದ ಆರಂಭಿಸಿ', 'diksoochi.choose': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
-  'common.about': 'Gitaverse ಕುರಿತು', 'common.install': 'Gitaverse ಸ್ಥಾಪಿಸಿ', 'common.close': 'ಮುಚ್ಚಿ',
+  'common.about': 'Gitaverse ಕುರಿತು', 'common.install': 'Gitaverse ಸ್ಥಾಪಿಸಿ', 'common.close': 'ಮುಚ್ಚಿ', 'common.back': '← ಹಿಂದೆ',
   'loading.title': 'ಗೀತೆಯನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ', 'loading.message': 'ಶ್ಲೋಕಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ…', 'error.title': 'ಪ್ಲೇಯರ್ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ',
   'menu.chapters': 'ಅಧ್ಯಾಯಗಳು', 'menu.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'menu.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ({language})',
   'menu.fullscreen': 'ಪೂರ್ಣ ಪರದೆ', 'menu.exitFullscreen': 'ಪೂರ್ಣ ಪರದೆಯಿಂದ ಹೊರಗೆ', 'menu.edit': 'ಈ ಶ್ಲೋಕ ಸಂಪಾದಿಸಿ', 'menu.leaveEdit': 'ಸಂಪಾದನೆ ಮುಗಿಸಿ',
-  'menu.home': 'ದಿಕ್ಸೂಚಿ', 'menu.help': 'ಸಹಾಯ', 'menu.open': 'ಮೆನು ತೆರೆಯಿರಿ', 'menu.close': 'ಮೆನು ಮುಚ್ಚಿ',
+  'menu.home': 'ದಿಕ್ಸೂಚಿ / ಮುಖಪುಟ', 'menu.journey': 'ನಿಮ್ಮ ಪಯಣ', 'menu.help': 'ಸಹಾಯ', 'menu.open': 'ಮೆನು ತೆರೆಯಿರಿ', 'menu.close': 'ಮೆನು ಮುಚ್ಚಿ',
   'dialog.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'dialog.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'dialog.chapters': 'ಅಧ್ಯಾಯಗಳು', 'dialog.shortcuts': 'ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್‌ಕಟ್‌ಗಳು',
   'about.body': 'Gitaverse ಗೀತಾಜ್ಯೋತಿಯ ಶ್ಲೋಕ ಮತ್ತು ಪಠಣ ಅನುಭವ—ಭಗವದ್ಗೀತೆಯನ್ನು ಆಲಿಸಲು, ಅಧ್ಯಯನ ಮಾಡಲು ಮತ್ತು ಅದರ ಸಮೀಪದಲ್ಲಿರಲು ಸರಳ ಸ್ಥಳ.',
   'about.version': 'ಆವೃತ್ತಿ',
@@ -99,10 +111,12 @@ const KN_MESSAGES = {
   'audio.shortcut': 'P ಅಥವಾ Space',
   'audio.onlineError': 'ಆಡಿಯೊ ಈಗ ಲಭ್ಯವಿಲ್ಲ.', 'audio.offlineError': 'ಈ ಆಡಿಯೊ ಇನ್ನೂ ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಲಭ್ಯವಿಲ್ಲ.',
   'help.previous': 'ಹಿಂದಿನ ಶ್ಲೋಕ', 'help.next': 'ಮುಂದಿನ ಶ್ಲೋಕ', 'help.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'help.chapters': 'ಅಧ್ಯಾಯಗಳನ್ನು ತೆರೆಯಿರಿ',
-  'help.language': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'help.home': 'ದಿಕ್ಸೂಚಿಗೆ ಹಿಂತಿರುಗಿ', 'help.play': 'ಆಡಿಯೊ ಪ್ಲೇ ಅಥವಾ ವಿರಾಮ', 'help.fullscreen': 'ಪೂರ್ಣ ಪರದೆಗೆ ಹೋಗಿ ಅಥವಾ ಹೊರಬನ್ನಿ',
+  'help.language': 'ವಿಷಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ', 'help.home': 'ದಿಕ್ಸೂಚಿ / ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ', 'help.journey': 'ನಿಮ್ಮ ಪಯಣವನ್ನು ತೆರೆಯಿರಿ', 'help.play': 'ಆಡಿಯೊ ಪ್ಲೇ ಅಥವಾ ವಿರಾಮ', 'help.fullscreen': 'ಪೂರ್ಣ ಪರದೆಗೆ ಹೋಗಿ ಅಥವಾ ಹೊರಬನ್ನಿ',
   'help.help': 'ಈ ಸಹಾಯ ತೆರೆಯಿರಿ', 'help.about': 'Gitaverse ಕುರಿತು ತೆರೆಯಿರಿ', 'help.menu': 'ಮೆನು ತೆರೆಯಿರಿ ಅಥವಾ ಮುಚ್ಚಿ', 'help.edit': 'ಸಂಪಾದನೆಗೆ ಹೋಗಿ ಅಥವಾ ಹೊರಬನ್ನಿ', 'help.escape': 'ಸಂವಾದ ಮುಚ್ಚಿ ಅಥವಾ ಪೂರ್ಣ ಪರದೆಯಿಂದ ಹೊರಬನ್ನಿ',
   'data.title': 'ಗೀತಾ ಸಂಗ್ರಹಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ', 'data.description': 'Gitaverse ಭಾಷೆ ಮತ್ತು ಮಾಧ್ಯಮ ಸಂಗ್ರಹಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮುಂದುವರಿಸಲು ಸ್ಥಳೀಯ data/collections ಫೋಲ್ಡರ್ ಆಯ್ಕೆಮಾಡಿ.',
   'data.choose': 'ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ಆಯ್ಕೆಮಾಡಿ', 'data.retry': 'ಸ್ವಯಂಚಾಲಿತ ಲೋಡ್ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ', 'data.localNote': 'ಆಯ್ಕೆಮಾಡಿದ ಫೈಲ್‌ಗಳು ಈ ಬ್ರೌಸರ್ ಅವಧಿಯಲ್ಲೇ ಇರುತ್ತವೆ; ಅಪ್‌ಲೋಡ್ ಅಥವಾ ಬದಲಾವಣೆ ಆಗುವುದಿಲ್ಲ.',
+  'collections.title': 'ಸ್ಥಳೀಯ ಸಂಗ್ರಹಗಳು', 'collections.message': 'Gitaverse ಅನ್ನು ಸ್ಥಳೀಯವಾಗಿ ಬಳಸಲು ಈ ರೆಪೊಸಿಟರಿಯ data/collections ಫೋಲ್ಡರ್ ಆಯ್ಕೆಮಾಡಿ.',
+  'collections.load': 'ಸಂಗ್ರಹಗಳನ್ನು ಲೋಡ್ ಮಾಡಿ', 'collections.readyTitle': 'ಸ್ಥಳೀಯ ಸಂಗ್ರಹಗಳು ಸಿದ್ಧವಾಗಿವೆ', 'collections.readyMessage': 'ಬಳಸಲಾಗುತ್ತಿದೆ: {name}', 'collections.change': 'ಸಂಗ್ರಹಗಳನ್ನು ಬದಲಿಸಿ', 'collections.invalid': 'ಆಯ್ಕೆಮಾಡಿದ ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.',
   'workspace.title': 'ಸ್ಥಳೀಯ ಸಂಗ್ರಹಗಳನ್ನು ತೆರೆಯಿರಿ', 'workspace.open': 'ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ತೆರೆಯಿರಿ', 'workspace.downloadOnly': 'ಡೌನ್‌ಲೋಡ್ ಮೂಲಕ ಮಾತ್ರ ಸಂಪಾದಿಸಿ',
   'workspace.note': 'ಫೋಲ್ಡರ್ ನಿಮ್ಮ ಸಾಧನದಲ್ಲೇ ಇರುತ್ತದೆ. ಆಯ್ಕೆಮಾಡಿದ ನಂತರ ಮಾತ್ರ Gitaverse ಓದು ಮತ್ತು ಬರವಣಿಗೆ ಅನುಮತಿ ಕೇಳುತ್ತದೆ.',
   'workspace.unsupported': 'ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಫೋಲ್ಡರ್‌ಗೆ ನೇರವಾಗಿ ಉಳಿಸುವುದು ಬೆಂಬಲಿತವಾಗಿಲ್ಲ. ಇತ್ತೀಚಿನ Chrome ಅಥವಾ Edge ಬಳಸಿ, ಅಥವಾ “ಡೌನ್‌ಲೋಡ್ ಮೂಲಕ ಮಾತ್ರ ಸಂಪಾದಿಸಿ” ಆಯ್ಕೆಮಾಡಿ.',
@@ -270,6 +284,7 @@ class ProfileStore {
     const settings = transaction.objectStore(SETTINGS_STORE);
     const defaultPid = await requestResult(settings.get('defaultPid'));
     if (defaultPid && Number(defaultPid.value) === Number(pid)) settings.delete('defaultPid');
+    settings.delete(`journeyView:${Number(pid)}`);
     transaction.objectStore(RESUME_STORE).delete(Number(pid));
     const engagement = transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid');
     const engagementCursor = engagement.openKeyCursor(IDBKeyRange.only(Number(pid)));
@@ -356,6 +371,22 @@ class ProfileStore {
     await transactionDone(transaction);
   }
 
+  async getJourneyView(pid) {
+    await this.open();
+    if (!Number.isInteger(Number(pid))) return null;
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readonly');
+    const setting = await requestResult(transaction.objectStore(SETTINGS_STORE).get(`journeyView:${Number(pid)}`));
+    return ['cards', 'table'].includes(setting?.value) ? setting.value : null;
+  }
+
+  async setJourneyView(pid, view) {
+    await this.open();
+    if (!Number.isInteger(Number(pid)) || !['cards', 'table'].includes(view)) return;
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readwrite');
+    transaction.objectStore(SETTINGS_STORE).put({ key: `journeyView:${Number(pid)}`, value: view });
+    await transactionDone(transaction);
+  }
+
   async recordDiksoochiEngagement({ pid, experience, sid, chapter, seconds, occurredAt }) {
     await this.open();
     const profileId = Number(pid);
@@ -380,9 +411,27 @@ class ProfileStore {
     const rows = await requestResult(transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid').getAll(Number(pid)));
     const meaningful = rows.filter((row) => row.meaningfulVisitCount > 0 || row.maxEngagementSeconds >= 10);
     return {
-      chapters: new Set(meaningful.map((row) => `${row.experience}:${row.chapter}`)).size,
-      shlokas: new Set(meaningful.map((row) => `${row.experience}:${row.sid}`)).size
+      chapters: new Set(meaningful.map((row) => row.chapter)).size,
+      shlokas: new Set(meaningful.map((row) => row.sid)).size
     };
+  }
+
+  async getDiksoochiDetails(pid) {
+    await this.open();
+    const transaction = this.database.transaction(DIKSOOCHI_ENGAGEMENT_STORE, 'readonly');
+    const rows = await requestResult(transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid').getAll(Number(pid)));
+    const bySid = new Map();
+    rows.filter((row) => row.meaningfulVisitCount > 0 || row.maxEngagementSeconds >= 10).forEach((row) => {
+      const existing = bySid.get(row.sid) || { sid: row.sid, chapter: row.chapter, count: 0 };
+      existing.count += Number(row.meaningfulVisitCount || (row.maxEngagementSeconds >= 10 ? 1 : 0));
+      bySid.set(row.sid, existing);
+    });
+    return Array.from(bySid.values()).sort((left, right) => {
+      const chapterDifference = Number(left.chapter) - Number(right.chapter);
+      if (chapterDifference) return chapterDifference;
+      const order = (value) => value === 'B' ? -1 : value === 'E' ? Number.MAX_SAFE_INTEGER : Number(value);
+      return order(left.sid.split('.').pop()) - order(right.sid.split('.').pop());
+    });
   }
 }
 
@@ -486,7 +535,7 @@ class ProfileUI {
     document.getElementById('profile-selection-back').hidden = !switching;
   }
 
-  async showForm(profile = null) {
+  async showForm(profile = null, { focusPreferences = false } = {}) {
     this.editingPid = profile?.pid || null;
     this.photo = profile?.photo || '';
     const formTitle = document.getElementById('profile-form-title');
@@ -506,6 +555,11 @@ class ProfileUI {
     document.getElementById('profile-form-cancel').hidden = !profile;
     document.getElementById('profile-form-error').textContent = '';
     this.renderPhotoPreview(profile);
+    requestAnimationFrame(() => {
+      const target = focusPreferences ? document.getElementById('profile-preferences-section') : document.getElementById('profile-name');
+      target?.scrollIntoView({ block: focusPreferences ? 'center' : 'nearest', behavior: 'smooth' });
+      target?.focus({ preventScroll: true });
+    });
   }
 
   renderPhotoPreview(profile = null) {
@@ -1282,7 +1336,17 @@ async function loadCollectionExperienceFromFiles(experienceId, fileList) {
     if (!objectUrls.has(url)) objectUrls.set(url, URL.createObjectURL(file));
     return objectUrls.get(url);
   };
-  return loadCollectionExperienceWithReader(experienceId, { text, resolveMediaUrl });
+  try {
+    const dataset = await loadCollectionExperienceWithReader(experienceId, { text, resolveMediaUrl });
+    dataset.release = () => {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+      objectUrls.clear();
+    };
+    return dataset;
+  } catch (error) {
+    objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    throw error;
+  }
 }
 
 function relativeCollectionPath(url) {
@@ -1391,6 +1455,50 @@ function serializeLanguageMaster(dataset, language) {
   return [headers, ...rows].map((row) => row.map(encode).join('#')).join('\n') + '\n';
 }
 
+// Source: js/player/collection-source.js
+class CollectionSourceRequiredError extends Error {
+  constructor() {
+    super('Choose the local collections folder to continue.');
+    this.name = 'CollectionSourceRequiredError';
+  }
+}
+
+class CollectionSource {
+  constructor({ protocol = location.protocol, version = '' } = {}) {
+    this.protocol = protocol;
+    this.version = version;
+    this.files = null;
+    this.cache = new Map();
+  }
+
+  get requiresSelection() { return this.protocol === 'file:' && !this.files; }
+  get usesLocalFiles() { return Boolean(this.files); }
+  get isReady() { return !this.requiresSelection; }
+  get label() { return this.files ? 'collections' : 'data/collections'; }
+
+  clear() {
+    this.cache.forEach((dataset) => dataset.release?.());
+    this.cache.clear();
+  }
+
+  selectFiles(fileList) {
+    const files = Array.from(fileList || []);
+    if (!files.length) throw new CollectionSourceRequiredError();
+    this.clear();
+    this.files = files;
+  }
+
+  async loadExperience(experienceId) {
+    if (this.cache.has(experienceId)) return this.cache.get(experienceId);
+    if (this.requiresSelection) throw new CollectionSourceRequiredError();
+    const dataset = this.files
+      ? await loadCollectionExperienceFromFiles(experienceId, this.files)
+      : await loadCollectionExperience(experienceId, { version: this.version });
+    this.cache.set(experienceId, dataset);
+    return dataset;
+  }
+}
+
 // Source: js/player/audio-player.js
 class AudioPlayer {
   constructor({ audio, playButton, playIcon, pauseIcon, seek, time, onError = () => {}, onEvent = () => {}, translate = (key, fallback) => fallback }) {
@@ -1486,6 +1594,10 @@ class AudioPlayer {
     if (!this.audio.getAttribute('src')) return;
     if (this.audio.paused) this.audio.play().catch(() => this.updatePlayState());
     else this.audio.pause();
+  }
+
+  pause() {
+    if (!this.audio.paused) this.audio.pause();
   }
 
   stop() {
@@ -1853,6 +1965,13 @@ const state = {
   profileReturnView: 'diksoochi',
   locationSource: null,
   experienceResumes: new Map(),
+  journeyDataset: null,
+  journeyView: null,
+  expandedJourneySid: null,
+  focusedJourneySid: null,
+  journeyReturnView: 'diksoochi',
+  journeyReturnFocus: 'journey-details-button',
+  pendingLocalDestination: null,
   appMetadata: { version: 'dev' }
 };
 
@@ -1863,6 +1982,7 @@ let requestedLanguage = params.get('lang');
 const explicitLocationRequested = params.has('play') || params.has('sid') || params.has('lang');
 const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
 const clarityProjectId = document.querySelector('meta[name="clarity-project-id"]')?.content || '';
+const collectionSource = new CollectionSource({ version: appVersion });
 const i18n = new I18n('en');
 const translate = (key, fallback, values = {}) => i18n.t(key, values) === key ? fallback : i18n.t(key, values);
 
@@ -1928,13 +2048,285 @@ function emitEvent(name, { context = {}, details = {}, profile = state.activePro
 }
 
 function showOnly(id) {
-  ['profile-setup', 'profile-selection', 'diksoochi', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
+  ['profile-setup', 'profile-selection', 'diksoochi', 'journey-details', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
     document.getElementById(name).hidden = name !== id;
   });
 }
 
 function visibleView() {
-  return ['profile-selection', 'diksoochi', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'diksoochi';
+  return ['profile-selection', 'diksoochi', 'journey-details', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'diksoochi';
+}
+
+function oneLine(value) {
+  return String(value || '').replace(/\s+/g, ' ').trim() || '—';
+}
+
+function setJourneyView(view, { save = true } = {}) {
+  state.journeyView = view === 'cards' ? 'cards' : 'table';
+  document.getElementById('journey-cards').hidden = state.journeyView !== 'cards';
+  document.getElementById('journey-table-wrap').hidden = state.journeyView !== 'table';
+  document.querySelectorAll('[data-journey-view]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.journeyView === state.journeyView));
+  });
+  syncJourneyInteraction();
+  if (save && state.activeProfile) profileStore.setJourneyView(state.activeProfile.pid, state.journeyView);
+}
+
+function journeyItems() {
+  const selector = state.journeyView === 'cards' ? '#journey-cards .journey-card' : '#journey-table-body .journey-table-row';
+  return Array.from(document.querySelectorAll(selector));
+}
+
+function syncJourneyInteraction({ focus = false } = {}) {
+  const items = journeyItems();
+  if (!items.length) return;
+  if (!items.some((item) => item.dataset.journeySid === state.focusedJourneySid)) state.focusedJourneySid = items[0].dataset.journeySid;
+  document.querySelectorAll('[data-journey-sid]').forEach((item) => {
+    const expanded = item.dataset.journeySid === state.expandedJourneySid;
+    item.setAttribute('aria-expanded', String(expanded));
+    item.tabIndex = item.dataset.journeySid === state.focusedJourneySid && items.includes(item) ? 0 : -1;
+  });
+  document.querySelectorAll('[data-journey-detail]').forEach((detail) => {
+    detail.hidden = detail.dataset.journeyDetail !== state.expandedJourneySid;
+  });
+  if (focus) items.find((item) => item.dataset.journeySid === state.focusedJourneySid)?.focus();
+}
+
+function toggleJourneyItem(sid) {
+  state.focusedJourneySid = sid;
+  state.expandedJourneySid = state.expandedJourneySid === sid ? null : sid;
+  syncJourneyInteraction({ focus: true });
+}
+
+function moveJourneyFocus(key) {
+  const items = journeyItems();
+  if (!items.length) return;
+  const current = Math.max(0, items.findIndex((item) => item.dataset.journeySid === state.focusedJourneySid));
+  let next = current;
+  if (key === 'Home') next = 0;
+  else if (key === 'End') next = items.length - 1;
+  else if (state.journeyView === 'table' && key === 'ArrowUp') next = Math.max(0, current - 1);
+  else if (state.journeyView === 'table' && key === 'ArrowDown') next = Math.min(items.length - 1, current + 1);
+  else if (state.journeyView === 'cards') {
+    const columns = items.filter((item) => Math.abs(item.getBoundingClientRect().top - items[0].getBoundingClientRect().top) < 2).length || 1;
+    if (key === 'ArrowLeft') next = Math.max(0, current - 1);
+    else if (key === 'ArrowRight') next = Math.min(items.length - 1, current + 1);
+    else if (key === 'ArrowUp') next = Math.max(0, current - columns);
+    else if (key === 'ArrowDown') next = Math.min(items.length - 1, current + columns);
+  }
+  state.focusedJourneySid = items[next].dataset.journeySid;
+  syncJourneyInteraction({ focus: true });
+}
+
+function handleJourneyKeydown(event) {
+  const item = event.target.closest('[data-journey-sid]');
+  if ((event.key === 'Enter' || event.key === ' ') && item) {
+    event.preventDefault();
+    toggleJourneyItem(item.dataset.journeySid);
+    return true;
+  }
+  if (item && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+    if (state.journeyView === 'table' && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) return true;
+    event.preventDefault();
+    moveJourneyFocus(event.key);
+    return true;
+  }
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    if (state.expandedJourneySid) {
+      state.expandedJourneySid = null;
+      syncJourneyInteraction({ focus: true });
+    } else {
+      returnFromJourney();
+    }
+    return true;
+  }
+  return false;
+}
+
+function returnFromJourney() {
+  state.expandedJourneySid = null;
+  const target = state.journeyReturnView === 'app' && state.dataset ? 'app' : 'diksoochi';
+  showOnly(target);
+  requestAnimationFrame(() => document.getElementById(state.journeyReturnFocus)?.focus());
+}
+
+function renderJourneyDetails(rows, dataset) {
+  const bySid = new Map(dataset.rows.map((row) => [row.sid, row]));
+  const cards = document.getElementById('journey-cards');
+  const table = document.getElementById('journey-table-body');
+  cards.textContent = '';
+  table.textContent = '';
+  rows.forEach((engagement) => {
+    const verse = bySid.get(engagement.sid);
+    const sanskrit = oneLine(verse?.source.shloka);
+    const preferred = state.activeProfile.contentLanguage;
+    const meaning = oneLine(verse?.languages[preferred]?.meaning || verse?.languages.en?.meaning);
+    const card = document.createElement('article');
+    card.className = 'journey-card';
+    card.dataset.journeySid = engagement.sid;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `${engagement.sid}, ${i18n.t('diksoochi.count')} ${engagement.count}`);
+    const detailId = `journey-card-detail-${engagement.sid.replace('.', '-')}`;
+    card.setAttribute('aria-controls', detailId);
+    const cardHead = document.createElement('div');
+    cardHead.className = 'journey-card-head';
+    const sid = document.createElement('strong');
+    sid.textContent = engagement.sid;
+    const count = document.createElement('span');
+    count.className = 'journey-count';
+    count.textContent = String(engagement.count);
+    count.setAttribute('aria-label', `${i18n.t('diksoochi.count')}: ${engagement.count}`);
+    const indicator = document.createElement('i');
+    indicator.className = 'journey-chevron';
+    indicator.setAttribute('aria-hidden', 'true');
+    cardHead.append(sid, count, indicator);
+    const shloka = document.createElement('p');
+    shloka.className = 'journey-line journey-sanskrit';
+    shloka.textContent = sanskrit;
+    shloka.title = sanskrit;
+    const meaningLine = document.createElement('p');
+    meaningLine.className = 'journey-line';
+    meaningLine.textContent = meaning;
+    meaningLine.title = meaning;
+    const cardDetail = document.createElement('div');
+    cardDetail.className = 'journey-expanded';
+    cardDetail.id = detailId;
+    cardDetail.dataset.journeyDetail = engagement.sid;
+    cardDetail.hidden = true;
+    const fullShloka = document.createElement('p');
+    fullShloka.className = 'journey-expanded-shloka';
+    fullShloka.textContent = verse?.source.shloka || '—';
+    const fullMeaning = document.createElement('p');
+    fullMeaning.textContent = verse?.languages[preferred]?.meaning || verse?.languages.en?.meaning || '—';
+    cardDetail.append(fullShloka, fullMeaning);
+    card.append(cardHead, shloka, meaningLine, cardDetail);
+    cards.appendChild(card);
+
+    const tr = document.createElement('tr');
+    tr.className = 'journey-table-row';
+    tr.dataset.journeySid = engagement.sid;
+    tr.tabIndex = -1;
+    tr.setAttribute('aria-label', `${engagement.sid}, ${i18n.t('diksoochi.count')} ${engagement.count}`);
+    const tableDetailId = `journey-table-detail-${engagement.sid.replace('.', '-')}`;
+    tr.setAttribute('aria-controls', tableDetailId);
+    [engagement.sid, sanskrit, meaning, String(engagement.count)].forEach((value, index) => {
+      const cell = document.createElement(index === 0 ? 'th' : 'td');
+      cell.textContent = value;
+      if (index === 0) cell.scope = 'row';
+      if (index === 1 || index === 2) {
+        cell.className = 'journey-table-line';
+        cell.title = value;
+      }
+      if (index === 3) {
+        const rowIndicator = document.createElement('i');
+        rowIndicator.className = 'journey-chevron';
+        rowIndicator.setAttribute('aria-hidden', 'true');
+        cell.appendChild(rowIndicator);
+      }
+      tr.appendChild(cell);
+    });
+    const detailRow = document.createElement('tr');
+    detailRow.className = 'journey-table-detail';
+    detailRow.id = tableDetailId;
+    detailRow.dataset.journeyDetail = engagement.sid;
+    detailRow.hidden = true;
+    const detailCell = document.createElement('td');
+    detailCell.colSpan = 4;
+    const tableShloka = document.createElement('p');
+    tableShloka.className = 'journey-expanded-shloka';
+    tableShloka.textContent = verse?.source.shloka || '—';
+    const tableMeaning = document.createElement('p');
+    tableMeaning.textContent = verse?.languages[preferred]?.meaning || verse?.languages.en?.meaning || '—';
+    detailCell.append(tableShloka, tableMeaning);
+    detailRow.appendChild(detailCell);
+    table.append(tr, detailRow);
+  });
+}
+
+async function openJourneyDetails() {
+  const origin = visibleView();
+  if (origin === 'app' || origin === 'diksoochi') {
+    state.journeyReturnView = origin;
+    state.journeyReturnFocus = origin === 'app' ? 'menu-button' : 'journey-details-button';
+  }
+  if (collectionSource.requiresSelection) return requestLocalCollections();
+  if (origin === 'app') {
+    setMenuOpen(false);
+    audioPlayer.pause();
+  }
+  showOnly('loading');
+  try {
+    const [rows, savedView, dataset] = await Promise.all([
+      profileStore.getDiksoochiDetails(state.activeProfile.pid),
+      profileStore.getJourneyView(state.activeProfile.pid),
+      state.journeyDataset ? Promise.resolve(state.journeyDataset) : collectionSource.loadExperience('gita-700')
+    ]);
+    state.journeyDataset = dataset;
+    state.expandedJourneySid = null;
+    state.focusedJourneySid = rows[0]?.sid || null;
+    renderJourneyDetails(rows, dataset);
+    setJourneyView(savedView || (matchMedia('(max-width: 700px)').matches ? 'cards' : 'table'), { save: false });
+    showOnly('journey-details');
+  } catch (error) {
+    showError(error.message || i18n.t('error.title'));
+  }
+}
+
+function syncHomeCollectionSource() {
+  const section = document.getElementById('home-collections');
+  section.hidden = location.protocol !== 'file:';
+  if (section.hidden) return;
+  const ready = collectionSource.isReady;
+  document.getElementById('home-collections-title').textContent = i18n.t(ready ? 'collections.readyTitle' : 'collections.title');
+  document.getElementById('home-collections-message').textContent = ready
+    ? i18n.t('collections.readyMessage', { name: collectionSource.label })
+    : i18n.t('collections.message');
+  document.getElementById('home-collections-button').textContent = i18n.t(ready ? 'collections.change' : 'collections.load');
+  document.getElementById('home-collections-error').textContent = '';
+  document.querySelectorAll('#continue-journey-link, #gita-700-link').forEach((link) => {
+    link.classList.toggle('needs-collections', !ready);
+    link.setAttribute('aria-disabled', String(!ready));
+  });
+}
+
+function requestLocalCollections() {
+  showOnly('diksoochi');
+  syncHomeCollectionSource();
+  const section = document.getElementById('home-collections');
+  section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('home-collections-button').focus({ preventScroll: true });
+}
+
+function openHomeExperience(link) {
+  if (collectionSource.requiresSelection) return requestLocalCollections();
+  const destination = new URL(link.href, location.href);
+  play = destination.searchParams.get('play');
+  requestedSid = destination.searchParams.get('sid');
+  requestedLanguage = destination.searchParams.get('lang');
+  history.replaceState(null, '', destination);
+  startRequestedExperience();
+}
+
+async function useSelectedCollections(fileList) {
+  const error = document.getElementById('home-collections-error');
+  error.textContent = '';
+  try {
+    collectionSource.selectFiles(fileList);
+    state.journeyDataset = null;
+    await collectionSource.loadExperience('gita-700');
+    syncHomeCollectionSource();
+    if (state.pendingLocalDestination) {
+      ({ play, requestedSid, requestedLanguage } = state.pendingLocalDestination);
+      state.pendingLocalDestination = null;
+      return startRequestedExperience();
+    }
+  } catch (failure) {
+    collectionSource.clear();
+    collectionSource.files = null;
+    syncHomeCollectionSource();
+    error.textContent = failure.message || i18n.t('collections.invalid');
+  }
 }
 
 function updateProfileUrl(profile) {
@@ -1960,6 +2352,7 @@ async function selectProfile(profile) {
 async function createProfile(profile) {
   await activateProfile(profile);
   emitEvent('profile_created');
+  if (location.protocol === 'file:' && explicitLocationRequested && play) return startRequestedExperience();
   goToExperienceSelection(profile, { source: 'profile_created' });
 }
 
@@ -1978,6 +2371,7 @@ async function handleProfileChange(profile, options = {}) {
     await profileUI.showSelection({ switching: true });
     return showOnly('profile-selection');
   }
+  if (state.profileReturnView === 'journey-details') return openJourneyDetails();
   if (state.dataset && state.profileReturnView === 'app') {
     showOnly('app');
     state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.contentLanguage;
@@ -2027,10 +2421,10 @@ async function openProfileLocation(profile, { honorExplicit = false } = {}) {
   goToExperienceSelection(profile, { source: resume ? 'resume' : 'profile_selected', track: !resume });
 }
 
-async function openProfileForm(profile = null) {
+async function openProfileForm(profile = null, { focusPreferences = false } = {}) {
   state.profileReturnView = visibleView();
   closeOverlays({ restoreFocus: false });
-  await profileUI.showForm(profile);
+  await profileUI.showForm(profile, { focusPreferences });
   document.getElementById('profile-dob').max = new Date().toISOString().slice(0, 10);
   showOnly('profile-setup');
 }
@@ -2106,13 +2500,29 @@ async function startRequestedExperience() {
   if (!play) {
     const summary = await profileStore.getDiksoochiSummary(state.activeProfile.pid);
     document.getElementById('diksoochi-greeting').textContent = i18n.t('diksoochi.greeting', { name: state.activeProfile.name });
-    document.getElementById('diksoochi-know-summary').textContent = summary.shlokas
+    const knowSummary = document.getElementById('diksoochi-know-summary');
+    const knowSummaryText = document.getElementById('diksoochi-know-summary-text');
+    const journeyStatements = document.getElementById('diksoochi-journey-statements');
+    const journeyEmpty = document.getElementById('diksoochi-journey-empty');
+    const hasJourneyDetails = summary.shlokas > 0;
+    knowSummaryText.textContent = hasJourneyDetails
       ? i18n.t('diksoochi.knowSummary', {
           chapterText: i18n.t(summary.chapters === 1 ? 'diksoochi.chapterOne' : 'diksoochi.chapterMany', { count: summary.chapters }),
           shlokaText: i18n.t(summary.shlokas === 1 ? 'diksoochi.shlokaOne' : 'diksoochi.shlokaMany', { count: summary.shlokas })
         })
-      : i18n.t('diksoochi.knowEmpty');
+      : '';
+    knowSummary.hidden = !hasJourneyDetails;
+    journeyStatements.hidden = !hasJourneyDetails;
+    journeyEmpty.hidden = hasJourneyDetails;
+    syncHomeCollectionSource();
     return showOnly('diksoochi');
+  }
+
+  if (collectionSource.requiresSelection) {
+    state.pendingLocalDestination = { play, requestedSid, requestedLanguage };
+    play = null;
+    requestedSid = null;
+    return requestLocalCollections();
   }
 
   const experience = getExperience(play);
@@ -2126,7 +2536,7 @@ async function startRequestedExperience() {
 
   showOnly('loading');
   try {
-    await startPlayer(await loadCollectionExperience(play, { version: appVersion }), experience);
+    await startPlayer(await collectionSource.loadExperience(play), experience);
   } catch (error) {
     emitEvent('data_load_failed', {
       context: { experience: play, language: requestedLanguage || state.activeProfile.contentLanguage },
@@ -2597,13 +3007,20 @@ function bindEvents() {
   state.eventsBound = true;
   document.getElementById('collections-folder-input').addEventListener('change', async (event) => {
     try {
-      const dataset = await loadCollectionExperienceFromFiles(play, event.target.files);
+      collectionSource.selectFiles(event.target.files);
+      const dataset = await collectionSource.loadExperience(play);
       await startPlayer(dataset, getExperience(play));
     } catch (error) {
       showDataChooser(error.message || 'The selected collections folder could not be read.');
     }
   });
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
+  document.getElementById('home-collections-input').addEventListener('change', (event) => useSelectedCollections(event.target.files));
+  document.getElementById('home-collections-button').addEventListener('click', () => document.getElementById('home-collections-input').click());
+  document.querySelectorAll('#continue-journey-link, #gita-700-link').forEach((link) => link.addEventListener('click', (event) => {
+    event.preventDefault();
+    openHomeExperience(link);
+  }));
   updateDeviceLayout();
   document.getElementById('menu-button').addEventListener('click', (event) => { event.stopPropagation(); toggleMenu(); });
   document.getElementById('chapter-trigger').addEventListener('click', () => openOverlay('chapters-overlay'));
@@ -2615,17 +3032,25 @@ function bindEvents() {
   document.querySelectorAll('[data-about]').forEach((button) => button.addEventListener('click', (event) => aboutDialog.open(event.currentTarget)));
   document.getElementById('language-button').addEventListener('click', () => openOverlay('language-overlay'));
   document.getElementById('home-button').addEventListener('click', goHome);
+  document.getElementById('journey-button').addEventListener('click', openJourneyDetails);
+  document.getElementById('journey-details-button').addEventListener('click', openJourneyDetails);
+  document.getElementById('journey-back-button').addEventListener('click', returnFromJourney);
+  document.querySelectorAll('[data-journey-view]').forEach((button) => button.addEventListener('click', () => setJourneyView(button.dataset.journeyView)));
+  ['journey-cards', 'journey-table-body'].forEach((id) => document.getElementById(id).addEventListener('click', (event) => {
+    const item = event.target.closest('[data-journey-sid]');
+    if (item) toggleJourneyItem(item.dataset.journeySid);
+  }));
   document.querySelectorAll('[data-profile-pill]').forEach((button) => button.addEventListener('click', () => openOverlay('profile-menu-overlay')));
-  document.getElementById('switch-profile-button').addEventListener('click', () => openProfileSelection());
-  document.getElementById('manage-profiles-button').addEventListener('click', () => openProfileSelection());
+  document.getElementById('profile-preferences-button').addEventListener('click', () => openProfileForm(state.activeProfile, { focusPreferences: true }));
+  document.getElementById('switch-manage-profiles-button').addEventListener('click', () => openProfileSelection());
   document.getElementById('edit-profile-button').addEventListener('click', () => openProfileForm(state.activeProfile));
   document.getElementById('add-profile-button').addEventListener('click', () => openProfileForm());
   document.getElementById('profile-selection-back').addEventListener('click', () => {
-    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'diksoochi');
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'journey-details' ? 'journey-details' : 'diksoochi'));
   });
   document.getElementById('profile-form-cancel').addEventListener('click', () => {
     setInterfaceLanguage(state.activeProfile?.interfaceLanguage || 'en');
-    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'diksoochi'));
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : (state.profileReturnView === 'journey-details' ? 'journey-details' : 'diksoochi')));
   });
   document.getElementById('edit-button').addEventListener('click', requestEditMode);
   document.getElementById('open-collections-workspace').addEventListener('click', openCollectionsWorkspace);
@@ -2668,7 +3093,8 @@ function bindEvents() {
       event.preventDefault();
       return;
     }
-    if (!state.dataset) return;
+    if (!document.getElementById('journey-details').hidden && handleJourneyKeydown(event)) return;
+    if (!state.dataset || document.getElementById('app').hidden) return;
     const active = document.activeElement;
     const typing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's' && state.editor.active) {
@@ -2696,6 +3122,8 @@ function bindEvents() {
         event.preventDefault(); openOverlay('language-overlay');
       } else if (menuKey === 'a') {
         event.preventDefault(); goHome();
+      } else if (menuKey === 'j') {
+        event.preventDefault(); openJourneyDetails();
       } else if (menuKey === 'k') {
         event.preventDefault(); openOverlay('about-overlay');
       } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -2734,6 +3162,7 @@ function bindEvents() {
     else if (key === 'c') { event.preventDefault(); openOverlay('chapters-overlay'); }
     else if (key === 'l') { event.preventDefault(); openOverlay('language-overlay'); }
     else if (key === 'a') { event.preventDefault(); goHome(); }
+    else if (key === 'j') { event.preventDefault(); openJourneyDetails(); }
     else if (key === 'f') { event.preventDefault(); toggleFullscreen(); }
     else if (key === 'h') { event.preventDefault(); openOverlay('help-overlay'); }
     else if (key === 'k') { event.preventDefault(); openOverlay('about-overlay'); }

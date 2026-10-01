@@ -72,7 +72,7 @@ export class ProfileUI {
     document.getElementById('profile-selection-back').hidden = !switching;
   }
 
-  async showForm(profile = null) {
+  async showForm(profile = null, { focusPreferences = false } = {}) {
     this.editingPid = profile?.pid || null;
     this.photo = profile?.photo || '';
     const formTitle = document.getElementById('profile-form-title');
@@ -92,6 +92,11 @@ export class ProfileUI {
     document.getElementById('profile-form-cancel').hidden = !profile;
     document.getElementById('profile-form-error').textContent = '';
     this.renderPhotoPreview(profile);
+    requestAnimationFrame(() => {
+      const target = focusPreferences ? document.getElementById('profile-preferences-section') : document.getElementById('profile-name');
+      target?.scrollIntoView({ block: focusPreferences ? 'center' : 'nearest', behavior: 'smooth' });
+      target?.focus({ preventScroll: true });
+    });
   }
 
   renderPhotoPreview(profile = null) {

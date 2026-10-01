@@ -91,8 +91,9 @@ async function run() {
     await page.goto(`${base}/player.html?play=gita-700&sid=6.7&lang=kn`, { waitUntil: 'networkidle' });
     assert.equal(await page.getByLabel('App language', { exact: true }).inputValue(), '', 'first profile must require an explicit app language');
     await createProfile(page);
-    assert.equal(await page.locator('.diksoochi-dimension').count(), 3);
-    assert.match(await page.locator('#diksoochi-know-summary').innerText(), /will unfold here/);
+    assert.equal(await page.locator('.diksoochi-dimension').count(), 0);
+    assert.equal(await page.locator('#diksoochi-journey-empty').innerText(), 'Your journey details will be updated here.');
+    assert.equal(await page.locator('#diksoochi-know-summary').isHidden(), true);
     assert.equal(await page.getByRole('heading', { name: 'Your journey', exact: true }).isVisible(), true);
     assert.equal(await page.locator('.diksoochi-flute').isVisible(), true);
     assert.equal(await page.locator('.diksoochi-flute img').evaluate((image) => getComputedStyle(image).animationIterationCount), 'infinite');
@@ -157,6 +158,7 @@ async function run() {
 
     await page.keyboard.press('h');
     assert.equal(await page.locator('#help-overlay').isVisible(), true);
+    assert.equal(await page.getByText('Open Your journey', { exact: true }).isVisible(), true);
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('#help-overlay').isVisible(), false);
     await page.keyboard.press('k');
@@ -237,38 +239,108 @@ async function run() {
           key: '1:gita-700:6.7', pid: 1, experience: 'gita-700', sid: '6.7', chapter: '6',
           firstMeaningfulAt: new Date().toISOString(), lastMeaningfulAt: new Date().toISOString(), meaningfulVisitCount: 1, maxEngagementSeconds: 10
         });
+        transaction.objectStore('diksoochiEngagement').put({
+          key: '1:gita-yoga:6.7', pid: 1, experience: 'gita-yoga', sid: '6.7', chapter: '6',
+          firstMeaningfulAt: new Date().toISOString(), lastMeaningfulAt: new Date().toISOString(), meaningfulVisitCount: 2, maxEngagementSeconds: 20
+        });
+        transaction.objectStore('diksoochiEngagement').put({
+          key: '1:gita-700:8.4', pid: 1, experience: 'gita-700', sid: '8.4', chapter: '8',
+          firstMeaningfulAt: new Date().toISOString(), lastMeaningfulAt: new Date().toISOString(), meaningfulVisitCount: 1, maxEngagementSeconds: 10
+        });
         transaction.oncomplete = () => { database.close(); resolve(); };
         transaction.onerror = () => reject(transaction.error);
       };
     }));
     await page.reload({ waitUntil: 'networkidle' });
     await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
-    assert.equal(await page.locator('#diksoochi-know-summary').innerText(), 'You have meaningfully explored 1 chapter and 1 shloka.');
+    assert.equal(await page.locator('#diksoochi-know-summary-text').innerText(), 'You have explored 2 chapters and 2 shlokas.');
+    await page.getByRole('button', { name: 'Details' }).click();
+    await page.getByRole('heading', { name: 'Your journey', exact: true }).waitFor();
+    assert.equal(await page.locator('[data-journey-view="cards"] svg').count(), 1);
+    assert.equal((await page.locator('[data-journey-view="cards"]').innerText()).trim(), '', 'journey view controls must remain icon-only');
+    assert.equal(await page.getByRole('button', { name: 'Table view' }).getAttribute('title'), 'Table view');
+    assert.equal(await page.locator('#journey-table-body .journey-table-row').count(), 2, 'the same SID across experiences must be one journey row');
+    const journeyCells = await page.locator('#journey-table-body tr').first().locator('th, td').allTextContents();
+    assert.equal(journeyCells[0], '6.7');
+    assert.equal(journeyCells[3], '3');
+    assert.ok(journeyCells[1].length > 10 && !journeyCells[1].includes('\n'), 'Sanskrit must be populated on one line');
+    assert.ok(journeyCells[2].length > 10 && !journeyCells[2].includes('\n'), 'preferred-language meaning must be populated on one line');
+    const journeyRows = page.locator('#journey-table-body .journey-table-row');
+    await journeyRows.first().focus();
+    await page.keyboard.press('ArrowDown');
+    assert.equal(await page.evaluate(() => document.activeElement?.dataset.journeySid), '8.4');
+    await page.keyboard.press('ArrowLeft');
+    assert.equal(await page.evaluate(() => document.activeElement?.dataset.journeySid), '8.4', 'table left/right must not change the selected row');
+    await page.keyboard.press('Enter');
+    assert.equal(await journeyRows.nth(1).getAttribute('aria-expanded'), 'true');
+    assert.equal(await page.locator('[data-journey-detail="8.4"]').last().isVisible(), true);
+    await page.keyboard.press('Escape');
+    assert.equal(await journeyRows.nth(1).getAttribute('aria-expanded'), 'false');
+    await page.getByRole('button', { name: 'Card view' }).click();
+    assert.equal(await page.getByRole('button', { name: 'Card view' }).getAttribute('aria-pressed'), 'true');
+    assert.match(await page.locator('.journey-card[data-journey-sid="6.7"]').innerText(), /6\.7[\s\S]*3/);
+    assert.equal(await page.locator('.journey-card[data-journey-sid="8.4"]').getAttribute('tabindex'), '0', 'view switching must preserve the selected SID');
+    await page.locator('.journey-card[data-journey-sid="8.4"]').focus();
+    await page.keyboard.press('ArrowLeft');
+    assert.equal(await page.evaluate(() => document.activeElement?.dataset.journeySid), '6.7');
+    await page.keyboard.press('Space');
+    assert.equal(await page.locator('.journey-card[data-journey-sid="6.7"]').getAttribute('aria-expanded'), 'true');
+    assert.match(await page.locator('.journey-card[data-journey-sid="6.7"] .journey-expanded').innerText(), /\n/, 'expanded card must show complete shloka and meaning blocks');
+    await page.getByRole('button', { name: '← Back' }).click();
+    await page.getByRole('button', { name: 'Details' }).click();
+    await page.locator('.journey-card').first().waitFor();
+    assert.equal(await page.getByRole('button', { name: 'Card view' }).getAttribute('aria-pressed'), 'true', 'journey view preference must persist per profile');
+    await page.getByRole('button', { name: '← Back' }).click();
     assert.match(await page.locator('#gita-700-link').getAttribute('href'), /[?&]sid=6\.7(?:&|$)/, 'experience link must carry the saved SID');
     await page.locator('#gita-700-link').click();
     await page.locator('#sid-label').waitFor();
     assert.equal(await page.locator('#sid-label').innerText(), '6.7', 'experience selection must preserve the per-experience resume point');
+    await page.locator('#play-button').click();
+    await page.locator('#play-button[aria-label="Pause audio"]').waitFor();
+    await page.keyboard.press('m');
+    await page.getByRole('button', { name: /Your journey\s+J/ }).click();
+    await page.getByRole('heading', { name: 'Your journey', exact: true }).waitFor();
+    assert.equal(await page.locator('#audio').evaluate((audio) => audio.paused), true, 'opening journey from the player must pause audio');
+    await page.getByRole('button', { name: 'Table view' }).click();
+    await page.locator('.journey-table-row').first().focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await page.locator('.journey-table-detail:not([hidden]) p').first().evaluate((element) => getComputedStyle(element).textAlign), 'center');
+    await page.getByRole('button', { name: '← Back' }).click();
+    assert.equal(await page.locator('#sid-label').innerText(), '6.7', 'journey Back must restore the originating player SID');
+    assert.equal(await page.locator('#audio').evaluate((audio) => audio.paused), true, 'audio must remain paused after returning from journey');
+    await page.keyboard.press('j');
+    await page.getByRole('heading', { name: 'Your journey', exact: true }).waitFor();
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('#sid-label').innerText(), '6.7', 'J and Escape must return to the player origin');
     await page.keyboard.press('a');
     await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
 
     await page.locator('[data-profile-pill]').first().click();
-    await page.getByRole('button', { name: 'Edit profile' }).click();
+    assert.deepEqual(await page.locator('.profile-menu-options button').allTextContents(), ['My preferences', 'View / edit profile', 'Switch / manage profiles']);
+    await page.getByRole('button', { name: 'My preferences' }).click();
+    await page.locator('#profile-preferences-section').waitFor({ state: 'visible' });
+    assert.equal(await page.getByRole('heading', { name: 'My preferences' }).isVisible(), true);
+    assert.equal(await page.getByLabel('App language', { exact: true }).inputValue(), 'en');
+    await page.getByRole('button', { name: 'Cancel' }).click();
+
+    await page.locator('[data-profile-pill]').first().click();
+    await page.getByRole('button', { name: 'View / edit profile' }).click();
     assert.equal(await page.getByLabel('Name', { exact: true }).inputValue(), 'Regression Profile');
     await page.getByRole('button', { name: 'Cancel' }).click();
 
     await page.locator('[data-profile-pill]').first().click();
-    await page.getByRole('button', { name: 'Switch profile' }).click();
+    await page.getByRole('button', { name: 'Switch / manage profiles' }).click();
     await page.getByRole('heading', { name: 'Switch profile' }).waitFor();
     await page.getByRole('button', { name: /Add another profile/ }).click();
     await createProfile(page, 'Second Regression');
     assert.match(await page.locator('[data-profile-pill]').first().getAttribute('aria-label'), /Second Regression/);
     await page.locator('[data-profile-pill]').first().click();
-    await page.getByRole('button', { name: 'Switch profile' }).click();
+    await page.getByRole('button', { name: 'Switch / manage profiles' }).click();
     await page.locator('.profile-select').filter({ hasText: 'Regression Profile' }).click();
     await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
     assert.match(await page.locator('[data-profile-pill]').first().getAttribute('aria-label'), /Regression Profile/);
     await page.locator('[data-profile-pill]').first().click();
-    await page.getByRole('button', { name: 'Manage profiles' }).click();
+    await page.getByRole('button', { name: 'Switch / manage profiles' }).click();
     assert.equal(await page.locator('.profile-card').count(), 2);
     const secondCard = page.locator('.profile-card').filter({ hasText: 'Second Regression' });
     const confirmDelete = page.waitForEvent('dialog');
@@ -284,8 +356,7 @@ async function run() {
     const mobilePage = await mobile.newPage();
     await mobilePage.goto(`${base}/player.html?play=gita-700&sid=6.7`, { waitUntil: 'networkidle' });
     await createProfile(mobilePage, 'Mobile Regression');
-    const diksoochiCards = await mobilePage.locator('.diksoochi-dimension').evaluateAll((cards) => cards.map((card) => card.getBoundingClientRect().top));
-    assert.ok(diksoochiCards.every((top, index) => index === 0 || top > diksoochiCards[index - 1]), 'mobile Diksoochi dimensions must stack vertically');
+    assert.equal(await mobilePage.locator('#diksoochi-journey-empty').isVisible(), true, 'mobile Diksoochi must show its compact journey state');
     await mobilePage.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
     const boxes = await mobilePage.locator('.gita-700-panel').evaluateAll((panels) => panels.map((panel) => panel.getBoundingClientRect().top));
     assert.ok(boxes.every((top, index) => index === 0 || top > boxes[index - 1]), 'mobile panels must stack vertically');
@@ -373,13 +444,40 @@ async function run() {
     const fileUrl = pathToFileURL(path.join(root, 'player.html')).href + '?play=gita-700&sid=6.7';
     await filePage.goto(fileUrl, { waitUntil: 'domcontentloaded' });
     await createProfile(filePage, 'File Regression');
-    await filePage.locator('#gita-700-link').click();
-    await filePage.locator('#data-chooser').waitFor({ state: 'visible' });
-    await filePage.locator('#collections-folder-input').setInputFiles(path.join(root, 'data/collections'));
+    await filePage.locator('#home-collections').waitFor({ state: 'visible' });
+    assert.equal(await filePage.locator('#home-collections-title').innerText(), 'Local collections');
+    await filePage.locator('#home-collections-input').setInputFiles(path.join(root, 'data/collections'));
     await filePage.locator('#sid-label').waitFor();
-    assert.equal(await filePage.locator('#sid-label').innerText(), '1.B');
+    assert.equal(await filePage.locator('#sid-label').innerText(), '6.7', 'file-mode direct destination must continue after selecting collections');
     await filePage.keyboard.press('ArrowRight');
     assert.match(await filePage.locator('#audio').getAttribute('src'), /^blob:/);
+    const originalLocalAudio = await filePage.locator('#audio').getAttribute('src');
+    await filePage.evaluate(() => new Promise((resolve, reject) => {
+      const request = indexedDB.open('gitaverse-profiles');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const database = request.result;
+        const transaction = database.transaction('diksoochiEngagement', 'readwrite');
+        transaction.objectStore('diksoochiEngagement').put({
+          key: '1:gita-700:6.7', pid: 1, experience: 'gita-700', sid: '6.7', chapter: '6',
+          firstMeaningfulAt: new Date().toISOString(), lastMeaningfulAt: new Date().toISOString(), meaningfulVisitCount: 1, maxEngagementSeconds: 10
+        });
+        transaction.oncomplete = () => { database.close(); resolve(); };
+        transaction.onerror = () => reject(transaction.error);
+      };
+    }));
+    await filePage.keyboard.press('a');
+    assert.equal(await filePage.locator('#home-collections-title').innerText(), 'Local collections ready');
+    await filePage.getByRole('button', { name: 'Details' }).click();
+    await filePage.locator('#journey-table-body tr').first().waitFor();
+    assert.equal(await filePage.locator('#journey-table-body .journey-table-row').count(), 1, 'file-mode journey details must reuse the Home collection choice');
+    await filePage.getByRole('button', { name: '← Back' }).click();
+    await filePage.keyboard.press('e');
+    assert.equal(await filePage.locator('#workspace-overlay').isVisible(), false, 'edit shortcut is inactive on Home');
+    await filePage.locator('#home-collections-input').setInputFiles(path.join(root, 'data/collections'));
+    await filePage.locator('#gita-700-link').click();
+    await filePage.locator('#sid-label').waitFor();
+    assert.notEqual(await filePage.locator('#audio').getAttribute('src'), originalLocalAudio, 'changing collections must replace cached local media URLs');
     await filePage.keyboard.press('e');
     assert.equal(await filePage.locator('#workspace-overlay').isVisible(), true);
     await fileContext.close();

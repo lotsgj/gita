@@ -1,4 +1,5 @@
-import { loadCollectionExperience, loadCollectionExperienceFromFiles, openWritableCollectionWorkspace } from './collection-data.js';
+import { openWritableCollectionWorkspace } from './collection-data.js';
+import { CollectionSource, CollectionSourceRequiredError } from './collection-source.js';
 import { ProfileStore } from '../profile-store.js';
 import { ProfileUI } from '../profile-ui.js';
 import { EventBus } from '../events/event-bus.js';
@@ -29,6 +30,13 @@ const state = {
   profileReturnView: 'diksoochi',
   locationSource: null,
   experienceResumes: new Map(),
+  journeyDataset: null,
+  journeyView: null,
+  expandedJourneySid: null,
+  focusedJourneySid: null,
+  journeyReturnView: 'diksoochi',
+  journeyReturnFocus: 'journey-details-button',
+  pendingLocalDestination: null,
   appMetadata: { version: 'dev' }
 };
 
@@ -39,6 +47,7 @@ let requestedLanguage = params.get('lang');
 const explicitLocationRequested = params.has('play') || params.has('sid') || params.has('lang');
 const appVersion = document.querySelector('meta[name="app-version"]')?.content || 'dev';
 const clarityProjectId = document.querySelector('meta[name="clarity-project-id"]')?.content || '';
+const collectionSource = new CollectionSource({ version: appVersion });
 const i18n = new I18n('en');
 const translate = (key, fallback, values = {}) => i18n.t(key, values) === key ? fallback : i18n.t(key, values);
 
@@ -104,13 +113,285 @@ function emitEvent(name, { context = {}, details = {}, profile = state.activePro
 }
 
 function showOnly(id) {
-  ['profile-setup', 'profile-selection', 'diksoochi', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
+  ['profile-setup', 'profile-selection', 'diksoochi', 'journey-details', 'loading', 'error', 'data-chooser', 'app'].forEach((name) => {
     document.getElementById(name).hidden = name !== id;
   });
 }
 
 function visibleView() {
-  return ['profile-selection', 'diksoochi', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'diksoochi';
+  return ['profile-selection', 'diksoochi', 'journey-details', 'loading', 'error', 'data-chooser', 'app'].find((id) => !document.getElementById(id).hidden) || 'diksoochi';
+}
+
+function oneLine(value) {
+  return String(value || '').replace(/\s+/g, ' ').trim() || '—';
+}
+
+function setJourneyView(view, { save = true } = {}) {
+  state.journeyView = view === 'cards' ? 'cards' : 'table';
+  document.getElementById('journey-cards').hidden = state.journeyView !== 'cards';
+  document.getElementById('journey-table-wrap').hidden = state.journeyView !== 'table';
+  document.querySelectorAll('[data-journey-view]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.journeyView === state.journeyView));
+  });
+  syncJourneyInteraction();
+  if (save && state.activeProfile) profileStore.setJourneyView(state.activeProfile.pid, state.journeyView);
+}
+
+function journeyItems() {
+  const selector = state.journeyView === 'cards' ? '#journey-cards .journey-card' : '#journey-table-body .journey-table-row';
+  return Array.from(document.querySelectorAll(selector));
+}
+
+function syncJourneyInteraction({ focus = false } = {}) {
+  const items = journeyItems();
+  if (!items.length) return;
+  if (!items.some((item) => item.dataset.journeySid === state.focusedJourneySid)) state.focusedJourneySid = items[0].dataset.journeySid;
+  document.querySelectorAll('[data-journey-sid]').forEach((item) => {
+    const expanded = item.dataset.journeySid === state.expandedJourneySid;
+    item.setAttribute('aria-expanded', String(expanded));
+    item.tabIndex = item.dataset.journeySid === state.focusedJourneySid && items.includes(item) ? 0 : -1;
+  });
+  document.querySelectorAll('[data-journey-detail]').forEach((detail) => {
+    detail.hidden = detail.dataset.journeyDetail !== state.expandedJourneySid;
+  });
+  if (focus) items.find((item) => item.dataset.journeySid === state.focusedJourneySid)?.focus();
+}
+
+function toggleJourneyItem(sid) {
+  state.focusedJourneySid = sid;
+  state.expandedJourneySid = state.expandedJourneySid === sid ? null : sid;
+  syncJourneyInteraction({ focus: true });
+}
+
+function moveJourneyFocus(key) {
+  const items = journeyItems();
+  if (!items.length) return;
+  const current = Math.max(0, items.findIndex((item) => item.dataset.journeySid === state.focusedJourneySid));
+  let next = current;
+  if (key === 'Home') next = 0;
+  else if (key === 'End') next = items.length - 1;
+  else if (state.journeyView === 'table' && key === 'ArrowUp') next = Math.max(0, current - 1);
+  else if (state.journeyView === 'table' && key === 'ArrowDown') next = Math.min(items.length - 1, current + 1);
+  else if (state.journeyView === 'cards') {
+    const columns = items.filter((item) => Math.abs(item.getBoundingClientRect().top - items[0].getBoundingClientRect().top) < 2).length || 1;
+    if (key === 'ArrowLeft') next = Math.max(0, current - 1);
+    else if (key === 'ArrowRight') next = Math.min(items.length - 1, current + 1);
+    else if (key === 'ArrowUp') next = Math.max(0, current - columns);
+    else if (key === 'ArrowDown') next = Math.min(items.length - 1, current + columns);
+  }
+  state.focusedJourneySid = items[next].dataset.journeySid;
+  syncJourneyInteraction({ focus: true });
+}
+
+function handleJourneyKeydown(event) {
+  const item = event.target.closest('[data-journey-sid]');
+  if ((event.key === 'Enter' || event.key === ' ') && item) {
+    event.preventDefault();
+    toggleJourneyItem(item.dataset.journeySid);
+    return true;
+  }
+  if (item && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+    if (state.journeyView === 'table' && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) return true;
+    event.preventDefault();
+    moveJourneyFocus(event.key);
+    return true;
+  }
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    if (state.expandedJourneySid) {
+      state.expandedJourneySid = null;
+      syncJourneyInteraction({ focus: true });
+    } else {
+      returnFromJourney();
+    }
+    return true;
+  }
+  return false;
+}
+
+function returnFromJourney() {
+  state.expandedJourneySid = null;
+  const target = state.journeyReturnView === 'app' && state.dataset ? 'app' : 'diksoochi';
+  showOnly(target);
+  requestAnimationFrame(() => document.getElementById(state.journeyReturnFocus)?.focus());
+}
+
+function renderJourneyDetails(rows, dataset) {
+  const bySid = new Map(dataset.rows.map((row) => [row.sid, row]));
+  const cards = document.getElementById('journey-cards');
+  const table = document.getElementById('journey-table-body');
+  cards.textContent = '';
+  table.textContent = '';
+  rows.forEach((engagement) => {
+    const verse = bySid.get(engagement.sid);
+    const sanskrit = oneLine(verse?.source.shloka);
+    const preferred = state.activeProfile.contentLanguage;
+    const meaning = oneLine(verse?.languages[preferred]?.meaning || verse?.languages.en?.meaning);
+    const card = document.createElement('article');
+    card.className = 'journey-card';
+    card.dataset.journeySid = engagement.sid;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `${engagement.sid}, ${i18n.t('diksoochi.count')} ${engagement.count}`);
+    const detailId = `journey-card-detail-${engagement.sid.replace('.', '-')}`;
+    card.setAttribute('aria-controls', detailId);
+    const cardHead = document.createElement('div');
+    cardHead.className = 'journey-card-head';
+    const sid = document.createElement('strong');
+    sid.textContent = engagement.sid;
+    const count = document.createElement('span');
+    count.className = 'journey-count';
+    count.textContent = String(engagement.count);
+    count.setAttribute('aria-label', `${i18n.t('diksoochi.count')}: ${engagement.count}`);
+    const indicator = document.createElement('i');
+    indicator.className = 'journey-chevron';
+    indicator.setAttribute('aria-hidden', 'true');
+    cardHead.append(sid, count, indicator);
+    const shloka = document.createElement('p');
+    shloka.className = 'journey-line journey-sanskrit';
+    shloka.textContent = sanskrit;
+    shloka.title = sanskrit;
+    const meaningLine = document.createElement('p');
+    meaningLine.className = 'journey-line';
+    meaningLine.textContent = meaning;
+    meaningLine.title = meaning;
+    const cardDetail = document.createElement('div');
+    cardDetail.className = 'journey-expanded';
+    cardDetail.id = detailId;
+    cardDetail.dataset.journeyDetail = engagement.sid;
+    cardDetail.hidden = true;
+    const fullShloka = document.createElement('p');
+    fullShloka.className = 'journey-expanded-shloka';
+    fullShloka.textContent = verse?.source.shloka || '—';
+    const fullMeaning = document.createElement('p');
+    fullMeaning.textContent = verse?.languages[preferred]?.meaning || verse?.languages.en?.meaning || '—';
+    cardDetail.append(fullShloka, fullMeaning);
+    card.append(cardHead, shloka, meaningLine, cardDetail);
+    cards.appendChild(card);
+
+    const tr = document.createElement('tr');
+    tr.className = 'journey-table-row';
+    tr.dataset.journeySid = engagement.sid;
+    tr.tabIndex = -1;
+    tr.setAttribute('aria-label', `${engagement.sid}, ${i18n.t('diksoochi.count')} ${engagement.count}`);
+    const tableDetailId = `journey-table-detail-${engagement.sid.replace('.', '-')}`;
+    tr.setAttribute('aria-controls', tableDetailId);
+    [engagement.sid, sanskrit, meaning, String(engagement.count)].forEach((value, index) => {
+      const cell = document.createElement(index === 0 ? 'th' : 'td');
+      cell.textContent = value;
+      if (index === 0) cell.scope = 'row';
+      if (index === 1 || index === 2) {
+        cell.className = 'journey-table-line';
+        cell.title = value;
+      }
+      if (index === 3) {
+        const rowIndicator = document.createElement('i');
+        rowIndicator.className = 'journey-chevron';
+        rowIndicator.setAttribute('aria-hidden', 'true');
+        cell.appendChild(rowIndicator);
+      }
+      tr.appendChild(cell);
+    });
+    const detailRow = document.createElement('tr');
+    detailRow.className = 'journey-table-detail';
+    detailRow.id = tableDetailId;
+    detailRow.dataset.journeyDetail = engagement.sid;
+    detailRow.hidden = true;
+    const detailCell = document.createElement('td');
+    detailCell.colSpan = 4;
+    const tableShloka = document.createElement('p');
+    tableShloka.className = 'journey-expanded-shloka';
+    tableShloka.textContent = verse?.source.shloka || '—';
+    const tableMeaning = document.createElement('p');
+    tableMeaning.textContent = verse?.languages[preferred]?.meaning || verse?.languages.en?.meaning || '—';
+    detailCell.append(tableShloka, tableMeaning);
+    detailRow.appendChild(detailCell);
+    table.append(tr, detailRow);
+  });
+}
+
+async function openJourneyDetails() {
+  const origin = visibleView();
+  if (origin === 'app' || origin === 'diksoochi') {
+    state.journeyReturnView = origin;
+    state.journeyReturnFocus = origin === 'app' ? 'menu-button' : 'journey-details-button';
+  }
+  if (collectionSource.requiresSelection) return requestLocalCollections();
+  if (origin === 'app') {
+    setMenuOpen(false);
+    audioPlayer.pause();
+  }
+  showOnly('loading');
+  try {
+    const [rows, savedView, dataset] = await Promise.all([
+      profileStore.getDiksoochiDetails(state.activeProfile.pid),
+      profileStore.getJourneyView(state.activeProfile.pid),
+      state.journeyDataset ? Promise.resolve(state.journeyDataset) : collectionSource.loadExperience('gita-700')
+    ]);
+    state.journeyDataset = dataset;
+    state.expandedJourneySid = null;
+    state.focusedJourneySid = rows[0]?.sid || null;
+    renderJourneyDetails(rows, dataset);
+    setJourneyView(savedView || (matchMedia('(max-width: 700px)').matches ? 'cards' : 'table'), { save: false });
+    showOnly('journey-details');
+  } catch (error) {
+    showError(error.message || i18n.t('error.title'));
+  }
+}
+
+function syncHomeCollectionSource() {
+  const section = document.getElementById('home-collections');
+  section.hidden = location.protocol !== 'file:';
+  if (section.hidden) return;
+  const ready = collectionSource.isReady;
+  document.getElementById('home-collections-title').textContent = i18n.t(ready ? 'collections.readyTitle' : 'collections.title');
+  document.getElementById('home-collections-message').textContent = ready
+    ? i18n.t('collections.readyMessage', { name: collectionSource.label })
+    : i18n.t('collections.message');
+  document.getElementById('home-collections-button').textContent = i18n.t(ready ? 'collections.change' : 'collections.load');
+  document.getElementById('home-collections-error').textContent = '';
+  document.querySelectorAll('#continue-journey-link, #gita-700-link').forEach((link) => {
+    link.classList.toggle('needs-collections', !ready);
+    link.setAttribute('aria-disabled', String(!ready));
+  });
+}
+
+function requestLocalCollections() {
+  showOnly('diksoochi');
+  syncHomeCollectionSource();
+  const section = document.getElementById('home-collections');
+  section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('home-collections-button').focus({ preventScroll: true });
+}
+
+function openHomeExperience(link) {
+  if (collectionSource.requiresSelection) return requestLocalCollections();
+  const destination = new URL(link.href, location.href);
+  play = destination.searchParams.get('play');
+  requestedSid = destination.searchParams.get('sid');
+  requestedLanguage = destination.searchParams.get('lang');
+  history.replaceState(null, '', destination);
+  startRequestedExperience();
+}
+
+async function useSelectedCollections(fileList) {
+  const error = document.getElementById('home-collections-error');
+  error.textContent = '';
+  try {
+    collectionSource.selectFiles(fileList);
+    state.journeyDataset = null;
+    await collectionSource.loadExperience('gita-700');
+    syncHomeCollectionSource();
+    if (state.pendingLocalDestination) {
+      ({ play, requestedSid, requestedLanguage } = state.pendingLocalDestination);
+      state.pendingLocalDestination = null;
+      return startRequestedExperience();
+    }
+  } catch (failure) {
+    collectionSource.clear();
+    collectionSource.files = null;
+    syncHomeCollectionSource();
+    error.textContent = failure.message || i18n.t('collections.invalid');
+  }
 }
 
 function updateProfileUrl(profile) {
@@ -136,6 +417,7 @@ async function selectProfile(profile) {
 async function createProfile(profile) {
   await activateProfile(profile);
   emitEvent('profile_created');
+  if (location.protocol === 'file:' && explicitLocationRequested && play) return startRequestedExperience();
   goToExperienceSelection(profile, { source: 'profile_created' });
 }
 
@@ -154,6 +436,7 @@ async function handleProfileChange(profile, options = {}) {
     await profileUI.showSelection({ switching: true });
     return showOnly('profile-selection');
   }
+  if (state.profileReturnView === 'journey-details') return openJourneyDetails();
   if (state.dataset && state.profileReturnView === 'app') {
     showOnly('app');
     state.language = requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : profile.contentLanguage;
@@ -203,10 +486,10 @@ async function openProfileLocation(profile, { honorExplicit = false } = {}) {
   goToExperienceSelection(profile, { source: resume ? 'resume' : 'profile_selected', track: !resume });
 }
 
-async function openProfileForm(profile = null) {
+async function openProfileForm(profile = null, { focusPreferences = false } = {}) {
   state.profileReturnView = visibleView();
   closeOverlays({ restoreFocus: false });
-  await profileUI.showForm(profile);
+  await profileUI.showForm(profile, { focusPreferences });
   document.getElementById('profile-dob').max = new Date().toISOString().slice(0, 10);
   showOnly('profile-setup');
 }
@@ -282,13 +565,29 @@ async function startRequestedExperience() {
   if (!play) {
     const summary = await profileStore.getDiksoochiSummary(state.activeProfile.pid);
     document.getElementById('diksoochi-greeting').textContent = i18n.t('diksoochi.greeting', { name: state.activeProfile.name });
-    document.getElementById('diksoochi-know-summary').textContent = summary.shlokas
+    const knowSummary = document.getElementById('diksoochi-know-summary');
+    const knowSummaryText = document.getElementById('diksoochi-know-summary-text');
+    const journeyStatements = document.getElementById('diksoochi-journey-statements');
+    const journeyEmpty = document.getElementById('diksoochi-journey-empty');
+    const hasJourneyDetails = summary.shlokas > 0;
+    knowSummaryText.textContent = hasJourneyDetails
       ? i18n.t('diksoochi.knowSummary', {
           chapterText: i18n.t(summary.chapters === 1 ? 'diksoochi.chapterOne' : 'diksoochi.chapterMany', { count: summary.chapters }),
           shlokaText: i18n.t(summary.shlokas === 1 ? 'diksoochi.shlokaOne' : 'diksoochi.shlokaMany', { count: summary.shlokas })
         })
-      : i18n.t('diksoochi.knowEmpty');
+      : '';
+    knowSummary.hidden = !hasJourneyDetails;
+    journeyStatements.hidden = !hasJourneyDetails;
+    journeyEmpty.hidden = hasJourneyDetails;
+    syncHomeCollectionSource();
     return showOnly('diksoochi');
+  }
+
+  if (collectionSource.requiresSelection) {
+    state.pendingLocalDestination = { play, requestedSid, requestedLanguage };
+    play = null;
+    requestedSid = null;
+    return requestLocalCollections();
   }
 
   const experience = getExperience(play);
@@ -302,7 +601,7 @@ async function startRequestedExperience() {
 
   showOnly('loading');
   try {
-    await startPlayer(await loadCollectionExperience(play, { version: appVersion }), experience);
+    await startPlayer(await collectionSource.loadExperience(play), experience);
   } catch (error) {
     emitEvent('data_load_failed', {
       context: { experience: play, language: requestedLanguage || state.activeProfile.contentLanguage },
@@ -773,13 +1072,20 @@ function bindEvents() {
   state.eventsBound = true;
   document.getElementById('collections-folder-input').addEventListener('change', async (event) => {
     try {
-      const dataset = await loadCollectionExperienceFromFiles(play, event.target.files);
+      collectionSource.selectFiles(event.target.files);
+      const dataset = await collectionSource.loadExperience(play);
       await startPlayer(dataset, getExperience(play));
     } catch (error) {
       showDataChooser(error.message || 'The selected collections folder could not be read.');
     }
   });
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
+  document.getElementById('home-collections-input').addEventListener('change', (event) => useSelectedCollections(event.target.files));
+  document.getElementById('home-collections-button').addEventListener('click', () => document.getElementById('home-collections-input').click());
+  document.querySelectorAll('#continue-journey-link, #gita-700-link').forEach((link) => link.addEventListener('click', (event) => {
+    event.preventDefault();
+    openHomeExperience(link);
+  }));
   updateDeviceLayout();
   document.getElementById('menu-button').addEventListener('click', (event) => { event.stopPropagation(); toggleMenu(); });
   document.getElementById('chapter-trigger').addEventListener('click', () => openOverlay('chapters-overlay'));
@@ -791,17 +1097,25 @@ function bindEvents() {
   document.querySelectorAll('[data-about]').forEach((button) => button.addEventListener('click', (event) => aboutDialog.open(event.currentTarget)));
   document.getElementById('language-button').addEventListener('click', () => openOverlay('language-overlay'));
   document.getElementById('home-button').addEventListener('click', goHome);
+  document.getElementById('journey-button').addEventListener('click', openJourneyDetails);
+  document.getElementById('journey-details-button').addEventListener('click', openJourneyDetails);
+  document.getElementById('journey-back-button').addEventListener('click', returnFromJourney);
+  document.querySelectorAll('[data-journey-view]').forEach((button) => button.addEventListener('click', () => setJourneyView(button.dataset.journeyView)));
+  ['journey-cards', 'journey-table-body'].forEach((id) => document.getElementById(id).addEventListener('click', (event) => {
+    const item = event.target.closest('[data-journey-sid]');
+    if (item) toggleJourneyItem(item.dataset.journeySid);
+  }));
   document.querySelectorAll('[data-profile-pill]').forEach((button) => button.addEventListener('click', () => openOverlay('profile-menu-overlay')));
-  document.getElementById('switch-profile-button').addEventListener('click', () => openProfileSelection());
-  document.getElementById('manage-profiles-button').addEventListener('click', () => openProfileSelection());
+  document.getElementById('profile-preferences-button').addEventListener('click', () => openProfileForm(state.activeProfile, { focusPreferences: true }));
+  document.getElementById('switch-manage-profiles-button').addEventListener('click', () => openProfileSelection());
   document.getElementById('edit-profile-button').addEventListener('click', () => openProfileForm(state.activeProfile));
   document.getElementById('add-profile-button').addEventListener('click', () => openProfileForm());
   document.getElementById('profile-selection-back').addEventListener('click', () => {
-    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : 'diksoochi');
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'journey-details' ? 'journey-details' : 'diksoochi'));
   });
   document.getElementById('profile-form-cancel').addEventListener('click', () => {
     setInterfaceLanguage(state.activeProfile?.interfaceLanguage || 'en');
-    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : 'diksoochi'));
+    showOnly(state.profileReturnView === 'app' && state.dataset ? 'app' : (state.profileReturnView === 'profile-selection' ? 'profile-selection' : (state.profileReturnView === 'journey-details' ? 'journey-details' : 'diksoochi')));
   });
   document.getElementById('edit-button').addEventListener('click', requestEditMode);
   document.getElementById('open-collections-workspace').addEventListener('click', openCollectionsWorkspace);
@@ -844,7 +1158,8 @@ function bindEvents() {
       event.preventDefault();
       return;
     }
-    if (!state.dataset) return;
+    if (!document.getElementById('journey-details').hidden && handleJourneyKeydown(event)) return;
+    if (!state.dataset || document.getElementById('app').hidden) return;
     const active = document.activeElement;
     const typing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's' && state.editor.active) {
@@ -872,6 +1187,8 @@ function bindEvents() {
         event.preventDefault(); openOverlay('language-overlay');
       } else if (menuKey === 'a') {
         event.preventDefault(); goHome();
+      } else if (menuKey === 'j') {
+        event.preventDefault(); openJourneyDetails();
       } else if (menuKey === 'k') {
         event.preventDefault(); openOverlay('about-overlay');
       } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -910,6 +1227,7 @@ function bindEvents() {
     else if (key === 'c') { event.preventDefault(); openOverlay('chapters-overlay'); }
     else if (key === 'l') { event.preventDefault(); openOverlay('language-overlay'); }
     else if (key === 'a') { event.preventDefault(); goHome(); }
+    else if (key === 'j') { event.preventDefault(); openJourneyDetails(); }
     else if (key === 'f') { event.preventDefault(); toggleFullscreen(); }
     else if (key === 'h') { event.preventDefault(); openOverlay('help-overlay'); }
     else if (key === 'k') { event.preventDefault(); openOverlay('about-overlay'); }

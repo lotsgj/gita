@@ -40,25 +40,31 @@
     <h1 id="profile-form-title">Create your profile</h1>
     <p id="profile-form-intro">Profiles keep each person’s language and experience separate on this device.</p>
     <form id="profile-form">
-      <div class="profile-photo-field">
-        <div id="profile-photo-preview"></div>
-        <div class="profile-photo-actions">
-          <label class="secondary-button" for="profile-photo" data-i18n="profile.choosePhoto">Choose photo</label>
-          <input id="profile-photo" type="file" accept="image/*" hidden>
-          <button class="quiet-button" id="profile-photo-remove" type="button" hidden data-i18n="profile.remove">Remove</button>
-          <small data-i18n="profile.photoNote">Optional. Stored only on this device.</small>
+      <section class="profile-form-section" id="profile-details-section">
+        <h2 data-i18n="profile.details">Profile details</h2>
+        <div class="profile-photo-field">
+          <div id="profile-photo-preview"></div>
+          <div class="profile-photo-actions">
+            <label class="secondary-button" for="profile-photo" data-i18n="profile.choosePhoto">Choose photo</label>
+            <input id="profile-photo" type="file" accept="image/*" hidden>
+            <button class="quiet-button" id="profile-photo-remove" type="button" hidden data-i18n="profile.remove">Remove</button>
+            <small data-i18n="profile.photoNote">Optional. Stored only on this device.</small>
+          </div>
         </div>
-      </div>
-      <label class="field-label" for="profile-name" data-i18n="profile.name">Name</label>
-      <input class="profile-input" id="profile-name" autocomplete="name" maxlength="60" required>
-      <div class="profile-field-grid">
-        <div><label class="field-label" for="profile-dob" data-i18n="profile.dob">Date of birth</label><input class="profile-input" id="profile-dob" type="date" required></div>
-        <div><label class="field-label" for="profile-gender"><span data-i18n="profile.gender">Gender</span> <small data-i18n="profile.optional">(optional)</small></label><select class="profile-input" id="profile-gender"><option value="" data-i18n="profile.notSaid">Prefer not to say</option><option value="female" data-i18n="profile.female">Female</option><option value="male" data-i18n="profile.male">Male</option><option value="nonbinary" data-i18n="profile.nonbinary">Non-binary</option><option value="self-described" data-i18n="profile.selfDescribed">Self-described</option></select></div>
-      </div>
-      <label class="field-label" for="profile-interface-language" data-i18n="profile.appLanguage">App language</label>
-      <select class="profile-input" id="profile-interface-language" required><option value="" data-i18n="profile.chooseLanguage">Choose your language</option><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
-      <label class="field-label" for="profile-content-language" data-i18n="profile.contentLanguage">Preferred Gita content language</label>
-      <select class="profile-input" id="profile-content-language" required><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
+        <label class="field-label" for="profile-name" data-i18n="profile.name">Name</label>
+        <input class="profile-input" id="profile-name" autocomplete="name" maxlength="60" required>
+        <div class="profile-field-grid">
+          <div><label class="field-label" for="profile-dob" data-i18n="profile.dob">Date of birth</label><input class="profile-input" id="profile-dob" type="date" required></div>
+          <div><label class="field-label" for="profile-gender"><span data-i18n="profile.gender">Gender</span> <small data-i18n="profile.optional">(optional)</small></label><select class="profile-input" id="profile-gender"><option value="" data-i18n="profile.notSaid">Prefer not to say</option><option value="female" data-i18n="profile.female">Female</option><option value="male" data-i18n="profile.male">Male</option><option value="nonbinary" data-i18n="profile.nonbinary">Non-binary</option><option value="self-described" data-i18n="profile.selfDescribed">Self-described</option></select></div>
+        </div>
+      </section>
+      <section class="profile-form-section profile-preferences-section" id="profile-preferences-section" tabindex="-1">
+        <h2 data-i18n="profile.preferences">My preferences</h2>
+        <label class="field-label" for="profile-interface-language" data-i18n="profile.appLanguage">App language</label>
+        <select class="profile-input" id="profile-interface-language" required><option value="" data-i18n="profile.chooseLanguage">Choose your language</option><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
+        <label class="field-label" for="profile-content-language" data-i18n="profile.contentLanguage">Preferred Gita content language</label>
+        <select class="profile-input" id="profile-content-language" required><option value="en">English</option><option value="kn">ಕನ್ನಡ</option></select>
+      </section>
       <label class="check-row"><input id="profile-default" type="checkbox" checked><span data-i18n="profile.default">Use this profile automatically on this device</span></label>
       <p class="analytics-notice" data-i18n="profile.analytics">We collect anonymised information to improve the product experience.</p>
       <div class="form-error" id="profile-form-error" role="alert"></div>
@@ -101,13 +107,44 @@
     </section>
     <section class="diksoochi-journey">
       <h2 data-i18n="diksoochi.journey">Your journey</h2>
-      <div class="diksoochi-grid">
-        <article class="diksoochi-dimension"><h3 data-i18n="diksoochi.know">Know</h3><p id="diksoochi-know-summary" data-i18n="diksoochi.knowEmpty">Your map of the Gita will unfold here as you explore its chapters and spend time with its shlokas.</p></article>
-        <article class="diksoochi-dimension"><h3 data-i18n="diksoochi.able">Able</h3><p data-i18n="diksoochi.ableEmpty">Your growing ability to chant and interpret shlokas will unfold here.</p></article>
-        <article class="diksoochi-dimension"><h3 data-i18n="diksoochi.use">Use</h3><p data-i18n="diksoochi.useEmpty">This will unfold as you connect the Gita with choices, relationships, challenges and everyday life.</p></article>
+      <div class="diksoochi-journey-statements" id="diksoochi-journey-statements" hidden>
+        <p id="diksoochi-know-summary" hidden><span id="diksoochi-know-summary-text"></span> <button class="journey-details-link" id="journey-details-button" type="button" data-i18n="diksoochi.details">Details</button></p>
       </div>
+      <p class="diksoochi-journey-empty" id="diksoochi-journey-empty" data-i18n="diksoochi.journeyEmpty">Your journey details will be updated here.</p>
     </section>
     <div class="landing-links"><button class="about-link" type="button" data-about data-i18n="common.about">About Gitaverse</button><button class="about-link" type="button" data-install data-i18n="common.install" hidden>Install Gitaverse</button></div>
+    <section class="home-collections" id="home-collections" hidden>
+      <div><h2 id="home-collections-title">Local collections</h2><p id="home-collections-message"></p></div>
+      <button class="secondary-button" id="home-collections-button" type="button">Load collections</button>
+      <input id="home-collections-input" type="file" webkitdirectory multiple hidden>
+      <p class="file-error" id="home-collections-error" role="alert"></p>
+    </section>
+  </section>
+</main>
+
+<main id="journey-details" class="journey-details" hidden>
+  <button class="profile-pill landing-profile-pill" type="button" data-profile-pill data-clarity-mask="true"></button>
+  <section class="journey-details-shell">
+    <header class="journey-details-head">
+      <button class="journey-back" id="journey-back-button" type="button" data-i18n="common.back">← Back</button>
+      <h1 data-i18n="diksoochi.journey">Your journey</h1>
+      <div class="journey-view-switch" role="group" aria-label="Journey view" data-i18n-aria="diksoochi.viewLabel">
+        <button type="button" data-journey-view="cards" aria-pressed="false" aria-label="Card view" title="Card view" data-i18n-aria="diksoochi.cardView" data-i18n-title="diksoochi.cardView">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+        </button>
+        <button type="button" data-journey-view="table" aria-pressed="false" aria-label="Table view" title="Table view" data-i18n-aria="diksoochi.tableView" data-i18n-title="diksoochi.tableView">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1.5"/><path d="M3.5 10h17M3.5 14.5h17M9 5v14"/></svg>
+        </button>
+      </div>
+    </header>
+    <p class="journey-note" data-i18n="diksoochi.countNote">Count shows meaningful engagements with each shloka.</p>
+    <div id="journey-cards" class="journey-cards"></div>
+    <div id="journey-table-wrap" class="journey-table-wrap" hidden>
+      <table class="journey-table">
+        <thead><tr><th data-i18n="diksoochi.shloka">Shloka</th><th data-i18n="diksoochi.sanskritShloka">Sanskrit shloka</th><th data-i18n="diksoochi.meaning">Meaning</th><th data-i18n="diksoochi.count">Count</th></tr></thead>
+        <tbody id="journey-table-body"></tbody>
+      </table>
+    </div>
   </section>
 </main>
 
@@ -157,6 +194,7 @@
           <div class="top-menu-divider"></div>
           <button class="top-menu-item" id="edit-button" type="button"><span class="top-menu-label" data-i18n="menu.edit">Edit this shloka</span><span class="menu-shortcut">E</span></button>
           <button class="top-menu-item" id="home-button" type="button"><span class="top-menu-label" data-i18n="menu.home">Home</span><span class="menu-shortcut">A</span></button>
+          <button class="top-menu-item" id="journey-button" type="button"><span class="top-menu-label" data-i18n="menu.journey">Your journey</span><span class="menu-shortcut">J</span></button>
           <button class="top-menu-item" id="help-button" type="button"><span class="top-menu-label" data-i18n="menu.help">Help</span><span class="menu-shortcut">H</span></button>
           <div class="top-menu-divider"></div>
           <button class="top-menu-item" id="about-button" type="button"><span class="top-menu-label" data-i18n="common.about">About Gitaverse</span><span class="menu-shortcut">K</span></button>
@@ -253,6 +291,7 @@
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>C</kbd></div><div class="shortcut-description" data-i18n="help.chapters">Open chapters</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>L</kbd></div><div class="shortcut-description" data-i18n="help.language">Choose content language</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>A</kbd></div><div class="shortcut-description" data-i18n="help.home">Return to Home</div></div>
+        <div class="shortcut-row"><div class="shortcut-keys"><kbd>J</kbd></div><div class="shortcut-description" data-i18n="help.journey">Open Your journey</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>P</kbd><kbd>Space</kbd></div><div class="shortcut-description" data-i18n="help.play">Play or pause audio</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>F</kbd></div><div class="shortcut-description" data-i18n="help.fullscreen">Enter or exit fullscreen</div></div>
         <div class="shortcut-row"><div class="shortcut-keys"><kbd>H</kbd></div><div class="shortcut-description" data-i18n="help.help">Open this help</div></div>
@@ -269,9 +308,9 @@
   <section class="dialog profile-menu-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-menu-title">
     <header class="dialog-head"><h2 id="profile-menu-title" data-i18n="profile.title">Profile</h2><button class="icon-button close-dialog" type="button" aria-label="Close" data-i18n-aria="common.close">×</button></header>
     <div class="dialog-body profile-menu-options">
-      <button type="button" id="switch-profile-button" data-i18n="profile.switch">Switch profile</button>
-      <button type="button" id="edit-profile-button" data-i18n="profile.edit">Edit profile</button>
-      <button type="button" id="manage-profiles-button" data-i18n="profile.manage">Manage profiles</button>
+      <button type="button" id="profile-preferences-button" data-i18n="profile.preferences">My preferences</button>
+      <button type="button" id="edit-profile-button" data-i18n="profile.viewEdit">View / edit profile</button>
+      <button type="button" id="switch-manage-profiles-button" data-i18n="profile.switchManage">Switch / manage profiles</button>
     </div>
   </section>
 </div>

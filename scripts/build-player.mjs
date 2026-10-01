@@ -16,6 +16,7 @@ const sources = [
   'js/pwa.js',
   'js/shared/about-dialog.js',
   'js/player/collection-data.js',
+  'js/player/collection-source.js',
   'js/player/audio-player.js',
   'js/player/renderers/gita-700.js',
   'js/player/renderers/registry.js',

@@ -1,7 +1,7 @@
 # Collections and media
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 1 October 2026
 
 ## Organization
 
@@ -34,3 +34,7 @@ Media is owned by reusable collections, not by an experience. Gita 700’s audio
 ## Validation
 
 The loader verifies required headers, unique/aligned SIDs, supported schema versions, catalog references, and media paths before producing normalized rows. HTTP, file chooser, and writable-workspace loading share the same normalization rules.
+
+## Runtime source
+
+A shared collection-source service owns runtime loading. Web and PWA sessions use the deployed relative collection root; file-mode sessions use the folder selected on Home. It caches normalized datasets by experience for the session so player and journey views reuse identical data. Replacing a local folder clears those datasets and revokes their media object URLs. Writable editing remains a separate permission layered over the same collection structure.

@@ -59,8 +59,8 @@ function updateProfileContext(profile) {
   }
 }
 
-async function showProfileForm(profile = null) {
-  await profileUI.showForm(profile);
+async function showProfileForm(profile = null, { focusPreferences = false } = {}) {
+  await profileUI.showForm(profile, { focusPreferences });
   document.getElementById('profile-dob').max = new Date().toISOString().slice(0, 10);
   closeProfileViews();
   document.getElementById('profile-setup').hidden = false;
@@ -402,8 +402,8 @@ document.getElementById('docs-profile-pill').addEventListener('click', () => {
   if (!activeProfile) return showProfileForm();
   document.getElementById('profile-menu-overlay').hidden = false;
 });
-document.getElementById('switch-profile-button').addEventListener('click', showProfileSelection);
-document.getElementById('manage-profiles-button').addEventListener('click', showProfileSelection);
+document.getElementById('profile-preferences-button').addEventListener('click', () => showProfileForm(activeProfile, { focusPreferences: true }));
+document.getElementById('switch-manage-profiles-button').addEventListener('click', showProfileSelection);
 document.getElementById('edit-profile-button').addEventListener('click', () => showProfileForm(activeProfile));
 document.getElementById('add-profile-button').addEventListener('click', () => showProfileForm());
 document.getElementById('profile-selection-back').addEventListener('click', closeProfileViews);
