@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "version": "1.01Oct2026-100725",
+    "date": "2026-10-01",
+    "message": "Add app version history and PWA update telemetry"
+  }
+]
