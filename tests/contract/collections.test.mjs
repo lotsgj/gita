@@ -9,6 +9,7 @@ const en = await parseTable('data/collections/verses/bhagavad-gita/master_en.csv
 const kn = await parseTable('data/collections/verses/bhagavad-gita/master_kn.csv');
 const audio = await parseTable('data/collections/experiences/gita-700/audio.csv');
 const images = await parseTable('data/collections/experiences/gita-700/images.csv');
+const audioRegistry = await parseTable('data/collections/audio/collection.csv');
 
 test('the Sanskrit master declares raw and display shloka fields in the collection contract order', () => {
   assert.deepEqual(sa.headers, ['cid', 'snum', 'sid', 'chapter_name', 'shloka_raw', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning']);
@@ -39,11 +40,14 @@ test('English and Kannada masters provide one consistent chapter name for every 
 
 test('all media catalog keys are unique and resolve to files', async () => {
   const audioCatalog = await parseTable('data/collections/audio/chanting-swami-brahmananda/catalog.csv');
+  const learningModeCatalog = await parseTable('data/collections/audio/chanting-aj-padma-aj-vijay-learn-mode/catalog.csv');
   const imageCatalog = await parseTable('data/collections/images/gita-chapter-icons/catalog.csv');
   assert.equal(audioCatalog.rows.length, 700);
+  assert.equal(learningModeCatalog.rows.length, 314);
   assert.equal(imageCatalog.rows.length, 19);
   for (const [label, catalog, urlField] of [
     ['audio', audioCatalog, 'audio_url'],
+    ['learning-mode audio', learningModeCatalog, 'audio_url'],
     ['images', imageCatalog, 'image_url']
   ]) {
     const keys = catalog.rows.map((row) => `${row.sid}:${row.order}`);
@@ -52,6 +56,15 @@ test('all media catalog keys are unique and resolve to files', async () => {
       assert.match(row.order, /^[1-9]\d*$/);
       await access(path.join(projectRoot, row[urlField]));
     }
+  }
+});
+
+test('every registered audio collection has a readable catalog', async () => {
+  assert.equal(new Set(audioRegistry.rows.map((row) => row.collection_id)).size, audioRegistry.rows.length);
+  for (const collection of audioRegistry.rows) {
+    const catalog = await parseTable(collection.catalog_url);
+    assert.deepEqual(catalog.headers, ['sid', 'order', 'language', 'audio_url']);
+    assert.ok(catalog.rows.length > 0, `${collection.collection_id} catalog must not be empty`);
   }
 });
 
