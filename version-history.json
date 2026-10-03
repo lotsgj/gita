@@ -8,5 +8,10 @@
     "version": "1.02Oct2026-085323",
     "date": "2026-10-02",
     "message": "Register learning-mode audio collection"
+  },
+  {
+    "version": "1.03Oct2026-214840",
+    "date": "2026-10-03",
+    "message": "Format Sanskrit shlokas by pada"
   }
 ]
