@@ -13,5 +13,10 @@
     "version": "1.03Oct2026-214840",
     "date": "2026-10-03",
     "message": "Format Sanskrit shlokas by pada"
+  },
+  {
+    "version": "1.04Oct2026-093241",
+    "date": "2026-10-04",
+    "message": "Use Noto Sans throughout the player"
   }
 ]
