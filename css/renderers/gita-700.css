@@ -19,11 +19,11 @@
 }
 .gita-700-text { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
 [data-field="shloka_sa"] {
-  font-family: "Noto Serif Devanagari", "Kohinoor Devanagari", Georgia, serif;
+  font-family: var(--font-sans, sans-serif);
   color: #33261e; line-height: 1.65; font-weight: 550;
 }
-[data-role="transliteration"] { color: #684c39; line-height: 1.65; font-family: Georgia, "Times New Roman", serif; }
-[data-role="meaning"] { color: #26384a; line-height: 1.58; font-family: Georgia, "Times New Roman", serif; }
+[data-role="transliteration"] { color: #684c39; line-height: 1.65; font-family: var(--font-sans, sans-serif); }
+[data-role="meaning"] { color: #26384a; line-height: 1.58; font-family: var(--font-sans, sans-serif); }
 [data-role="word"] { color: #45565d; line-height: 1.55; text-align: left; }
 .gita-700-text.empty { color: #a59d91 !important; font-style: italic; font-family: inherit !important; }
 

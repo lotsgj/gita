@@ -36,6 +36,7 @@ export function createGita700Renderer() {
       const element = root.querySelector('[data-role="' + panel.role + '"]');
       const text = fieldValue(row, field);
       element.dataset.field = field;
+      element.lang = panel.role === 'shloka' ? 'sa' : language;
       element.textContent = text || '—';
       element.classList.toggle('empty', !text);
       if (editing) makeEditable(element);

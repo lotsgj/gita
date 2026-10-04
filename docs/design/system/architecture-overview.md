@@ -1,7 +1,7 @@
 # Architecture overview
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 4 October 2026
 
 ## Layers
 
@@ -21,6 +21,10 @@ The active profile establishes language and resume context. The requested experi
 ## Isolation
 
 The active application has no dependency on the archived `x` directory. Deployment explicitly rejects `x`. Rachana is delivered beside the app but bypasses service-worker caching.
+
+## Typography
+
+The player bundles variable Noto Sans fonts for Latin, Devanagari and Kannada. One CSS family selects the appropriate script face by Unicode range, and rendered verse fields carry `sa`, `en` or `kn` language metadata. All player surfaces use this family; Rachana retains its independent documentation typography. A build script embeds the font data in the player font stylesheet so HTTPS, installed PWA and `file://` mode render identically. The generated stylesheet is part of the offline shell; source fonts and SIL Open Font License notices remain deployment assets without being cached a second time.
 
 ## Extension points
 

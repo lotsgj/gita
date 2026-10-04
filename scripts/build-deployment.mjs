@@ -85,6 +85,7 @@ const changeMessage = String(process.env.GITAVERSE_CHANGE_MESSAGE || execFileSyn
 versionHistory = [...versionHistory, { version, date: `${dateParts.year}-${dateParts.month}-${dateParts.day}`, message: changeMessage || 'Gitaverse update' }];
 validateVersionHistory(versionHistory);
 
+run(process.execPath, ['scripts/build-font-css.mjs']);
 run(process.execPath, ['scripts/build-player.mjs']);
 run(process.execPath, ['--check', 'js/player.bundle.js']);
 run(process.execPath, ['scripts/build-docs.mjs']);

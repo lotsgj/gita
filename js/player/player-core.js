@@ -256,10 +256,12 @@ function renderJourneyDetails(rows, dataset) {
     cardHead.append(sid, count, indicator);
     const shloka = document.createElement('p');
     shloka.className = 'journey-line journey-sanskrit';
+    shloka.lang = 'sa';
     shloka.textContent = sanskrit;
     shloka.title = sanskrit;
     const meaningLine = document.createElement('p');
     meaningLine.className = 'journey-line';
+    meaningLine.lang = preferred;
     meaningLine.textContent = meaning;
     meaningLine.title = meaning;
     const cardDetail = document.createElement('div');
@@ -269,8 +271,10 @@ function renderJourneyDetails(rows, dataset) {
     cardDetail.hidden = true;
     const fullShloka = document.createElement('p');
     fullShloka.className = 'journey-expanded-shloka';
+    fullShloka.lang = 'sa';
     fullShloka.textContent = verse?.source.shloka || '—';
     const fullMeaning = document.createElement('p');
+    fullMeaning.lang = preferred;
     fullMeaning.textContent = verse?.languages[preferred]?.meaning || verse?.languages.en?.meaning || '—';
     cardDetail.append(fullShloka, fullMeaning);
     card.append(cardHead, shloka, meaningLine, cardDetail);
@@ -289,6 +293,7 @@ function renderJourneyDetails(rows, dataset) {
       if (index === 0) cell.scope = 'row';
       if (index === 1 || index === 2) {
         cell.className = 'journey-table-line';
+        cell.lang = index === 1 ? 'sa' : preferred;
         cell.title = value;
       }
       if (index === 3) {
@@ -308,8 +313,10 @@ function renderJourneyDetails(rows, dataset) {
     detailCell.colSpan = 4;
     const tableShloka = document.createElement('p');
     tableShloka.className = 'journey-expanded-shloka';
+    tableShloka.lang = 'sa';
     tableShloka.textContent = verse?.source.shloka || '—';
     const tableMeaning = document.createElement('p');
+    tableMeaning.lang = preferred;
     tableMeaning.textContent = verse?.languages[preferred]?.meaning || verse?.languages.en?.meaning || '—';
     detailCell.append(tableShloka, tableMeaning);
     detailRow.appendChild(detailCell);

@@ -11,7 +11,7 @@ const chromePath = process.env.CHROME_PATH || '/Applications/Google Chrome.app/C
 const mime = {
   '.css': 'text/css', '.csv': 'text/csv; charset=utf-8', '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.json': 'application/json', '.mp3': 'audio/mpeg',
-  '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json'
+  '.png': 'image/png', '.svg': 'image/svg+xml', '.ttf': 'font/ttf', '.webmanifest': 'application/manifest+json'
 };
 
 function staticServer() {
@@ -108,11 +108,24 @@ async function run() {
     assert.equal(await page.locator('#sid-label').innerText(), '1.B');
 
     await page.goto(`${base}/player.html?play=gita-700&sid=6.7&lang=kn&pid=1`, { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    for (const sample of ['Gitaverse', 'श्रीमद्भगवद्गीता', 'ಶ್ರೀಮದ್ಭಗವದ್ಗೀತೆ']) {
+      await page.evaluate((text) => document.fonts.load('16px "Gitaverse Noto Sans"', text), sample);
+      assert.equal(await page.evaluate((text) => document.fonts.check('16px "Gitaverse Noto Sans"', text), sample), true, `Noto Sans must load for ${sample}`);
+    }
+    assert.match(await page.locator('body').evaluate((element) => getComputedStyle(element).fontFamily), /Gitaverse Noto Sans/);
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
     assert.equal(await page.locator('#language-button .top-menu-label').innerText(), 'Content language (ಕನ್ನಡ)');
     assert.equal(await page.locator('#help-button .top-menu-label').innerText(), 'Help');
     assert.match(await page.locator('#chapter-title').innerText(), /^6 — /);
     assert.equal(await page.locator('.gita-700-panel').count(), 4);
+    assert.equal(await page.locator('[data-role="shloka"]').getAttribute('lang'), 'sa');
+    assert.equal(await page.locator('[data-role="meaning"]').getAttribute('lang'), 'kn');
+    assert.match(await page.locator('[data-role="shloka"]').evaluate((element) => getComputedStyle(element).fontFamily), /Gitaverse Noto Sans/);
+    assert.equal(await page.locator('.gita-700-panel-content').evaluateAll((panels) => panels.every((panel) => {
+      const text = panel.firstElementChild;
+      return text.scrollHeight <= panel.clientHeight + 1 && text.scrollWidth <= panel.clientWidth + 1;
+    })), true, 'Noto Sans content must fit every desktop panel');
     assert.equal(await page.locator('#play-button').isEnabled(), true);
     assert.match(await page.locator('#audio').getAttribute('src'), /data\/collections\/audio\/chanting-swami-brahmananda\/sa\/chapter-06\/06-007\.mp3/);
     await page.locator('#play-button').click();
@@ -451,6 +464,9 @@ async function run() {
     const filePage = await fileContext.newPage();
     const fileUrl = pathToFileURL(path.join(root, 'player.html')).href + '?play=gita-700&sid=6.7';
     await filePage.goto(fileUrl, { waitUntil: 'domcontentloaded' });
+    await filePage.evaluate(() => document.fonts.ready);
+    await filePage.evaluate(() => document.fonts.load('16px "Gitaverse Noto Sans"', 'ಶ್ರೀಮದ್ಭಗವದ್ಗೀತೆ'));
+    assert.equal(await filePage.evaluate(() => document.fonts.check('16px "Gitaverse Noto Sans"', 'ಶ್ರೀಮದ್ಭಗವದ್ಗೀತೆ')), true, 'file mode must load bundled Noto Sans');
     await createProfile(filePage, 'File Regression');
     await filePage.locator('#home-collections').waitFor({ state: 'visible' });
     assert.equal(await filePage.locator('#home-collections-title').innerText(), 'Local collections');

@@ -2,7 +2,7 @@ body.editing .sid-badge::after {
   content: "Editing"; margin-left: 10px; padding: 4px 8px; vertical-align: middle;
   border: 1px solid rgba(183, 93, 42, .35); border-radius: 999px;
   color: var(--saffron); background: var(--saffron-soft); font-size: 9px;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase;
+  font-family: var(--font-sans, sans-serif); letter-spacing: .04em; text-transform: uppercase;
 }
 .edit-toolbar {
   position: fixed; z-index: 42; left: 50%; bottom: 76px; transform: translateX(-50%);
