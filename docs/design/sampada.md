@@ -1,7 +1,7 @@
 # Sampada — Treasure trove of Gitaverse enhancements
 
 **Status:** Current  
-**Last updated:** 30 September 2026
+**Last updated:** 4 October 2026
 
 Sampada keeps both future possibilities and completed enhancements. Items retain their number after completion so decisions and delivery history remain traceable.
 
@@ -134,6 +134,18 @@ Create a feature, provisionally named **Bhetal**, that helps the user reflect, q
 **Tag:** Major
 
 Create **Sadguru**, an experience for studying interpretations from Prabhuji and other respected acharyas. Preserve the source and attribution of every interpretation, let the user choose whose interpretation to explore, and keep commentary distinct from the canonical shloka text and translation.
+
+### 11. Automated verse-content verification
+
+**Status:** To unfold
+
+**Tag:** Major
+
+Create layered verification for the Sanskrit, English and Kannada verse masters. Extend the existing schema and SID checks with required-field completeness, script and character checks, pada alignment, word-by-word structure, duplicate or placeholder detection, and a change report that identifies modified fields and unexpected cross-language edits.
+
+Introduce an approved-source comparison and a separate verification ledger containing language, SID, field, source, review status, reviewer, review date and content hash. A content change should invalidate the previous verification for that field. Structural errors should fail the build; suspicious content should produce a review report; semantic accuracy of meanings and word-by-word explanations should remain human-verified.
+
+Run the validator in GitHub Actions, publish its change report with the build, and document the verification workflow in Rachana when implemented.
 
 ## Done
 
