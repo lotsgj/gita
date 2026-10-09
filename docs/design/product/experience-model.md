@@ -13,6 +13,8 @@ Gitaverse separates the shared application shell from individual learning experi
 
 **Gita Yoga** is live. It presents Sanskrit, Kannada, and English chanting text in a responsive three-panel learning layout and uses its experience-specific composite audio composition where available.
 
+Its learning-audio collection is intentionally incomplete while production continues. Missing audio never blocks verse text. The data layer supports validated cue metadata, but cue-region controls and user-selectable audio collections remain future enhancements.
+
 **Gita Sara** remains a future choice. Its media and panel design can differ while reusing the shell.
 
 ## URL contract

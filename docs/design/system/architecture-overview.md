@@ -1,7 +1,7 @@
 # Architecture overview
 
 **Status:** Current  
-**Last updated:** 4 October 2026
+**Last updated:** 9 October 2026
 
 ## Layers
 
@@ -16,7 +16,9 @@ Gitaverse is a static web application deployed by GitHub Pages:
 
 ## Runtime flow
 
-The active profile establishes language and resume context. The requested experience is loaded through registries and catalogs, normalized by SID, and passed to the registered renderer. Shared controls update location, audio, or shell state. Events fan out to independent adapters.
+The active profile establishes language and resume context. The requested experience is loaded through registries and catalogs, normalized by SID, and passed to the registered renderer. Experience configuration can declare generic audio-binding field names, allowing each composition to select a reusable collection and asset order without provider-specific renderer code. Shared controls update location, audio, or shell state. Events fan out to independent adapters.
+
+Renderers create one DOM element per semantic content field. Responsive CSS places those elements into desktop or mobile layouts rather than maintaining duplicated hidden views. Presentation-only layers may supply panel backgrounds without owning content or edit state.
 
 ## Isolation
 
@@ -28,4 +30,4 @@ The player bundles variable Noto Sans fonts for Latin, Devanagari and Kannada. O
 
 ## Extension points
 
-Add experiences through configuration, compositions, and renderers. Add telemetry or local behavior through event adapters. Add media through reusable type collections rather than embedding provider-specific paths in renderer code.
+Add experiences through configuration, compositions, and renderers registered in `js/player/renderers/registry.js`. Add telemetry or local behavior through event adapters. Add media through reusable type collections rather than embedding provider-specific paths in renderer code. Optional audio cue files are validated and indexed by the collection layer; a future UI can consume that index without changing the source audio.

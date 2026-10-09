@@ -1,7 +1,7 @@
 # Collections and media
 
 **Status:** Current  
-**Last updated:** 1 October 2026
+**Last updated:** 9 October 2026
 
 ## Organization
 
@@ -29,7 +29,30 @@ The Bhagavad Gita verse catalog points to `master_sa.csv`, `master_en.csv`, and 
 
 ## Media
 
-Media is owned by reusable collections, not by an experience. Gita 700’s audio composition references a collection and order for the `chant_full_sa` purpose; its image composition references chapter icons. A catalog uses SID plus order as the unique identity, permitting multiple media records for one SID.
+Media is owned by reusable collections, not by an experience. A catalog uses SID plus order as the unique identity, permitting multiple assets for one SID and reuse across experiences.
+
+The audio registry uses:
+
+```text
+collection_id#title#contributor#language#catalog_url#cue_purpose_url#cue_url#attribution#license#source
+```
+
+Each audio catalog uses `sid#order#language#audio_url`. Gita 700’s composition uses the purpose-specific fields `chant_full_sa_collection` and `chant_full_sa_order`. Gita Yoga uses `audio_collection` and `audio_order`; its `experience.json` declares those names through `audioBinding.collectionField` and `audioBinding.orderField`. This generic binding lets future experiences define their own composition vocabulary without placing provider paths in a renderer.
+
+Gita 700’s image composition references its chapter icons through the same reusable-collection principle.
+
+## Audio cues
+
+An audio collection may optionally declare both cue files in its registry row:
+
+- `cue-purpose.csv`: `cue_id#language#purpose#description`
+- `cue.csv`: `sid#asset_order#cue_order#cue_id#start_ms#end_ms`
+
+The two URLs must be supplied as a pair. The loader validates cue identifiers, ordering, non-overlap, time ranges, asset references, and uniqueness, then builds an index by collection, SID, and asset order. Invalid cue metadata is isolated from ordinary verse and audio loading so the source recording remains usable without segment controls.
+
+The current AJ Padma and AJ Vijay collection does not yet publish cue files. Cue-region display and segment playback are therefore not active. The cue contract has automated fixture coverage, including a 4,500-record performance case, so production cue files can be added without changing the collection model.
+
+Gita Yoga’s composition deliberately contains all canonical SIDs even though its learning-mode audio is still being produced. Blank collection/order values mean that no recording is available for that SID; text rendering and navigation remain available.
 
 ## Validation
 

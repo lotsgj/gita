@@ -32,6 +32,7 @@
         { "title": "Profiles and first use", "route": "profiles-and-first-use", "path": "design/experiences/profiles-and-first-use.md" },
         { "title": "Home and experience selection", "route": "home-and-experience-selection", "path": "design/experiences/home-and-experience-selection.md" },
         { "title": "Shared player", "route": "shared-player", "path": "design/experiences/shared-player.md" },
+        { "title": "Gita Yoga", "route": "gita-yoga", "path": "design/experiences/gita-yoga.md" },
         { "title": "Gita 700", "route": "gita-700", "path": "design/experiences/gita-700.md" },
         { "title": "Local content editing", "route": "local-content-editing", "path": "design/experiences/local-content-editing.md" },
         { "title": "Install, offline and updates", "route": "install-offline-and-updates", "path": "design/experiences/install-offline-and-updates.md" }

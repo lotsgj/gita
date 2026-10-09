@@ -1,7 +1,7 @@
 # Sampada — Treasure trove of Gitaverse enhancements
 
 **Status:** Current  
-**Last updated:** 4 October 2026
+**Last updated:** 9 October 2026
 
 Sampada keeps both future possibilities and completed enhancements. Items retain their number after completion so decisions and delivery history remain traceable.
 
@@ -147,7 +147,35 @@ Introduce an approved-source comparison and a separate verification ledger conta
 
 Run the validator in GitHub Actions, publish its change report with the build, and document the verification workflow in Rachana when implemented.
 
+### 13. Gita Yoga cue-region playback
+
+**Status:** To unfold
+
+**Tag:** Major
+
+Turn a Gita Yoga composite recording into directly selectable learning regions without modifying or cropping the source audio. Read boundaries from the collection’s validated `cue-purpose.csv` and `cue.csv` files, and show available regions in cue order near the shared audio control.
+
+Marker text should follow the profile’s app language where a translated cue description is available. Selecting a region should start it immediately and stop at its declared end, avoiding a separate select-then-play action. Desktop markers should provide hover help; all markers need keyboard navigation, accessible names, and clear active/progress states.
+
+Missing or invalid cue metadata must not block the full recording, verse text, or navigation. The feature should work with a large complete-Gita cue catalog through the existing indexed lookup rather than scanning all records on every verse.
+
 ## Done
+
+### 12. Gita Yoga foundation
+
+**Status:** Done
+
+**Tag:** Major
+
+**Completed:** 9 October 2026
+
+Gita Yoga is a live Vak Shuddhi and guided-chanting experience. It is offered above Gita 700 in **Choose an experience**, while **Continue your journey** still follows the profile’s genuinely last-visited experience and SID.
+
+The renderer provides a responsive three-panel learning view for Sanskrit, Kannada, and English. Desktop fits one Sanskrit panel and two equal language panels between the shared bars without an inner scrollbar; mobile uses a natural-height vertical stack. Preferred content language controls Kannada/English order in both layouts. Eight semantic content fields exist once in the DOM and become the eight unique edit targets, avoiding duplicated responsive views and the overlap they can cause.
+
+The experience composes the reusable AJ Padma and AJ Vijay learning-mode collection where audio is currently available. All canonical SIDs remain present and missing work-in-progress audio does not block content. The collection loader also supports and validates optional cue-purpose and cue files and indexes them efficiently, establishing the data foundation for segment playback.
+
+User-selectable audio collections remain item 6. Visible cue markers and click-to-play learning regions remain item 13.
 
 ### 10. Diksoochi foundation and Know
 

@@ -1,7 +1,7 @@
 # Rachana — Gitaverse design details
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 9 October 2026
 
 ## Purpose
 
@@ -13,7 +13,7 @@ Rachana has three responsibilities:
 2. Preserve important product and technical decisions.
 3. Make the design understandable to both product collaborators and engineers.
 
-Future possibilities belong in [Sampada](sampada.md), not in current-design pages. After an item is implemented, verified and documented in Rachana, it is removed from Sampada.
+Future possibilities belong in [Sampada](sampada.md), not in current-design pages. After an item is implemented, verified and documented in Rachana, it moves to Sampada’s Done section and retains its stable item number as delivery history.
 
 ## Audience
 
@@ -129,10 +129,11 @@ When a key product transition occurs:
 
 1. Update the affected Rachana page to describe implemented behaviour.
 2. Update its Last updated value.
-3. Update navigation if a page was added, moved or removed.
-4. Add a short decision record when the reasoning needs to survive future reconsideration.
-5. Remove completed items from Sampada after implementation, regression testing and documentation are complete.
-6. Run documentation contracts, the production build and the browser regression.
+3. Set `docs/welcome.md` to the newest Last updated date used anywhere in Rachana.
+4. Update navigation if a page was added, moved or removed.
+5. Add a short decision record when the reasoning needs to survive future reconsideration.
+6. Move completed Sampada items to Done after implementation, regression testing and documentation are complete; retain their numbers.
+7. Run documentation contracts, the production build and the browser regression.
 
 Keep one fact in one canonical location. Use links to connect experience and engineering views instead of copying the same explanation.
 
@@ -143,6 +144,7 @@ The regular build verifies that:
 - The navigation manifest is valid and contains unique, safe routes and paths.
 - Every listed Markdown file exists.
 - Every page has one title, a valid Status and a valid Last updated date.
+- The Welcome page’s Last updated date equals the newest date across all navigable Rachana pages.
 - Sampada is reachable under Future possibilities and every item has a Major or Minor tag.
 - Required documentation assets are included in deployment but excluded from initial PWA precaching.
 - The viewer works over HTTP and `file://`.

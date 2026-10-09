@@ -8,6 +8,14 @@ const manifestPath = path.join(projectRoot, 'docs/navigation.json');
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
 const pages = manifest.sections.flatMap((section) => section.pages);
 
+function readUpdatedDate(markdown, documentPath) {
+  const match = markdown.match(/^\*\*Last updated:\*\* (\d{1,2}) ([A-Z][a-z]+) (\d{4})\s*$/m);
+  assert.ok(match, documentPath + ' has an invalid or missing Last updated date');
+  const timestamp = Date.parse(`${match[2]} ${match[1]}, ${match[3]} UTC`);
+  assert.equal(Number.isNaN(timestamp), false, documentPath + ' has an invalid date');
+  return timestamp;
+}
+
 test('Rachana navigation is safe, unique, and resolves to Markdown documents', async () => {
   assert.equal(manifest.title, 'Rachana');
   assert.ok(pages.length > 0);
@@ -27,10 +35,19 @@ test('every listed Rachana document has current metadata and one title', async (
     assert.equal(markdown.match(/^# /gm)?.length, 1, page.path + ' must have one top-level title');
     const status = markdown.match(/^\*\*Status:\*\* (Current|Partial|Superseded)\s*$/m);
     assert.ok(status, page.path + ' has an invalid or missing Status');
-    const updated = markdown.match(/^\*\*Last updated:\*\* (\d{1,2}) ([A-Z][a-z]+) (\d{4})\s*$/m);
-    assert.ok(updated, page.path + ' has an invalid or missing Last updated date');
-    assert.equal(Number.isNaN(Date.parse(`${updated[2]} ${updated[1]}, ${updated[3]}`)), false, page.path + ' has an invalid date');
+    readUpdatedDate(markdown, page.path);
   }
+});
+
+test('the Rachana welcome date matches the newest documentation update', async () => {
+  const datedPages = await Promise.all(pages.map(async (page) => {
+    const markdown = await readFile(path.join(projectRoot, 'docs', page.path), 'utf8');
+    return { page, timestamp: readUpdatedDate(markdown, page.path) };
+  }));
+  const welcome = datedPages.find(({ page }) => page.route === manifest.defaultPage);
+  assert.ok(welcome, 'default Rachana page is missing');
+  const newest = Math.max(...datedPages.map(({ timestamp }) => timestamp));
+  assert.equal(welcome.timestamp, newest, 'docs/welcome.md Last updated must match the newest Rachana page');
 });
 
 test('every internal Markdown link resolves to a navigable Rachana document', async () => {
@@ -51,7 +68,7 @@ test('every internal Markdown link resolves to a navigable Rachana document', as
 test('the handbook exposes the approved product, experience, system, and future structure', () => {
   const expected = {
     Product: ['purpose-and-principles', 'experience-model', 'terminology'],
-    Experiences: ['profiles-and-first-use', 'home-and-experience-selection', 'shared-player', 'gita-700', 'local-content-editing', 'install-offline-and-updates'],
+    Experiences: ['profiles-and-first-use', 'home-and-experience-selection', 'shared-player', 'gita-yoga', 'gita-700', 'local-content-editing', 'install-offline-and-updates'],
     System: ['architecture-overview', 'collections-and-media', 'profiles-and-local-storage', 'events-analytics-and-resume', 'pwa-cache-and-updates', 'build-test-and-deployment'],
     'Future possibilities': ['sampada']
   };
@@ -81,6 +98,8 @@ test('Sampada preserves both future possibilities and completed enhancements wit
   });
   assert.match(markdown, /^### 3\. Consistent chapter names\n\n\*\*Status:\*\* Done/m);
   assert.match(markdown, /^### 9\. Global app-language preference\n\n\*\*Status:\*\* Done/m);
+  assert.match(markdown, /^### 12\. Gita Yoga foundation\n\n\*\*Status:\*\* Done/m);
+  assert.match(markdown, /^### 13\. Gita Yoga cue-region playback\n\n\*\*Status:\*\* To unfold/m);
   assert.equal(markdown.includes('Treasure Trove'), false);
 });
 

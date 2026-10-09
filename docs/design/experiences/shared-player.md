@@ -1,7 +1,7 @@
 # Shared player
 
 **Status:** Current  
-**Last updated:** 4 October 2026
+**Last updated:** 9 October 2026
 
 ## Persistent frame
 
@@ -21,4 +21,6 @@ The shell supplies content-language choice, chapter and SID routing, audio contr
 
 The complete player uses bundled Noto Sans faces for English, Sanskrit and Kannada. Script-specific faces are selected without changing the common visual family, and are available offline with the application shell.
 
-See [Gita 700](gita-700.md) for the current renderer.
+The shell selects a renderer through the experience registry. Each renderer owns its layout and editable-field map, while experience configuration declares reusable content and audio bindings. Renderers must represent each semantic field once; responsive CSS may reposition that node but must not create hidden duplicate data views.
+
+See [Gita Yoga](gita-yoga.md) and [Gita 700](gita-700.md) for the current renderers.
