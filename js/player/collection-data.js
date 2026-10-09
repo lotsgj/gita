@@ -1,5 +1,9 @@
 export const COLLECTION_ROOT = 'data/collections';
 
+export const AUDIO_REGISTRY_HEADERS = ['collection_id', 'title', 'contributor', 'language', 'catalog_url', 'cue_purpose_url', 'cue_url', 'attribution', 'license', 'source'];
+export const AUDIO_CUE_PURPOSE_HEADERS = ['cue_id', 'language', 'purpose', 'description'];
+export const AUDIO_CUE_HEADERS = ['sid', 'asset_order', 'cue_order', 'cue_id', 'start_ms', 'end_ms'];
+
 const MASTER_HEADERS = {
   sa: ['cid', 'snum', 'sid', 'chapter_name', 'shloka_raw', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'],
   en: ['cid', 'snum', 'sid', 'chapter_name', 'transliteration', 'meaning', 'word_by_word_meaning'],
@@ -34,7 +38,9 @@ export function parseCollectionTable(text, expectedHeaders, label = 'collection 
     const row = Object.fromEntries(headers.map((header, fieldIndex) => [header, decode(fields[fieldIndex])]));
     if (row.sid) {
       if (row.sid !== row.cid + '.' + row.snum && 'cid' in row) throw new Error(label + ' contains an invalid SID: ' + row.sid);
-      const key = row.order ? row.sid + ':' + row.order : row.sid;
+      const key = row.asset_order && row.cue_order
+        ? row.sid + ':' + row.asset_order + ':' + row.cue_order
+        : row.order ? row.sid + ':' + row.order : row.sid;
       if (seen.has(key)) throw new Error(label + ' contains duplicate key ' + key + '.');
       seen.add(key);
     }
@@ -87,10 +93,107 @@ function mediaKey(sid, order) {
   return sid + ':' + order;
 }
 
-export function normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience, resolveMediaUrl = (url) => url }) {
-  for (const [label, table] of [['English master', en], ['Kannada master', kn], ['Gita-700 audio composition', audioComposition], ['Gita-700 image composition', imageComposition]]) {
+function audioBinding(experience) {
+  return {
+    collectionField: experience?.audioBinding?.collectionField || 'chant_full_sa_collection',
+    orderField: experience?.audioBinding?.orderField || 'chant_full_sa_order'
+  };
+}
+
+function audioCompositionHeaders(experience) {
+  const binding = audioBinding(experience);
+  return ['cid', 'snum', 'sid', binding.collectionField, binding.orderField];
+}
+
+function positiveInteger(value) {
+  return /^[1-9]\d*$/.test(String(value));
+}
+
+function nonNegativeInteger(value) {
+  return /^(0|[1-9]\d*)$/.test(String(value));
+}
+
+function cueContractError(collectionId, errors) {
+  return new Error('Audio cue metadata for ' + collectionId + ' is invalid: ' + errors.join(' '));
+}
+
+export function buildAudioCueIndex({ collectionId = 'audio collection', catalog, cuePurposes, cues, strict = true }) {
+  const globalErrors = [];
+  const purposeById = new Map();
+  for (const [index, row] of cuePurposes.rows.entries()) {
+    const location = 'cue-purpose row ' + (index + 2);
+    if (!row.cue_id || !row.language || !row.purpose) globalErrors.push(location + ' is incomplete.');
+    else if (purposeById.has(row.cue_id)) globalErrors.push(location + ' duplicates cue_id ' + row.cue_id + '.');
+    else purposeById.set(row.cue_id, Object.freeze({
+      cueId: row.cue_id,
+      language: row.language,
+      purpose: row.purpose,
+      description: row.description
+    }));
+  }
+  if (!purposeById.size) globalErrors.push('cue-purpose.csv defines no cue purposes.');
+  if (globalErrors.length) {
+    if (strict) throw cueContractError(collectionId, globalErrors);
+    return { purposeById, cuesByAsset: new Map(), errors: globalErrors };
+  }
+
+  const assetKeys = new Set(catalog.rows.map((row) => mediaKey(row.sid, row.order)));
+  const groups = new Map();
+  cues.rows.forEach((row, index) => {
+    const key = mediaKey(row.sid, row.asset_order);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ row, line: index + 2 });
+  });
+
+  const cuesByAsset = new Map();
+  const errors = [];
+  for (const [key, entries] of groups) {
+    const groupErrors = [];
+    if (!assetKeys.has(key)) groupErrors.push('does not reference an audio catalog asset.');
+    const orders = new Set();
+    const normalized = [];
+    for (const { row, line } of entries) {
+      if (!row.sid || !positiveInteger(row.asset_order) || !positiveInteger(row.cue_order)) {
+        groupErrors.push('line ' + line + ' has an invalid identity or order.');
+        continue;
+      }
+      if (orders.has(row.cue_order)) groupErrors.push('line ' + line + ' duplicates cue_order ' + row.cue_order + '.');
+      orders.add(row.cue_order);
+      const purpose = purposeById.get(row.cue_id);
+      if (!purpose) groupErrors.push('line ' + line + ' references unknown cue_id ' + row.cue_id + '.');
+      if (!nonNegativeInteger(row.start_ms) || !nonNegativeInteger(row.end_ms) || Number(row.start_ms) >= Number(row.end_ms)) {
+        groupErrors.push('line ' + line + ' has an invalid time range.');
+      }
+      if (purpose && nonNegativeInteger(row.start_ms) && nonNegativeInteger(row.end_ms) && Number(row.start_ms) < Number(row.end_ms)) {
+        normalized.push(Object.freeze({
+          order: Number(row.cue_order),
+          cueId: row.cue_id,
+          language: purpose.language,
+          purpose: purpose.purpose,
+          description: purpose.description,
+          startMs: Number(row.start_ms),
+          endMs: Number(row.end_ms)
+        }));
+      }
+    }
+    normalized.sort((left, right) => left.order - right.order);
+    normalized.forEach((cue, index) => {
+      if (cue.order !== index + 1) groupErrors.push('cue_order must be sequential from 1.');
+      const previous = normalized[index - 1];
+      if (previous && cue.startMs < previous.endMs) groupErrors.push('cue ' + cue.order + ' overlaps cue ' + previous.order + '.');
+    });
+    if (groupErrors.length) errors.push(...groupErrors.map((message) => key + ' ' + message));
+    else cuesByAsset.set(key, Object.freeze(normalized));
+  }
+  if (strict && errors.length) throw cueContractError(collectionId, errors);
+  return { purposeById, cuesByAsset, errors };
+}
+
+export function normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, audioCueIndexes = new Map(), audioCueErrors = new Map(), imageCatalogs, experience, resolveMediaUrl = (url) => url }) {
+  for (const [label, table] of [['English master', en], ['Kannada master', kn], ['Experience audio composition', audioComposition], ['Experience image composition', imageComposition]]) {
     verifyIdentity(sa, table, label);
   }
+  const binding = audioBinding(experience);
   const bySid = (table) => new Map(table.rows.map((row) => [row.sid, row]));
   const enBySid = bySid(en);
   const knBySid = bySid(kn);
@@ -102,12 +205,26 @@ export function normalizeCollectionData({ sa, en, kn, audioComposition, imageCom
     const audioRef = audioBySid.get(sourceRow.sid);
     const imageRef = imageBySid.get(sourceRow.sid);
     let chantFullSaUrl = '';
-    if (audioRef.chant_full_sa_collection || audioRef.chant_full_sa_order) {
-      if (!audioRef.chant_full_sa_collection || !audioRef.chant_full_sa_order) throw new Error('Incomplete audio reference at ' + sourceRow.sid + '.');
-      const catalog = audioCatalogs.get(audioRef.chant_full_sa_collection);
-      const asset = catalog?.rows.find((row) => mediaKey(row.sid, row.order) === mediaKey(sourceRow.sid, audioRef.chant_full_sa_order));
+    let chantFullSaCues = Object.freeze([]);
+    let primaryAudioCollection = '';
+    let primaryAudioOrder = '';
+    let primaryAudioUrl = '';
+    let primaryAudioCues = Object.freeze([]);
+    const collectionId = audioRef[binding.collectionField];
+    const assetOrder = audioRef[binding.orderField];
+    if (collectionId || assetOrder) {
+      if (!collectionId || !assetOrder) throw new Error('Incomplete audio reference at ' + sourceRow.sid + '.');
+      const catalog = audioCatalogs.get(collectionId);
+      const asset = catalog?.rows.find((row) => mediaKey(row.sid, row.order) === mediaKey(sourceRow.sid, assetOrder));
       if (!asset) throw new Error('Audio reference does not resolve at ' + sourceRow.sid + '.');
-      chantFullSaUrl = resolveMediaUrl(asset.audio_url);
+      primaryAudioCollection = collectionId;
+      primaryAudioOrder = assetOrder;
+      primaryAudioUrl = resolveMediaUrl(asset.audio_url);
+      primaryAudioCues = audioCueIndexes.get(collectionId)?.get(mediaKey(sourceRow.sid, assetOrder)) || primaryAudioCues;
+      if (binding.collectionField === 'chant_full_sa_collection') {
+        chantFullSaUrl = primaryAudioUrl;
+        chantFullSaCues = primaryAudioCues;
+      }
     }
     let chapterIconUrl = '';
     if (imageRef.chapter_icon_collection || imageRef.chapter_icon_order) {
@@ -133,10 +250,23 @@ export function normalizeCollectionData({ sa, en, kn, audioComposition, imageCom
         en: { chapterName: enRow.chapter_name, transliteration: enRow.transliteration, meaning: enRow.meaning, wordByWordMeaning: enRow.word_by_word_meaning },
         kn: { chapterName: knRow.chapter_name, transliteration: knRow.transliteration, meaning: knRow.meaning, wordByWordMeaning: knRow.word_by_word_meaning }
       },
-      media: { chantFullSaUrl, chapterIconUrl }
+      media: {
+        primaryAudioCollection,
+        primaryAudioOrder,
+        primaryAudioUrl,
+        primaryAudioCues,
+        chantFullSaUrl,
+        chantFullSaCues,
+        chapterIconUrl
+      }
     };
   });
-  return { schemaVersion: 3, experience, rows };
+  return {
+    schemaVersion: 3,
+    experience,
+    rows,
+    diagnostics: { audioCues: Object.fromEntries(audioCueErrors) }
+  };
 }
 
 async function loadMediaCatalogs(type, composition, collectionField, headers, version) {
@@ -148,6 +278,36 @@ async function loadMediaCatalogs(type, composition, collectionField, headers, ve
     catalogs.set(id, await fetchTable(entry.catalog_url, headers, version));
   }
   return catalogs;
+}
+
+async function loadAudioCatalogs(composition, collectionField, version) {
+  const collectionIds = new Set(composition.rows.map((row) => row[collectionField]).filter(Boolean));
+  const registry = await fetchTable(COLLECTION_ROOT + '/audio/collection.csv', AUDIO_REGISTRY_HEADERS, version);
+  const catalogs = new Map();
+  const cueIndexes = new Map();
+  const cueErrors = new Map();
+  for (const id of collectionIds) {
+    const entry = registryEntry(registry, id, 'audio');
+    const catalog = await fetchTable(entry.catalog_url, ['sid', 'order', 'language', 'audio_url'], version);
+    catalogs.set(id, catalog);
+    if (!entry.cue_purpose_url && !entry.cue_url) continue;
+    if (!entry.cue_purpose_url || !entry.cue_url) {
+      cueErrors.set(id, ['Audio collection must define both cue_purpose_url and cue_url.']);
+      continue;
+    }
+    try {
+      const [cuePurposes, cues] = await Promise.all([
+        fetchTable(entry.cue_purpose_url, AUDIO_CUE_PURPOSE_HEADERS, version),
+        fetchTable(entry.cue_url, AUDIO_CUE_HEADERS, version)
+      ]);
+      const result = buildAudioCueIndex({ collectionId: id, catalog, cuePurposes, cues, strict: false });
+      cueIndexes.set(id, result.cuesByAsset);
+      if (result.errors.length) cueErrors.set(id, result.errors);
+    } catch (error) {
+      cueErrors.set(id, [error.message]);
+    }
+  }
+  return { catalogs, cueIndexes, cueErrors };
 }
 
 export async function loadCollectionExperience(experienceId, { version = '' } = {}) {
@@ -166,14 +326,20 @@ export async function loadCollectionExperience(experienceId, { version = '' } = 
     fetchTable(languageFile(verseCatalog, 'sa'), MASTER_HEADERS.sa, version),
     fetchTable(languageFile(verseCatalog, 'en'), MASTER_HEADERS.en, version),
     fetchTable(languageFile(verseCatalog, 'kn'), MASTER_HEADERS.kn, version),
-    fetchTable(catalogEntry(experienceCatalog, 'audio', experienceId), ['cid', 'snum', 'sid', 'chant_full_sa_collection', 'chant_full_sa_order'], version),
+    fetchTable(catalogEntry(experienceCatalog, 'audio', experienceId), audioCompositionHeaders(experience), version),
     fetchTable(catalogEntry(experienceCatalog, 'images', experienceId), ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order'], version)
   ]);
-  const [audioCatalogs, imageCatalogs] = await Promise.all([
-    loadMediaCatalogs('audio', audioComposition, 'chant_full_sa_collection', ['sid', 'order', 'language', 'audio_url'], version),
+  const [audioCollections, imageCatalogs] = await Promise.all([
+    loadAudioCatalogs(audioComposition, audioBinding(experience).collectionField, version),
     loadMediaCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url'], version)
   ]);
-  return normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience });
+  return normalizeCollectionData({
+    sa, en, kn, audioComposition, imageComposition,
+    audioCatalogs: audioCollections.catalogs,
+    audioCueIndexes: audioCollections.cueIndexes,
+    audioCueErrors: audioCollections.cueErrors,
+    imageCatalogs, experience
+  });
 }
 
 function selectedCollectionFiles(fileList) {
@@ -203,7 +369,7 @@ async function loadCollectionExperienceWithReader(experienceId, { text, resolveM
     table(languageUrls.sa, MASTER_HEADERS.sa),
     table(languageUrls.en, MASTER_HEADERS.en),
     table(languageUrls.kn, MASTER_HEADERS.kn),
-    table(catalogEntry(experienceCatalog, 'audio', experienceId), ['cid', 'snum', 'sid', 'chant_full_sa_collection', 'chant_full_sa_order']),
+    table(catalogEntry(experienceCatalog, 'audio', experienceId), audioCompositionHeaders(experience)),
     table(catalogEntry(experienceCatalog, 'images', experienceId), ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order'])
   ]);
   async function localCatalogs(type, composition, collectionField, headers) {
@@ -214,11 +380,46 @@ async function loadCollectionExperienceWithReader(experienceId, { text, resolveM
     }
     return catalogs;
   }
-  const [audioCatalogs, imageCatalogs] = await Promise.all([
-    localCatalogs('audio', audioComposition, 'chant_full_sa_collection', ['sid', 'order', 'language', 'audio_url']),
+  async function localAudioCatalogs() {
+    const registry = await table(COLLECTION_ROOT + '/audio/collection.csv', AUDIO_REGISTRY_HEADERS);
+    const catalogs = new Map();
+    const cueIndexes = new Map();
+    const cueErrors = new Map();
+    const binding = audioBinding(experience);
+    for (const id of new Set(audioComposition.rows.map((row) => row[binding.collectionField]).filter(Boolean))) {
+      const entry = registryEntry(registry, id, 'audio');
+      const catalog = await table(entry.catalog_url, ['sid', 'order', 'language', 'audio_url']);
+      catalogs.set(id, catalog);
+      if (!entry.cue_purpose_url && !entry.cue_url) continue;
+      if (!entry.cue_purpose_url || !entry.cue_url) {
+        cueErrors.set(id, ['Audio collection must define both cue_purpose_url and cue_url.']);
+        continue;
+      }
+      try {
+        const [cuePurposes, cues] = await Promise.all([
+          table(entry.cue_purpose_url, AUDIO_CUE_PURPOSE_HEADERS),
+          table(entry.cue_url, AUDIO_CUE_HEADERS)
+        ]);
+        const result = buildAudioCueIndex({ collectionId: id, catalog, cuePurposes, cues, strict: false });
+        cueIndexes.set(id, result.cuesByAsset);
+        if (result.errors.length) cueErrors.set(id, result.errors);
+      } catch (error) {
+        cueErrors.set(id, [error.message]);
+      }
+    }
+    return { catalogs, cueIndexes, cueErrors };
+  }
+  const [audioCollections, imageCatalogs] = await Promise.all([
+    localAudioCatalogs(),
     localCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url'])
   ]);
-  return normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience, resolveMediaUrl });
+  return normalizeCollectionData({
+    sa, en, kn, audioComposition, imageComposition,
+    audioCatalogs: audioCollections.catalogs,
+    audioCueIndexes: audioCollections.cueIndexes,
+    audioCueErrors: audioCollections.cueErrors,
+    imageCatalogs, experience, resolveMediaUrl
+  });
 }
 
 export async function loadCollectionExperienceFromFiles(experienceId, fileList) {
@@ -302,7 +503,7 @@ export class WritableCollectionWorkspace {
       }
     });
     for (const row of dataset.rows) {
-      for (const field of ['chantFullSaUrl', 'chapterIconUrl']) {
+      for (const field of ['primaryAudioUrl', 'chantFullSaUrl', 'chapterIconUrl']) {
         if (row.media[field] instanceof Promise) row.media[field] = await row.media[field];
       }
     }

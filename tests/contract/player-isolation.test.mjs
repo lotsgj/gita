@@ -11,6 +11,7 @@ const fonts = await readFile(new URL('../../css/fonts.css', import.meta.url), 'u
 const playerStyles = await readFile(new URL('../../css/player.css', import.meta.url), 'utf8');
 const editorStyles = await readFile(new URL('../../css/editor.css', import.meta.url), 'utf8');
 const rendererStyles = await readFile(new URL('../../css/renderers/gita-700.css', import.meta.url), 'utf8');
+const yogaRendererStyles = await readFile(new URL('../../css/renderers/gita-yoga.css', import.meta.url), 'utf8');
 const fontBuilder = await readFile(new URL('../../scripts/build-font-css.mjs', import.meta.url), 'utf8');
 
 test('the collection player is isolated from the legacy master and legacy media paths', () => {
@@ -48,9 +49,10 @@ test('the player uses the bundled Noto Sans family for every supported script', 
     await access(new URL(`../../assets/fonts/${license}`, import.meta.url));
   }
   const namedLegacyFonts = /Inter|Georgia|Times New Roman|Avenir Next|Segoe UI|Kohinoor|Noto Serif|SFMono|Menlo/;
-  assert.doesNotMatch(playerStyles + editorStyles + rendererStyles, namedLegacyFonts);
+  assert.doesNotMatch(playerStyles + editorStyles + rendererStyles + yogaRendererStyles, namedLegacyFonts);
   assert.equal((fonts.match(/data:font\/ttf;base64,/g) || []).length, 3);
   assert.match(playerStyles, /var\(--font-sans, sans-serif\)/);
   assert.match(rendererStyles, /var\(--font-sans, sans-serif\)/);
+  assert.match(yogaRendererStyles, /gita-yoga/);
   assert.match(deployment, /scripts\/build-font-css\.mjs/);
 });

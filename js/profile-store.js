@@ -189,7 +189,21 @@ export class ProfileStore {
         language: record.language,
         savedAt: record.savedAt
       };
+      record.lastExperience = {
+        experience: record.experience,
+        sid: record.sid,
+        language: record.language,
+        savedAt: record.savedAt
+      };
     } else {
+      if (!record.lastExperience && existing?.view === 'experience' && existing.experience && existing.sid) {
+        record.lastExperience = {
+          experience: existing.experience,
+          sid: existing.sid,
+          language: existing.language === 'kn' ? 'kn' : 'en',
+          savedAt: existing.savedAt
+        };
+      }
       delete record.experience;
       delete record.sid;
     }

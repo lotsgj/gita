@@ -1,7 +1,7 @@
 # Home and experience selection
 
 **Status:** Current  
-**Last updated:** 1 October 2026
+**Last updated:** 9 October 2026
 
 ## Diksoochi landing
 
@@ -25,7 +25,9 @@ The player’s main menu exposes **Your journey — J** immediately after **Diks
 
 ## Choices
 
-The **Choose an experience** section is part of Diksoochi. Gita 700 is selectable and opens the shared player with its renderer. Gita Yoga and Gita Sara are visible as coming-later choices so the intended experience family is understandable without implying they are implemented.
+The **Continue your journey** action always targets the most recently visited experience and that experience’s saved SID, even after the person explicitly returns Home. Its choice is independent of display order in the experience catalog.
+
+The **Choose an experience** section is part of Diksoochi. Gita Yoga is listed above Gita 700 as the first catalog choice; both are selectable and open the shared player with their own renderers. Gita Sara remains visible as a future choice.
 
 Choosing an experience preserves the profile identifier and preferred content language in application navigation. The profile’s app language governs this interface; `lang` links affect content only. The **Diksoochi / Home** command (`A`) returns from the player to Diksoochi and records it as the resumable location. Direct experience URLs still open the requested experience.
 

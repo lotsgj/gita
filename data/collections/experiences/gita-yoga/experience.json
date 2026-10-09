@@ -1,0 +1,20 @@
+{
+  "id": "gita-yoga",
+  "schemaVersion": 1,
+  "title": "Gita Yoga",
+  "verseCollection": "bhagavad-gita",
+  "languages": [
+    "sa",
+    "en",
+    "kn"
+  ],
+  "renderer": "gita-yoga",
+  "audioBinding": {
+    "collectionField": "audio_collection",
+    "orderField": "audio_order"
+  },
+  "resources": {
+    "audio": "data/collections/experiences/gita-yoga/audio.csv",
+    "images": "data/collections/experiences/gita-700/images.csv"
+  }
+}

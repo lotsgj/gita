@@ -1,7 +1,7 @@
 # Experience model
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 9 October 2026
 
 ## Model
 
@@ -11,7 +11,9 @@ Gitaverse separates the shared application shell from individual learning experi
 
 **Gita 700** is live. It presents four panels for the Sanskrit shloka, transliteration, meaning, and word-by-word meaning.
 
-**Gita Yoga** and **Gita Sara** appear as future choices but do not yet have active renderers. Their media and panel designs can differ while reusing the shell.
+**Gita Yoga** is live. It presents Sanskrit, Kannada, and English chanting text in a responsive three-panel learning layout and uses its experience-specific composite audio composition where available.
+
+**Gita Sara** remains a future choice. Its media and panel design can differ while reusing the shell.
 
 ## URL contract
 

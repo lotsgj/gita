@@ -20,7 +20,7 @@ const EN_MESSAGES = {
   'profile.who': 'Who is using Gitaverse?', 'profile.choose': 'Choose a profile to continue.', 'profile.add': '＋ Add another profile', 'profile.back': 'Back',
   'profile.defaultBadge': 'Default', 'profile.editAction': 'Edit', 'profile.makeDefault': 'Make default', 'profile.unsetDefault': 'Unset default', 'profile.delete': 'Delete',
   'home.chooseExperience': 'Choose an experience', 'home.intro': 'Read, reflect, and listen at your own pace.',
-  'home.gita700Note': 'Four-panel study experience', 'home.future': 'Experience to be designed', 'home.coming': 'Coming later',
+  'home.gitaYogaNote': 'Guided chanting and meaning experience', 'home.gita700Note': 'Four-panel study experience', 'home.future': 'Experience to be designed', 'home.coming': 'Coming later',
   'diksoochi.title': 'Diksoochi', 'diksoochi.greeting': 'Namaste, {name}',
   'diksoochi.know': 'Know', 'diksoochi.able': 'Able', 'diksoochi.use': 'Use',
   'diksoochi.knowEmpty': 'Your map of the Gita will unfold here as you explore its chapters and spend time with its shlokas.',
@@ -34,6 +34,7 @@ const EN_MESSAGES = {
   'diksoochi.shloka': 'Shloka', 'diksoochi.sanskritShloka': 'Sanskrit shloka', 'diksoochi.meaning': 'Meaning', 'diksoochi.count': 'Count',
   'diksoochi.countNote': 'Count shows meaningful engagements with each shloka.',
   'diksoochi.resume': 'Resume Gita 700 · Shloka {sid}', 'diksoochi.begin': 'Begin with Gita 700', 'diksoochi.choose': 'Choose an experience',
+  'diksoochi.resumeExperience': 'Resume {experience} · Shloka {sid}', 'diksoochi.beginExperience': 'Begin with {experience}',
   'common.about': 'About Gitaverse', 'common.install': 'Install Gitaverse', 'common.close': 'Close', 'common.back': '← Back',
   'loading.title': 'Opening the Gita', 'loading.message': 'Preparing the verses…', 'error.title': 'Unable to open the player',
   'menu.chapters': 'Chapters', 'menu.goto': 'Go to shloka', 'menu.contentLanguage': 'Content language ({language})',
@@ -61,7 +62,7 @@ const EN_MESSAGES = {
   'workspace.opening': 'Opening and validating the collections folder…', 'workspace.permission': 'Read and write access to the collections folder was not granted.',
   'workspace.openFailed': 'The selected collections folder could not be opened.',
   'goto.note': 'Enter a stable shloka ID, such as 6.B, 6.7, or 6.E.', 'goto.notFound': 'That shloka ID was not found.',
-  'editor.editVisible': 'Edit the four visible fields', 'editor.cancel': 'Cancel', 'editor.save': 'Save row', 'editor.unsaved': 'Unsaved changes', 'editor.removeHash': 'Remove # before saving',
+  'editor.editVisible': 'Edit the visible fields', 'editor.cancel': 'Cancel', 'editor.save': 'Save row', 'editor.unsaved': 'Unsaved changes', 'editor.removeHash': 'Remove # before saving',
   'editor.noChanges': 'No changes to save', 'editor.savingFiles': 'Saving to collections…', 'editor.savingBrowser': 'Saving in this browser…', 'editor.savedBrowser': 'Saved in this browser session', 'editor.savedFiles': 'Saved to {files}', 'editor.saveFailed': 'The local collections could not be saved.', 'editor.downloaded': 'Downloaded edited language data',
   'editor.discard': 'Discard the unsaved edits to this shloka?', 'editor.discardNavigate': 'Discard the unsaved edits to this shloka and continue?',
   'editor.download': '↓ Download edited language files', 'editor.downloadAgain': '↓ Download again',
@@ -86,7 +87,7 @@ const KN_MESSAGES = {
   'profile.who': 'Gitaverse ಅನ್ನು ಯಾರು ಬಳಸುತ್ತಿದ್ದಾರೆ?', 'profile.choose': 'ಮುಂದುವರಿಸಲು ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ.', 'profile.add': '＋ ಮತ್ತೊಂದು ಪ್ರೊಫೈಲ್ ಸೇರಿಸಿ', 'profile.back': 'ಹಿಂದೆ',
   'profile.defaultBadge': 'ಪೂರ್ವನಿಯೋಜಿತ', 'profile.editAction': 'ಸಂಪಾದಿಸಿ', 'profile.makeDefault': 'ಪೂರ್ವನಿಯೋಜಿತವಾಗಿಸಿ', 'profile.unsetDefault': 'ಪೂರ್ವನಿಯೋಜಿತ ತೆಗೆದುಹಾಕಿ', 'profile.delete': 'ಅಳಿಸಿ',
   'home.chooseExperience': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ', 'home.intro': 'ನಿಮ್ಮ ವೇಗದಲ್ಲಿ ಓದಿ, ಚಿಂತಿಸಿ ಮತ್ತು ಆಲಿಸಿ.',
-  'home.gita700Note': 'ನಾಲ್ಕು ಫಲಕಗಳ ಅಧ್ಯಯನ ಅನುಭವ', 'home.future': 'ಅನುಭವವನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಬೇಕಿದೆ', 'home.coming': 'ಮುಂದೆ ಬರಲಿದೆ',
+  'home.gitaYogaNote': 'ಮಾರ್ಗದರ್ಶಿತ ಪಠಣ ಮತ್ತು ಅರ್ಥದ ಅನುಭವ', 'home.gita700Note': 'ನಾಲ್ಕು ಫಲಕಗಳ ಅಧ್ಯಯನ ಅನುಭವ', 'home.future': 'ಅನುಭವವನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಬೇಕಿದೆ', 'home.coming': 'ಮುಂದೆ ಬರಲಿದೆ',
   'diksoochi.title': 'ದಿಕ್ಸೂಚಿ', 'diksoochi.greeting': 'ನಮಸ್ತೆ, {name}',
   'diksoochi.know': 'ತಿಳಿದಿದೆ', 'diksoochi.able': 'ಸಾಧ್ಯವಾಗಿದೆ', 'diksoochi.use': 'ಬಳಸಬಲ್ಲೆ',
   'diksoochi.knowEmpty': 'ಅಧ್ಯಾಯಗಳನ್ನು ಅನ್ವೇಷಿಸಿ ಶ್ಲೋಕಗಳೊಂದಿಗೆ ಸಮಯ ಕಳೆದಂತೆ ನಿಮ್ಮ ಗೀತೆಯ ನಕ್ಷೆ ಇಲ್ಲಿ ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ.',
@@ -100,6 +101,7 @@ const KN_MESSAGES = {
   'diksoochi.shloka': 'ಶ್ಲೋಕ', 'diksoochi.sanskritShloka': 'ಸಂಸ್ಕೃತ ಶ್ಲೋಕ', 'diksoochi.meaning': 'ಅರ್ಥ', 'diksoochi.count': 'ಎಣಿಕೆ',
   'diksoochi.countNote': 'ಪ್ರತಿ ಶ್ಲೋಕದ ಅರ್ಥಪೂರ್ಣ ತೊಡಗಿಸಿಕೊಳ್ಳುವಿಕೆಗಳನ್ನು ಎಣಿಕೆ ತೋರಿಸುತ್ತದೆ.',
   'diksoochi.resume': 'ಗೀತಾ 700 ಮುಂದುವರಿಸಿ · ಶ್ಲೋಕ {sid}', 'diksoochi.begin': 'ಗೀತಾ 700ರಿಂದ ಆರಂಭಿಸಿ', 'diksoochi.choose': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+  'diksoochi.resumeExperience': '{experience} ಮುಂದುವರಿಸಿ · ಶ್ಲೋಕ {sid}', 'diksoochi.beginExperience': '{experience} ಆರಂಭಿಸಿ',
   'common.about': 'Gitaverse ಕುರಿತು', 'common.install': 'Gitaverse ಸ್ಥಾಪಿಸಿ', 'common.close': 'ಮುಚ್ಚಿ', 'common.back': '← ಹಿಂದೆ',
   'loading.title': 'ಗೀತೆಯನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ', 'loading.message': 'ಶ್ಲೋಕಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ…', 'error.title': 'ಪ್ಲೇಯರ್ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ',
   'menu.chapters': 'ಅಧ್ಯಾಯಗಳು', 'menu.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'menu.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ({language})',
@@ -127,7 +129,7 @@ const KN_MESSAGES = {
   'workspace.opening': 'ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ತೆರೆಯಲಾಗುತ್ತಿದೆ ಮತ್ತು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…', 'workspace.permission': 'ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್‌ಗೆ ಓದು ಮತ್ತು ಬರವಣಿಗೆ ಅನುಮತಿ ನೀಡಲಾಗಿಲ್ಲ.',
   'workspace.openFailed': 'ಆಯ್ಕೆಮಾಡಿದ ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.',
   'goto.note': '6.B, 6.7 ಅಥವಾ 6.E ನಂತಹ ಸ್ಥಿರ ಶ್ಲೋಕ ID ನಮೂದಿಸಿ.', 'goto.notFound': 'ಆ ಶ್ಲೋಕ ID ಕಂಡುಬಂದಿಲ್ಲ.',
-  'editor.editVisible': 'ಕಾಣುವ ನಾಲ್ಕು ಕ್ಷೇತ್ರಗಳನ್ನು ಸಂಪಾದಿಸಿ', 'editor.cancel': 'ರದ್ದುಮಾಡಿ', 'editor.save': 'ಸಾಲು ಉಳಿಸಿ', 'editor.unsaved': 'ಉಳಿಸದ ಬದಲಾವಣೆಗಳು', 'editor.removeHash': 'ಉಳಿಸುವ ಮೊದಲು # ತೆಗೆದುಹಾಕಿ',
+  'editor.editVisible': 'ಕಾಣುವ ಕ್ಷೇತ್ರಗಳನ್ನು ಸಂಪಾದಿಸಿ', 'editor.cancel': 'ರದ್ದುಮಾಡಿ', 'editor.save': 'ಸಾಲು ಉಳಿಸಿ', 'editor.unsaved': 'ಉಳಿಸದ ಬದಲಾವಣೆಗಳು', 'editor.removeHash': 'ಉಳಿಸುವ ಮೊದಲು # ತೆಗೆದುಹಾಕಿ',
   'editor.noChanges': 'ಉಳಿಸಲು ಬದಲಾವಣೆಗಳಿಲ್ಲ', 'editor.savingFiles': 'ಸಂಗ್ರಹಗಳಿಗೆ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'editor.savingBrowser': 'ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'editor.savedBrowser': 'ಈ ಬ್ರೌಸರ್ ಅವಧಿಯಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ', 'editor.savedFiles': '{files} ಗೆ ಉಳಿಸಲಾಗಿದೆ', 'editor.saveFailed': 'ಸ್ಥಳೀಯ ಸಂಗ್ರಹಗಳನ್ನು ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.', 'editor.downloaded': 'ಸಂಪಾದಿತ ಭಾಷಾ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಆಗಿದೆ',
   'editor.discard': 'ಈ ಶ್ಲೋಕದ ಉಳಿಸದ ಸಂಪಾದನೆಗಳನ್ನು ತ್ಯಜಿಸುವುದೇ?', 'editor.discardNavigate': 'ಈ ಶ್ಲೋಕದ ಉಳಿಸದ ಸಂಪಾದನೆಗಳನ್ನು ತ್ಯಜಿಸಿ ಮುಂದುವರಿಯುವುದೇ?',
   'editor.download': '↓ ಸಂಪಾದಿತ ಭಾಷಾ ಫೈಲ್‌ಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ', 'editor.downloadAgain': '↓ ಮತ್ತೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
@@ -428,7 +430,21 @@ class ProfileStore {
         language: record.language,
         savedAt: record.savedAt
       };
+      record.lastExperience = {
+        experience: record.experience,
+        sid: record.sid,
+        language: record.language,
+        savedAt: record.savedAt
+      };
     } else {
+      if (!record.lastExperience && existing?.view === 'experience' && existing.experience && existing.sid) {
+        record.lastExperience = {
+          experience: existing.experience,
+          sid: existing.sid,
+          language: existing.language === 'kn' ? 'kn' : 'en',
+          savedAt: existing.savedAt
+        };
+      }
       delete record.experience;
       delete record.sid;
     }
@@ -1327,6 +1343,10 @@ class AboutDialog {
 // Source: js/player/collection-data.js
 const COLLECTION_ROOT = 'data/collections';
 
+const AUDIO_REGISTRY_HEADERS = ['collection_id', 'title', 'contributor', 'language', 'catalog_url', 'cue_purpose_url', 'cue_url', 'attribution', 'license', 'source'];
+const AUDIO_CUE_PURPOSE_HEADERS = ['cue_id', 'language', 'purpose', 'description'];
+const AUDIO_CUE_HEADERS = ['sid', 'asset_order', 'cue_order', 'cue_id', 'start_ms', 'end_ms'];
+
 const MASTER_HEADERS = {
   sa: ['cid', 'snum', 'sid', 'chapter_name', 'shloka_raw', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'],
   en: ['cid', 'snum', 'sid', 'chapter_name', 'transliteration', 'meaning', 'word_by_word_meaning'],
@@ -1361,7 +1381,9 @@ function parseCollectionTable(text, expectedHeaders, label = 'collection data') 
     const row = Object.fromEntries(headers.map((header, fieldIndex) => [header, decode(fields[fieldIndex])]));
     if (row.sid) {
       if (row.sid !== row.cid + '.' + row.snum && 'cid' in row) throw new Error(label + ' contains an invalid SID: ' + row.sid);
-      const key = row.order ? row.sid + ':' + row.order : row.sid;
+      const key = row.asset_order && row.cue_order
+        ? row.sid + ':' + row.asset_order + ':' + row.cue_order
+        : row.order ? row.sid + ':' + row.order : row.sid;
       if (seen.has(key)) throw new Error(label + ' contains duplicate key ' + key + '.');
       seen.add(key);
     }
@@ -1414,10 +1436,107 @@ function mediaKey(sid, order) {
   return sid + ':' + order;
 }
 
-function normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience, resolveMediaUrl = (url) => url }) {
-  for (const [label, table] of [['English master', en], ['Kannada master', kn], ['Gita-700 audio composition', audioComposition], ['Gita-700 image composition', imageComposition]]) {
+function audioBinding(experience) {
+  return {
+    collectionField: experience?.audioBinding?.collectionField || 'chant_full_sa_collection',
+    orderField: experience?.audioBinding?.orderField || 'chant_full_sa_order'
+  };
+}
+
+function audioCompositionHeaders(experience) {
+  const binding = audioBinding(experience);
+  return ['cid', 'snum', 'sid', binding.collectionField, binding.orderField];
+}
+
+function positiveInteger(value) {
+  return /^[1-9]\d*$/.test(String(value));
+}
+
+function nonNegativeInteger(value) {
+  return /^(0|[1-9]\d*)$/.test(String(value));
+}
+
+function cueContractError(collectionId, errors) {
+  return new Error('Audio cue metadata for ' + collectionId + ' is invalid: ' + errors.join(' '));
+}
+
+function buildAudioCueIndex({ collectionId = 'audio collection', catalog, cuePurposes, cues, strict = true }) {
+  const globalErrors = [];
+  const purposeById = new Map();
+  for (const [index, row] of cuePurposes.rows.entries()) {
+    const location = 'cue-purpose row ' + (index + 2);
+    if (!row.cue_id || !row.language || !row.purpose) globalErrors.push(location + ' is incomplete.');
+    else if (purposeById.has(row.cue_id)) globalErrors.push(location + ' duplicates cue_id ' + row.cue_id + '.');
+    else purposeById.set(row.cue_id, Object.freeze({
+      cueId: row.cue_id,
+      language: row.language,
+      purpose: row.purpose,
+      description: row.description
+    }));
+  }
+  if (!purposeById.size) globalErrors.push('cue-purpose.csv defines no cue purposes.');
+  if (globalErrors.length) {
+    if (strict) throw cueContractError(collectionId, globalErrors);
+    return { purposeById, cuesByAsset: new Map(), errors: globalErrors };
+  }
+
+  const assetKeys = new Set(catalog.rows.map((row) => mediaKey(row.sid, row.order)));
+  const groups = new Map();
+  cues.rows.forEach((row, index) => {
+    const key = mediaKey(row.sid, row.asset_order);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ row, line: index + 2 });
+  });
+
+  const cuesByAsset = new Map();
+  const errors = [];
+  for (const [key, entries] of groups) {
+    const groupErrors = [];
+    if (!assetKeys.has(key)) groupErrors.push('does not reference an audio catalog asset.');
+    const orders = new Set();
+    const normalized = [];
+    for (const { row, line } of entries) {
+      if (!row.sid || !positiveInteger(row.asset_order) || !positiveInteger(row.cue_order)) {
+        groupErrors.push('line ' + line + ' has an invalid identity or order.');
+        continue;
+      }
+      if (orders.has(row.cue_order)) groupErrors.push('line ' + line + ' duplicates cue_order ' + row.cue_order + '.');
+      orders.add(row.cue_order);
+      const purpose = purposeById.get(row.cue_id);
+      if (!purpose) groupErrors.push('line ' + line + ' references unknown cue_id ' + row.cue_id + '.');
+      if (!nonNegativeInteger(row.start_ms) || !nonNegativeInteger(row.end_ms) || Number(row.start_ms) >= Number(row.end_ms)) {
+        groupErrors.push('line ' + line + ' has an invalid time range.');
+      }
+      if (purpose && nonNegativeInteger(row.start_ms) && nonNegativeInteger(row.end_ms) && Number(row.start_ms) < Number(row.end_ms)) {
+        normalized.push(Object.freeze({
+          order: Number(row.cue_order),
+          cueId: row.cue_id,
+          language: purpose.language,
+          purpose: purpose.purpose,
+          description: purpose.description,
+          startMs: Number(row.start_ms),
+          endMs: Number(row.end_ms)
+        }));
+      }
+    }
+    normalized.sort((left, right) => left.order - right.order);
+    normalized.forEach((cue, index) => {
+      if (cue.order !== index + 1) groupErrors.push('cue_order must be sequential from 1.');
+      const previous = normalized[index - 1];
+      if (previous && cue.startMs < previous.endMs) groupErrors.push('cue ' + cue.order + ' overlaps cue ' + previous.order + '.');
+    });
+    if (groupErrors.length) errors.push(...groupErrors.map((message) => key + ' ' + message));
+    else cuesByAsset.set(key, Object.freeze(normalized));
+  }
+  if (strict && errors.length) throw cueContractError(collectionId, errors);
+  return { purposeById, cuesByAsset, errors };
+}
+
+function normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, audioCueIndexes = new Map(), audioCueErrors = new Map(), imageCatalogs, experience, resolveMediaUrl = (url) => url }) {
+  for (const [label, table] of [['English master', en], ['Kannada master', kn], ['Experience audio composition', audioComposition], ['Experience image composition', imageComposition]]) {
     verifyIdentity(sa, table, label);
   }
+  const binding = audioBinding(experience);
   const bySid = (table) => new Map(table.rows.map((row) => [row.sid, row]));
   const enBySid = bySid(en);
   const knBySid = bySid(kn);
@@ -1429,12 +1548,26 @@ function normalizeCollectionData({ sa, en, kn, audioComposition, imageCompositio
     const audioRef = audioBySid.get(sourceRow.sid);
     const imageRef = imageBySid.get(sourceRow.sid);
     let chantFullSaUrl = '';
-    if (audioRef.chant_full_sa_collection || audioRef.chant_full_sa_order) {
-      if (!audioRef.chant_full_sa_collection || !audioRef.chant_full_sa_order) throw new Error('Incomplete audio reference at ' + sourceRow.sid + '.');
-      const catalog = audioCatalogs.get(audioRef.chant_full_sa_collection);
-      const asset = catalog?.rows.find((row) => mediaKey(row.sid, row.order) === mediaKey(sourceRow.sid, audioRef.chant_full_sa_order));
+    let chantFullSaCues = Object.freeze([]);
+    let primaryAudioCollection = '';
+    let primaryAudioOrder = '';
+    let primaryAudioUrl = '';
+    let primaryAudioCues = Object.freeze([]);
+    const collectionId = audioRef[binding.collectionField];
+    const assetOrder = audioRef[binding.orderField];
+    if (collectionId || assetOrder) {
+      if (!collectionId || !assetOrder) throw new Error('Incomplete audio reference at ' + sourceRow.sid + '.');
+      const catalog = audioCatalogs.get(collectionId);
+      const asset = catalog?.rows.find((row) => mediaKey(row.sid, row.order) === mediaKey(sourceRow.sid, assetOrder));
       if (!asset) throw new Error('Audio reference does not resolve at ' + sourceRow.sid + '.');
-      chantFullSaUrl = resolveMediaUrl(asset.audio_url);
+      primaryAudioCollection = collectionId;
+      primaryAudioOrder = assetOrder;
+      primaryAudioUrl = resolveMediaUrl(asset.audio_url);
+      primaryAudioCues = audioCueIndexes.get(collectionId)?.get(mediaKey(sourceRow.sid, assetOrder)) || primaryAudioCues;
+      if (binding.collectionField === 'chant_full_sa_collection') {
+        chantFullSaUrl = primaryAudioUrl;
+        chantFullSaCues = primaryAudioCues;
+      }
     }
     let chapterIconUrl = '';
     if (imageRef.chapter_icon_collection || imageRef.chapter_icon_order) {
@@ -1460,10 +1593,23 @@ function normalizeCollectionData({ sa, en, kn, audioComposition, imageCompositio
         en: { chapterName: enRow.chapter_name, transliteration: enRow.transliteration, meaning: enRow.meaning, wordByWordMeaning: enRow.word_by_word_meaning },
         kn: { chapterName: knRow.chapter_name, transliteration: knRow.transliteration, meaning: knRow.meaning, wordByWordMeaning: knRow.word_by_word_meaning }
       },
-      media: { chantFullSaUrl, chapterIconUrl }
+      media: {
+        primaryAudioCollection,
+        primaryAudioOrder,
+        primaryAudioUrl,
+        primaryAudioCues,
+        chantFullSaUrl,
+        chantFullSaCues,
+        chapterIconUrl
+      }
     };
   });
-  return { schemaVersion: 3, experience, rows };
+  return {
+    schemaVersion: 3,
+    experience,
+    rows,
+    diagnostics: { audioCues: Object.fromEntries(audioCueErrors) }
+  };
 }
 
 async function loadMediaCatalogs(type, composition, collectionField, headers, version) {
@@ -1475,6 +1621,36 @@ async function loadMediaCatalogs(type, composition, collectionField, headers, ve
     catalogs.set(id, await fetchTable(entry.catalog_url, headers, version));
   }
   return catalogs;
+}
+
+async function loadAudioCatalogs(composition, collectionField, version) {
+  const collectionIds = new Set(composition.rows.map((row) => row[collectionField]).filter(Boolean));
+  const registry = await fetchTable(COLLECTION_ROOT + '/audio/collection.csv', AUDIO_REGISTRY_HEADERS, version);
+  const catalogs = new Map();
+  const cueIndexes = new Map();
+  const cueErrors = new Map();
+  for (const id of collectionIds) {
+    const entry = registryEntry(registry, id, 'audio');
+    const catalog = await fetchTable(entry.catalog_url, ['sid', 'order', 'language', 'audio_url'], version);
+    catalogs.set(id, catalog);
+    if (!entry.cue_purpose_url && !entry.cue_url) continue;
+    if (!entry.cue_purpose_url || !entry.cue_url) {
+      cueErrors.set(id, ['Audio collection must define both cue_purpose_url and cue_url.']);
+      continue;
+    }
+    try {
+      const [cuePurposes, cues] = await Promise.all([
+        fetchTable(entry.cue_purpose_url, AUDIO_CUE_PURPOSE_HEADERS, version),
+        fetchTable(entry.cue_url, AUDIO_CUE_HEADERS, version)
+      ]);
+      const result = buildAudioCueIndex({ collectionId: id, catalog, cuePurposes, cues, strict: false });
+      cueIndexes.set(id, result.cuesByAsset);
+      if (result.errors.length) cueErrors.set(id, result.errors);
+    } catch (error) {
+      cueErrors.set(id, [error.message]);
+    }
+  }
+  return { catalogs, cueIndexes, cueErrors };
 }
 
 async function loadCollectionExperience(experienceId, { version = '' } = {}) {
@@ -1493,14 +1669,20 @@ async function loadCollectionExperience(experienceId, { version = '' } = {}) {
     fetchTable(languageFile(verseCatalog, 'sa'), MASTER_HEADERS.sa, version),
     fetchTable(languageFile(verseCatalog, 'en'), MASTER_HEADERS.en, version),
     fetchTable(languageFile(verseCatalog, 'kn'), MASTER_HEADERS.kn, version),
-    fetchTable(catalogEntry(experienceCatalog, 'audio', experienceId), ['cid', 'snum', 'sid', 'chant_full_sa_collection', 'chant_full_sa_order'], version),
+    fetchTable(catalogEntry(experienceCatalog, 'audio', experienceId), audioCompositionHeaders(experience), version),
     fetchTable(catalogEntry(experienceCatalog, 'images', experienceId), ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order'], version)
   ]);
-  const [audioCatalogs, imageCatalogs] = await Promise.all([
-    loadMediaCatalogs('audio', audioComposition, 'chant_full_sa_collection', ['sid', 'order', 'language', 'audio_url'], version),
+  const [audioCollections, imageCatalogs] = await Promise.all([
+    loadAudioCatalogs(audioComposition, audioBinding(experience).collectionField, version),
     loadMediaCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url'], version)
   ]);
-  return normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience });
+  return normalizeCollectionData({
+    sa, en, kn, audioComposition, imageComposition,
+    audioCatalogs: audioCollections.catalogs,
+    audioCueIndexes: audioCollections.cueIndexes,
+    audioCueErrors: audioCollections.cueErrors,
+    imageCatalogs, experience
+  });
 }
 
 function selectedCollectionFiles(fileList) {
@@ -1530,7 +1712,7 @@ async function loadCollectionExperienceWithReader(experienceId, { text, resolveM
     table(languageUrls.sa, MASTER_HEADERS.sa),
     table(languageUrls.en, MASTER_HEADERS.en),
     table(languageUrls.kn, MASTER_HEADERS.kn),
-    table(catalogEntry(experienceCatalog, 'audio', experienceId), ['cid', 'snum', 'sid', 'chant_full_sa_collection', 'chant_full_sa_order']),
+    table(catalogEntry(experienceCatalog, 'audio', experienceId), audioCompositionHeaders(experience)),
     table(catalogEntry(experienceCatalog, 'images', experienceId), ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order'])
   ]);
   async function localCatalogs(type, composition, collectionField, headers) {
@@ -1541,11 +1723,46 @@ async function loadCollectionExperienceWithReader(experienceId, { text, resolveM
     }
     return catalogs;
   }
-  const [audioCatalogs, imageCatalogs] = await Promise.all([
-    localCatalogs('audio', audioComposition, 'chant_full_sa_collection', ['sid', 'order', 'language', 'audio_url']),
+  async function localAudioCatalogs() {
+    const registry = await table(COLLECTION_ROOT + '/audio/collection.csv', AUDIO_REGISTRY_HEADERS);
+    const catalogs = new Map();
+    const cueIndexes = new Map();
+    const cueErrors = new Map();
+    const binding = audioBinding(experience);
+    for (const id of new Set(audioComposition.rows.map((row) => row[binding.collectionField]).filter(Boolean))) {
+      const entry = registryEntry(registry, id, 'audio');
+      const catalog = await table(entry.catalog_url, ['sid', 'order', 'language', 'audio_url']);
+      catalogs.set(id, catalog);
+      if (!entry.cue_purpose_url && !entry.cue_url) continue;
+      if (!entry.cue_purpose_url || !entry.cue_url) {
+        cueErrors.set(id, ['Audio collection must define both cue_purpose_url and cue_url.']);
+        continue;
+      }
+      try {
+        const [cuePurposes, cues] = await Promise.all([
+          table(entry.cue_purpose_url, AUDIO_CUE_PURPOSE_HEADERS),
+          table(entry.cue_url, AUDIO_CUE_HEADERS)
+        ]);
+        const result = buildAudioCueIndex({ collectionId: id, catalog, cuePurposes, cues, strict: false });
+        cueIndexes.set(id, result.cuesByAsset);
+        if (result.errors.length) cueErrors.set(id, result.errors);
+      } catch (error) {
+        cueErrors.set(id, [error.message]);
+      }
+    }
+    return { catalogs, cueIndexes, cueErrors };
+  }
+  const [audioCollections, imageCatalogs] = await Promise.all([
+    localAudioCatalogs(),
     localCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url'])
   ]);
-  return normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, imageCatalogs, experience, resolveMediaUrl });
+  return normalizeCollectionData({
+    sa, en, kn, audioComposition, imageComposition,
+    audioCatalogs: audioCollections.catalogs,
+    audioCueIndexes: audioCollections.cueIndexes,
+    audioCueErrors: audioCollections.cueErrors,
+    imageCatalogs, experience, resolveMediaUrl
+  });
 }
 
 async function loadCollectionExperienceFromFiles(experienceId, fileList) {
@@ -1629,7 +1846,7 @@ class WritableCollectionWorkspace {
       }
     });
     for (const row of dataset.rows) {
-      for (const field of ['chantFullSaUrl', 'chapterIconUrl']) {
+      for (const field of ['primaryAudioUrl', 'chantFullSaUrl', 'chapterIconUrl']) {
         if (row.media[field] instanceof Promise) row.media[field] = await row.media[field];
       }
     }
@@ -1963,6 +2180,144 @@ function createGita700Renderer() {
   };
 }
 
+// Source: js/player/renderers/gita-yoga.js
+const FIELDS = [
+  { role: 'shloka', field: 'source.shloka', language: 'sa' },
+  { role: 'sanskrit-words', field: 'source.wordByWord', language: 'sa' },
+  { role: 'kn-transliteration', field: 'languages.kn.transliteration', language: 'kn' },
+  { role: 'kn-meaning', field: 'languages.kn.meaning', language: 'kn' },
+  { role: 'kn-words', field: 'languages.kn.wordByWordMeaning', language: 'kn' },
+  { role: 'en-transliteration', field: 'languages.en.transliteration', language: 'en' },
+  { role: 'en-meaning', field: 'languages.en.meaning', language: 'en' },
+  { role: 'en-words', field: 'languages.en.wordByWordMeaning', language: 'en' }
+];
+
+function fieldValue(row, field) {
+  return field.split('.').reduce((value, part) => value && value[part], row) || '';
+}
+
+function createGitaYogaRenderer() {
+  let root;
+  let editing = false;
+
+  function mount(container) {
+    root = container;
+    root.classList.add('gita-yoga-root');
+    root.innerHTML = '<div class="gita-yoga-panels">' +
+      '<div class="gita-yoga-panel gita-yoga-sanskrit" data-language-panel="sa" aria-hidden="true"></div>' +
+      '<div class="gita-yoga-panel gita-yoga-language-panel gita-yoga-kn" data-language-panel="kn" aria-hidden="true"></div>' +
+      '<div class="gita-yoga-panel gita-yoga-language-panel gita-yoga-en" data-language-panel="en" aria-hidden="true"></div>' +
+      '<div class="gita-yoga-field gita-yoga-sanskrit-words" data-role="sanskrit-words"></div>' +
+      '<div class="gita-yoga-field gita-yoga-shloka" data-role="shloka"></div>' +
+      '<div class="gita-yoga-field gita-yoga-transliteration gita-yoga-kn-content" data-role="kn-transliteration"></div>' +
+      '<div class="gita-yoga-field gita-yoga-meaning gita-yoga-lower-content gita-yoga-kn-content" data-role="kn-meaning"></div>' +
+      '<div class="gita-yoga-field gita-yoga-word-meaning gita-yoga-lower-content gita-yoga-kn-content" data-role="kn-words"></div>' +
+      '<div class="gita-yoga-field gita-yoga-transliteration gita-yoga-en-content" data-role="en-transliteration"></div>' +
+      '<div class="gita-yoga-field gita-yoga-meaning gita-yoga-lower-content gita-yoga-en-content" data-role="en-meaning"></div>' +
+      '<div class="gita-yoga-field gita-yoga-word-meaning gita-yoga-lower-content gita-yoga-en-content" data-role="en-words"></div>' +
+    '</div>';
+  }
+
+  function makeEditable(element) {
+    element.contentEditable = 'true';
+    element.spellcheck = false;
+    element.dataset.editField = element.dataset.field;
+    element.classList.remove('empty');
+    if (element.textContent === '—') element.textContent = '';
+  }
+
+  function render(row, contentLanguage) {
+    FIELDS.forEach(({ role, field, language }) => {
+      const element = root.querySelector('[data-role="' + role + '"]');
+      const text = fieldValue(row, field);
+      element.dataset.field = field;
+      element.lang = language;
+      element.textContent = text || '—';
+      element.classList.toggle('empty', !text);
+      if (editing) makeEditable(element);
+    });
+    const primary = contentLanguage === 'kn' ? 'kn' : 'en';
+    root.dataset.primaryLanguage = primary;
+    if (!editing) requestAnimationFrame(fitText);
+  }
+
+  function setEditing(enabled) {
+    editing = enabled;
+    root.querySelectorAll('[data-role]').forEach((element) => {
+      if (enabled) makeEditable(element);
+      else {
+        element.contentEditable = 'false';
+        delete element.dataset.editField;
+      }
+    });
+    if (!enabled) requestAnimationFrame(fitText);
+  }
+
+  function editableElements() {
+    return Array.from(root.querySelectorAll('[data-edit-field]'));
+  }
+
+  function fitGroup(specifications) {
+    const entries = specifications.map(({ role, max, min }) => ({
+      element: root.querySelector('[data-role="' + role + '"]'), max, min
+    })).filter(({ element }) => element && element.clientHeight && getComputedStyle(element).display !== 'none');
+    const applyScale = (scale) => entries.forEach(({ element, max, min }) => {
+      element.style.fontSize = Math.max(min, Math.floor(max * scale)) + 'px';
+    });
+    if (!entries.length) return;
+    const fits = () => entries.every(({ element }) =>
+      element.scrollHeight <= element.clientHeight + 1 && element.scrollWidth <= element.clientWidth + 1
+    );
+    let low = 40;
+    let high = 100;
+    let best = 40;
+    while (low <= high) {
+      const middle = Math.floor((low + high) / 2);
+      applyScale(middle / 100);
+      if (fits()) {
+        best = middle;
+        low = middle + 1;
+      } else {
+        high = middle - 1;
+      }
+    }
+    applyScale(best / 100);
+  }
+
+  function fitText() {
+    if (editing || !root) return;
+    const allText = root.querySelectorAll('[data-role]');
+    allText.forEach((element) => { element.style.fontSize = ''; });
+    if (matchMedia('(max-width: 760px)').matches || globalThis.document?.documentElement.classList.contains('mobile-layout')) return;
+    fitGroup([
+      { role: 'sanskrit-words', max: 19, min: 11 },
+      { role: 'shloka', max: 27, min: 14 },
+      { role: 'kn-transliteration', max: 22, min: 12 },
+      { role: 'en-transliteration', max: 22, min: 12 }
+    ]);
+    ['kn', 'en'].forEach((language) => fitGroup([
+      { role: language + '-meaning', max: 21, min: 12 },
+      { role: language + '-words', max: 17, min: 10 }
+    ]));
+  }
+
+  return {
+    id: 'gita-yoga',
+    mount,
+    render,
+    setEditing,
+    editableElements,
+    fitText,
+    destroy() {
+      if (root) {
+        root.classList.remove('gita-yoga-root');
+        root.textContent = '';
+      }
+      root = null;
+    }
+  };
+}
+
 // Source: js/player/renderers/registry.js
 const experiences = {
   'gita-700': {
@@ -1970,7 +2325,11 @@ const experiences = {
     label: 'Gita 700',
     load: async () => createGita700Renderer()
   },
-  'gita-yoga': { available: false, label: 'Gita Yoga' },
+  'gita-yoga': {
+    available: true,
+    label: 'Gita Yoga',
+    load: async () => createGitaYogaRenderer()
+  },
   'gita-sara': { available: false, label: 'Gita Sara' }
 };
 
@@ -2009,7 +2368,7 @@ class InlineEditor {
     toolbar.className = 'edit-toolbar';
     toolbar.hidden = true;
     toolbar.innerHTML =
-      '<span class="edit-status">' + this.translate('editor.editVisible', 'Edit the four visible fields') + '</span>' +
+      '<span class="edit-status">' + this.translate('editor.editVisible', 'Edit the visible fields') + '</span>' +
       '<button class="cancel-edit" type="button">' + this.translate('editor.cancel', 'Cancel') + '</button>' +
       '<button class="save-edit" type="button">' + this.translate('editor.save', 'Save row') + '</button>';
     document.body.appendChild(toolbar);
@@ -2526,7 +2885,7 @@ function syncHomeCollectionSource() {
     : i18n.t('collections.message');
   document.getElementById('home-collections-button').textContent = i18n.t(ready ? 'collections.change' : 'collections.load');
   document.getElementById('home-collections-error').textContent = '';
-  document.querySelectorAll('#continue-journey-link, #gita-700-link').forEach((link) => {
+  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link').forEach((link) => {
     link.classList.toggle('needs-collections', !ready);
     link.setAttribute('aria-disabled', String(!ready));
   });
@@ -2721,24 +3080,37 @@ async function checkPlayerVersion() {
 }
 
 async function startRequestedExperience() {
-  const chooserLink = document.getElementById('gita-700-link');
-  const chooserResume = state.experienceResumes.get('gita-700')
-    || await profileStore.getExperienceResume(state.activeProfile.pid, 'gita-700');
-  const chooserUrl = new URL(location.href);
-  chooserUrl.searchParams.set('play', 'gita-700');
-  chooserUrl.searchParams.delete('view');
-  if (chooserResume?.sid) chooserUrl.searchParams.set('sid', chooserResume.sid);
-  else chooserUrl.searchParams.delete('sid');
-  chooserUrl.searchParams.set('pid', state.activeProfile.pid);
-  const chooserLanguage = chooserResume?.language || (requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.contentLanguage);
-  if (chooserLanguage === 'kn') chooserUrl.searchParams.set('lang', 'kn');
-  else chooserUrl.searchParams.delete('lang');
-  chooserLink.href = chooserUrl.href;
+  const experienceIds = ['gita-yoga', 'gita-700'];
+  const resumes = new Map(await Promise.all(experienceIds.map(async (experienceId) => [
+    experienceId,
+    state.experienceResumes.get(experienceId) || await profileStore.getExperienceResume(state.activeProfile.pid, experienceId)
+  ])));
+  const chooserUrls = new Map(experienceIds.map((experienceId) => {
+    const resume = resumes.get(experienceId);
+    const chooserUrl = new URL(location.href);
+    chooserUrl.searchParams.set('play', experienceId);
+    chooserUrl.searchParams.delete('view');
+    if (resume?.sid) chooserUrl.searchParams.set('sid', resume.sid);
+    else chooserUrl.searchParams.delete('sid');
+    chooserUrl.searchParams.set('pid', state.activeProfile.pid);
+    const language = resume?.language || (requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.contentLanguage);
+    if (language === 'kn') chooserUrl.searchParams.set('lang', 'kn');
+    else chooserUrl.searchParams.delete('lang');
+    document.getElementById(experienceId + '-link').href = chooserUrl.href;
+    return [experienceId, chooserUrl];
+  }));
+  const latest = await profileStore.getResume(state.activeProfile.pid);
+  const lastExperienceId = latest?.lastExperience?.experience || (latest?.view === 'experience' ? latest.experience : null);
+  const continueExperience = getExperience(lastExperienceId)?.available
+    ? lastExperienceId
+    : 'gita-yoga';
+  const continueResume = resumes.get(continueExperience);
+  const chooserUrl = chooserUrls.get(continueExperience);
   const continueLink = document.getElementById('continue-journey-link');
   continueLink.href = chooserUrl.href;
-  continueLink.textContent = chooserResume?.sid
-    ? i18n.t('diksoochi.resume', { sid: chooserResume.sid })
-    : i18n.t('diksoochi.begin');
+  continueLink.textContent = continueResume?.sid
+    ? i18n.t('diksoochi.resumeExperience', { experience: getExperience(continueExperience).label, sid: continueResume.sid })
+    : i18n.t('diksoochi.beginExperience', { experience: getExperience(continueExperience).label });
   if (!play) {
     const summary = await profileStore.getDiksoochiSummary(state.activeProfile.pid);
     document.getElementById('diksoochi-greeting').textContent = i18n.t('diksoochi.greeting', { name: state.activeProfile.name });
@@ -2773,7 +3145,7 @@ async function startRequestedExperience() {
       state.locationSource = null;
       return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
     }
-    return showError('The requested experience is not available yet. Use ?play=gita-700.');
+    return showError('The requested experience is not available yet. Choose Gita Yoga or Gita 700.');
   }
 
   showOnly('loading');
@@ -2864,7 +3236,8 @@ function chapterIconFor(cid) {
 }
 
 function audioSource(row) {
-  return row.media.chantFullSaUrl ? new URL(row.media.chantFullSaUrl, location.href).href : '';
+  const source = row.media.primaryAudioUrl || row.media.chantFullSaUrl;
+  return source ? new URL(source, location.href).href : '';
 }
 
 function render(options = {}) {
@@ -2882,6 +3255,7 @@ function render(options = {}) {
   document.getElementById('position-label').textContent = (state.index + 1) + ' / ' + state.dataset.rows.length;
   document.querySelector('#language-button .top-menu-label').textContent = i18n.t('menu.contentLanguage', { language: state.language === 'kn' ? 'ಕನ್ನಡ' : 'English' });
   state.renderer.render(row, state.language);
+  document.getElementById('renderer-root').scrollTop = 0;
   state.experienceResumes.set(play, {
     experience: play,
     sid: row.sid,
@@ -3259,7 +3633,7 @@ function bindEvents() {
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
   document.getElementById('home-collections-input').addEventListener('change', (event) => useSelectedCollections(event.target.files));
   document.getElementById('home-collections-button').addEventListener('click', () => document.getElementById('home-collections-input').click());
-  document.querySelectorAll('#continue-journey-link, #gita-700-link').forEach((link) => link.addEventListener('click', (event) => {
+  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link').forEach((link) => link.addEventListener('click', (event) => {
     event.preventDefault();
     openHomeExperience(link);
   }));

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { loadCollectionExperienceFromFiles, normalizeCollectionData, openWritableCollectionWorkspace, parseCollectionTable, serializeLanguageMaster } from '../../js/player/collection-data.js';
+import { AUDIO_CUE_HEADERS, AUDIO_CUE_PURPOSE_HEADERS, buildAudioCueIndex, loadCollectionExperienceFromFiles, normalizeCollectionData, openWritableCollectionWorkspace, parseCollectionTable, serializeLanguageMaster } from '../../js/player/collection-data.js';
 import { projectRoot } from '../helpers/collection-data.mjs';
 
 async function table(relative) {
@@ -16,6 +16,17 @@ const audioComposition = await table('data/collections/experiences/gita-700/audi
 const imageComposition = await table('data/collections/experiences/gita-700/images.csv');
 const audioCatalog = await table('data/collections/audio/chanting-swami-brahmananda/catalog.csv');
 const imageCatalog = await table('data/collections/images/gita-chapter-icons/catalog.csv');
+const cueCatalog = await table('tests/fixtures/audio-cues/catalog.csv');
+const cuePurposes = parseCollectionTable(
+  await readFile(path.join(projectRoot, 'tests/fixtures/audio-cues/cue-purpose.csv'), 'utf8'),
+  AUDIO_CUE_PURPOSE_HEADERS,
+  'fixture cue-purpose.csv'
+);
+const cues = parseCollectionTable(
+  await readFile(path.join(projectRoot, 'tests/fixtures/audio-cues/cue.csv'), 'utf8'),
+  AUDIO_CUE_HEADERS,
+  'fixture cue.csv'
+);
 const dataset = normalizeCollectionData({
   sa, en, kn, audioComposition, imageComposition,
   audioCatalogs: new Map([['chanting-swami-brahmananda', audioCatalog]]),
@@ -75,9 +86,96 @@ test('the player builds its normalized model from collection data', () => {
   assert.ok(verse.languages.en.transliteration);
   assert.ok(verse.languages.kn.meaning);
   assert.equal(verse.media.chantFullSaUrl, 'data/collections/audio/chanting-swami-brahmananda/sa/chapter-06/06-007.mp3');
+  assert.deepEqual(verse.media.chantFullSaCues, []);
   const chapter = dataset.rows.find((row) => row.sid === '6.B');
   assert.equal(chapter.media.chapterIconUrl, 'data/collections/images/gita-chapter-icons/chapter-06.svg');
   assert.equal(chapter.media.chantFullSaUrl, '');
+});
+
+test('audio cues resolve purpose metadata and are indexed by SID plus asset order', () => {
+  const result = buildAudioCueIndex({
+    collectionId: 'fixture-learning-mode',
+    catalog: cueCatalog,
+    cuePurposes,
+    cues
+  });
+  assert.equal(result.errors.length, 0);
+  assert.equal(result.cuesByAsset.size, 2);
+  assert.deepEqual(result.cuesByAsset.get('1.1:1').map(({ cueId }) => cueId),
+    ['words', 'paada', 'ardha', 'padya', 'meaning_en', 'meaning_kn']);
+  assert.deepEqual(result.cuesByAsset.get('1.1:1')[4], {
+    order: 5,
+    cueId: 'meaning_en',
+    language: 'en',
+    purpose: 'meaning',
+    description: 'English meaning',
+    startMs: 49000,
+    endMs: 57000
+  });
+});
+
+test('normalized verse media receives only the cue set for its selected audio asset', () => {
+  const cue = Object.freeze({ order: 1, cueId: 'padya', language: 'sa', purpose: 'padya', description: 'Full verse', startMs: 0, endMs: 12000 });
+  const withCues = normalizeCollectionData({
+    sa, en, kn, audioComposition, imageComposition,
+    audioCatalogs: new Map([['chanting-swami-brahmananda', audioCatalog]]),
+    audioCueIndexes: new Map([['chanting-swami-brahmananda', new Map([['6.7:1', Object.freeze([cue])]])]]),
+    imageCatalogs: new Map([['gita-chapter-icons', imageCatalog]]),
+    experience: { id: 'gita-700' }
+  });
+  assert.deepEqual(withCues.rows.find((row) => row.sid === '6.7').media.chantFullSaCues, [cue]);
+  assert.deepEqual(withCues.rows.find((row) => row.sid === '6.8').media.chantFullSaCues, []);
+});
+
+test('an invalid asset cue set falls back without removing valid asset cues', () => {
+  const invalidRows = cues.rows.map((row) => ({ ...row }));
+  invalidRows.find((row) => row.sid === '1.2' && row.cue_order === '3').start_ms = '22000';
+  const result = buildAudioCueIndex({
+    collectionId: 'fixture-learning-mode',
+    catalog: cueCatalog,
+    cuePurposes,
+    cues: { headers: cues.headers, rows: invalidRows },
+    strict: false
+  });
+  assert.ok(result.cuesByAsset.has('1.1:1'));
+  assert.equal(result.cuesByAsset.has('1.2:1'), false);
+  assert.match(result.errors.join(' '), /1\.2:1 cue 3 overlaps cue 2/);
+  assert.throws(() => buildAudioCueIndex({
+    collectionId: 'fixture-learning-mode',
+    catalog: cueCatalog,
+    cuePurposes,
+    cues: { headers: cues.headers, rows: invalidRows }
+  }), /cue 3 overlaps cue 2/);
+});
+
+test('a 4,500-row cue catalog indexes once without touching audio URLs', () => {
+  const catalogRows = [];
+  const cueRows = [];
+  const purposeIds = ['words', 'paada', 'ardha', 'padya', 'meaning_en', 'meaning_kn'];
+  for (let asset = 1; asset <= 750; asset += 1) {
+    const sid = 'T.' + asset;
+    catalogRows.push({ sid, order: '1', language: 'sa-kn-en', audio_url: 'unrequested/' + asset + '.mp3' });
+    purposeIds.forEach((cueId, index) => cueRows.push({
+      sid,
+      asset_order: '1',
+      cue_order: String(index + 1),
+      cue_id: cueId,
+      start_ms: String(index * 10000),
+      end_ms: String((index + 1) * 10000)
+    }));
+  }
+  const started = performance.now();
+  const result = buildAudioCueIndex({
+    collectionId: 'scale-fixture',
+    catalog: { headers: cueCatalog.headers, rows: catalogRows },
+    cuePurposes,
+    cues: { headers: AUDIO_CUE_HEADERS, rows: cueRows }
+  });
+  const elapsed = performance.now() - started;
+  assert.equal(result.cuesByAsset.size, 750);
+  assert.equal(cueRows.length, 4500);
+  assert.ok(elapsed < 1000, `4,500 cues should index in under one second; took ${elapsed.toFixed(1)} ms`);
+  assert.equal(catalogRows[0].audio_url, 'unrequested/1.mp3');
 });
 
 test('the player identifies the legacy Sanskrit master schema clearly', () => {

@@ -1,7 +1,7 @@
 # Profiles and local storage
 
 **Status:** Current  
-**Last updated:** 30 September 2026
+**Last updated:** 9 October 2026
 
 ## Storage model
 
@@ -15,7 +15,7 @@ Profile photos are device-local data. Each profile stores separate `interfaceLan
 
 `pid` identifies the local profile within application URLs. It is meaningful only on the device and browser storage where that profile exists. Experience and SID make content links addressable. `lang` overrides content language only; interface language is never controlled by a URL.
 
-Opening Diksoochi records it as the current screen but preserves every experience’s last SID, language, and saved time. Selecting an experience from Diksoochi restores that experience’s point. Explicit URL parameters still take precedence. Older single-location records are read as a compatible resume point and are upgraded naturally by later navigation.
+Opening Diksoochi records it as the current screen but preserves every experience’s last SID, language, and saved time. It also preserves a separate most-recent-experience pointer for **Continue your journey**, so catalog ordering never overrides actual user history. Selecting an experience from Diksoochi restores that experience’s point. Explicit URL parameters still take precedence. Older single-location records are read as a compatible resume point and are upgraded naturally by later navigation.
 
 ## Failure behavior
 

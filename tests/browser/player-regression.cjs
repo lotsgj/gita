@@ -41,6 +41,19 @@ async function createProfile(page, name = 'Regression Profile') {
   await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
 }
 
+async function assertYogaTopColumnsDoNotOverlap(page) {
+  const boxes = await page.locator('[data-role="shloka"], [data-role$="-transliteration"]').evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { role: element.dataset.role, left: box.left, right: box.right, top: box.top, bottom: box.bottom };
+    }).sort((left, right) => left.left - right.left)
+  );
+  assert.equal(boxes.length, 3);
+  assert.ok(boxes[0].right <= boxes[1].left + 1, `${boxes[0].role} overlaps ${boxes[1].role}`);
+  assert.ok(boxes[1].right <= boxes[2].left + 1, `${boxes[1].role} overlaps ${boxes[2].role}`);
+  assert.ok(boxes.every((box) => box.top < box.bottom), 'all top-row fields must have visible geometry');
+}
+
 async function run() {
   const server = staticServer();
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -103,6 +116,47 @@ async function run() {
       return ids.map((selector) => document.querySelector(selector).getBoundingClientRect().top);
     });
     assert.ok(landingOrder[0] < landingOrder[1] && landingOrder[1] < landingOrder[2], 'Diksoochi action and journey sections must follow the approved order');
+    const experienceOrder = await page.locator('.diksoochi-experiences .experience-link').evaluateAll((links) => links.map((link) => link.id));
+    assert.deepEqual(experienceOrder.slice(0, 2), ['gita-yoga-link', 'gita-700-link'], 'Gita Yoga must appear above Gita 700');
+    await page.locator('#gita-yoga-link').click();
+    await page.locator('.gita-yoga-panel').first().waitFor();
+    assert.equal(await page.locator('#sid-label').innerText(), '1.B');
+    assert.equal(await page.locator('.gita-yoga-panel').count(), 3);
+    assert.equal(await page.locator('.gita-yoga-field').count(), 8, 'each Gita Yoga data field must have exactly one UI element');
+    assert.equal(await page.locator('[data-role]').evaluateAll((elements) => new Set(elements.map((element) => element.dataset.role)).size), 8, 'Gita Yoga roles must not be duplicated');
+    assert.equal(await page.locator('.gita-yoga-sanskrit').evaluate((element) => getComputedStyle(element).backgroundColor), 'rgb(251, 246, 234)');
+    assert.equal(await page.locator('.gita-yoga-language-panel').first().evaluate((element) => getComputedStyle(element).minHeight), '0px', 'language panels must use content-driven height');
+    assert.equal(await page.locator('.gita-yoga-panels').evaluate((panels) => panels.clientHeight === panels.parentElement.clientHeight), true, 'desktop Gita Yoga must fill the fixed renderer area');
+    assert.equal(await page.locator('.gita-yoga-language-panel').evaluateAll((panels) => new Set(panels.map((panel) => Math.round(panel.getBoundingClientRect().height))).size), 1, 'desktop language panels must share one fixed-height row');
+    assert.equal(await page.locator('[data-role="sanskrit-words"]').evaluate((words) => words.getBoundingClientRect().top < document.querySelector('[data-role="shloka"]').getBoundingClientRect().top), true, 'desktop word-by-word text must precede the three shloka columns');
+    assert.ok(Number(await page.locator('[data-role="shloka"]').evaluate((element) => getComputedStyle(element).fontWeight)) <= 550, 'Gita Yoga shloka typography must remain light');
+    assert.equal(await page.locator('[data-language-panel="en"]').evaluate((element) => element.getBoundingClientRect().left < document.querySelector('[data-language-panel="kn"]').getBoundingClientRect().left), true, 'English must be the primary desktop panel for English content');
+    await assertYogaTopColumnsDoNotOverlap(page);
+    assert.notEqual(await page.locator('[data-role="shloka"]').innerText(), '—');
+    assert.match(await page.locator('#audio').getAttribute('src'), /chanting-aj-padma-aj-vijay-learn-mode/);
+    await page.keyboard.press('l');
+    await page.getByRole('button', { name: 'ಕನ್ನಡ' }).click();
+    assert.equal(await page.locator('[data-language-panel="kn"]').evaluate((element) => element.getBoundingClientRect().left < document.querySelector('[data-language-panel="en"]').getBoundingClientRect().left), true, 'Kannada must move to the primary desktop panel when content language changes');
+    await assertYogaTopColumnsDoNotOverlap(page);
+    await page.locator('#renderer-root').evaluate((root) => {
+      root.querySelector('.gita-yoga-panels').style.paddingBottom = '1000px';
+      root.scrollTop = root.scrollHeight;
+    });
+    await page.keyboard.press('ArrowRight');
+    assert.equal(await page.locator('#renderer-root').evaluate((root) => root.scrollTop), 0, 'a newly rendered verse must start at the top');
+    await page.locator('.gita-yoga-panels').evaluate((panels) => { panels.style.paddingBottom = ''; });
+
+    await page.setViewportSize({ width: 1680, height: 950 });
+    await page.goto(`${base}/player.html?play=gita-yoga&sid=7.1&lang=kn&pid=1`, { waitUntil: 'networkidle' });
+    assert.equal(await page.locator('#renderer-root').evaluate((root) => root.scrollHeight <= root.clientHeight + 1), true, 'a content-fitting desktop verse must not create a renderer scrollbar');
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    await page.goto(`${base}/player.html?play=gita-yoga&sid=8.1&pid=1`, { waitUntil: 'networkidle' });
+    assert.equal(await page.locator('.gita-yoga-panel').count(), 3, 'missing work-in-progress audio must not prevent verse rendering');
+    assert.equal(await page.locator('#play-button').isDisabled(), true, 'a verse without mapped Gita Yoga audio must disable playback');
+
+    await page.keyboard.press('a');
+    await page.locator('#gita-700-link').waitFor({ state: 'visible' });
     await page.locator('#gita-700-link').click();
     await assert.doesNotReject(() => page.locator('#sid-label').waitFor());
     assert.equal(await page.locator('#sid-label').innerText(), '1.B');
@@ -250,6 +304,7 @@ async function run() {
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
     await page.keyboard.press('a');
     await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
+    assert.equal(await page.locator('#continue-journey-link').innerText(), 'Resume Gita 700 · Shloka 6.7', 'Home must continue the most recently visited experience rather than the first chooser item');
     await page.evaluate(() => new Promise((resolve, reject) => {
       const request = indexedDB.open('gitaverse-profiles');
       request.onerror = () => reject(request.error);
@@ -378,6 +433,15 @@ async function run() {
     await mobilePage.goto(`${base}/player.html?play=gita-700&sid=6.7`, { waitUntil: 'networkidle' });
     await createProfile(mobilePage, 'Mobile Regression');
     assert.equal(await mobilePage.locator('#diksoochi-journey-empty').isVisible(), true, 'mobile Diksoochi must show its compact journey state');
+    await mobilePage.goto(`${base}/player.html?play=gita-yoga&sid=1.1&pid=1`, { waitUntil: 'networkidle' });
+    const yogaBoxes = await mobilePage.locator('.gita-yoga-panel').evaluateAll((panels) => panels.map((panel) => {
+      const box = panel.getBoundingClientRect();
+      return { left: box.left, top: box.top };
+    }));
+    assert.equal(new Set(yogaBoxes.map(({ left }) => Math.round(left))).size, 1, 'mobile Gita Yoga panels must share one column');
+    assert.equal(new Set(yogaBoxes.map(({ top }) => Math.round(top))).size, 3, 'mobile Gita Yoga panels must occupy separate rows');
+    assert.equal(await mobilePage.locator('[data-role="kn-transliteration"]').isVisible(), true, 'mobile language panels must retain their transliteration');
+    assert.equal(await mobilePage.locator('[data-role="sanskrit-words"]').evaluate((words) => words.getBoundingClientRect().top > document.querySelector('[data-role="shloka"]').getBoundingClientRect().top), true, 'mobile must retain shloka before Sanskrit word-by-word text');
     await mobilePage.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
     const boxes = await mobilePage.locator('.gita-700-panel').evaluateAll((panels) => panels.map((panel) => panel.getBoundingClientRect().top));
     assert.ok(boxes.every((top, index) => index === 0 || top > boxes[index - 1]), 'mobile panels must stack vertically');

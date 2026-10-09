@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+  <title>Gita-Yoga visual review</title>
+  <style>
+    @font-face {
+      font-family: "Gitaverse Noto Sans";
+      src: url("../assets/fonts/NotoSans.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Gitaverse Noto Sans";
+      src: url("../assets/fonts/NotoSansDevanagari.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      unicode-range: U+0900-097F;
+    }
+    @font-face {
+      font-family: "Gitaverse Noto Sans";
+      src: url("../assets/fonts/NotoSansKannada.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      unicode-range: U+0C80-0CFF;
+    }
+
+    :root {
+      --ink: #263831;
+      --muted: #67746e;
+      --page: #f5f0e6;
+      --bar: rgba(252, 249, 242, .94);
+      --line: rgba(65, 79, 70, .17);
+      --accent: #315c55;
+      --accent-strong: #244a44;
+      --gold: #bd8b31;
+      --sa-bg: #fbf6ea;
+      --sa-ink: #33261e;
+      --kn-bg: #f2f4f3;
+      --kn-ink: #26384a;
+      --en-bg: #eaefee;
+      --en-ink: #45565d;
+      --shadow: 0 14px 38px rgba(50, 53, 43, .09);
+      --radius: 24px;
+      --font: "Gitaverse Noto Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { color-scheme: light; background: var(--page); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 9%, rgba(189, 139, 49, .10), transparent 22rem),
+        radial-gradient(circle at 94% 66%, rgba(49, 92, 85, .09), transparent 28rem),
+        var(--page);
+      font-family: var(--font);
+    }
+    button, select { font: inherit; }
+
+    .review-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      min-height: 46px;
+      padding: 7px 18px;
+      color: #f8f5ed;
+      background: #263831;
+      font-size: 13px;
+      letter-spacing: .02em;
+    }
+    .review-strip strong { font-weight: 650; }
+    .review-controls { display: flex; gap: 8px; }
+    .review-controls label { display: flex; align-items: center; gap: 6px; }
+    .review-controls select {
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 999px;
+      padding: 4px 24px 4px 10px;
+      color: white;
+      background: #344942;
+    }
+
+    .app-shell { min-height: calc(100vh - 46px); padding-bottom: 92px; }
+    .topbar {
+      position: sticky;
+      z-index: 10;
+      top: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      min-height: 72px;
+      padding: 8px clamp(14px, 3vw, 38px);
+      border-bottom: 1px solid var(--line);
+      background: var(--bar);
+      backdrop-filter: blur(14px);
+    }
+    .chapter {
+      justify-self: start;
+      overflow: hidden;
+      color: var(--ink);
+      font-size: clamp(14px, 1.5vw, 18px);
+      font-weight: 570;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sid {
+      justify-self: center;
+      padding: 0 20px;
+      color: #a4572e;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 780;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      letter-spacing: -.035em;
+    }
+    .top-actions { justify-self: end; display: flex; align-items: center; gap: 8px; }
+    .profile, .menu {
+      display: inline-grid;
+      min-width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255,255,255,.52);
+    }
+    .profile { padding: 0 14px; font-size: 14px; }
+    .menu { font-size: 21px; }
+
+    main { width: min(1440px, 100%); margin: 0 auto; padding: 14px clamp(12px, 2.2vw, 30px) 28px; }
+    .count { margin: 0 0 10px; color: var(--muted); text-align: center; font-size: 12px; letter-spacing: .09em; text-transform: uppercase; }
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(12px, 1.6vw, 22px); }
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(48, 61, 54, .12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .sanskrit {
+      grid-column: 1 / -1;
+      min-height: 0;
+      padding: clamp(18px, 2vw, 28px) clamp(22px, 6vw, 90px);
+      color: var(--sa-ink);
+      background:
+        linear-gradient(120deg, rgba(255,255,255,.18), transparent 48%),
+        var(--sa-bg);
+      text-align: center;
+    }
+    .shloka-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: center;
+      gap: clamp(20px, 3.2vw, 54px);
+    }
+    .shloka {
+      min-width: 0;
+      margin: 0 auto;
+      font-size: clamp(20px, 1.72vw, 27px);
+      font-weight: 550;
+      line-height: 1.52;
+      letter-spacing: .005em;
+      text-wrap: balance;
+    }
+    .shloka-translation {
+      font-size: clamp(17px, 1.4vw, 22px);
+      font-weight: 430;
+      line-height: 1.62;
+    }
+    .mobile-transliteration { display: none; }
+    .sa-words {
+      max-width: 1050px;
+      margin: 0 auto clamp(16px, 2.3vh, 24px);
+      font-size: clamp(16px, 1.3vw, 19px);
+      font-weight: 400;
+      line-height: 1.9;
+      opacity: .86;
+    }
+
+    .language-panel {
+      min-height: 0;
+      padding: clamp(18px, 1.7vw, 26px) clamp(22px, 2.5vw, 34px);
+    }
+    .kannada { color: var(--kn-ink); background: var(--kn-bg); }
+    .english { color: var(--en-ink); background: var(--en-bg); }
+    .panel-section + .panel-section {
+      margin-top: clamp(18px, 2.5vh, 26px);
+    }
+    .section-label {
+      display: none;
+    }
+    .transliteration {
+      margin: 0;
+      font-size: clamp(20px, 2vw, 27px);
+      font-weight: 430;
+      line-height: 1.55;
+      text-wrap: balance;
+    }
+    .meaning {
+      margin: 0;
+      font-size: clamp(17px, 1.55vw, 21px);
+      font-weight: 400;
+      line-height: 1.65;
+    }
+    .word-meaning {
+      margin: 0;
+      font-size: clamp(14px, 1.2vw, 17px);
+      line-height: 1.65;
+      opacity: .88;
+    }
+    .audio-dock {
+      position: fixed;
+      z-index: 20;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: grid;
+      grid-template-columns: auto minmax(260px, 760px) auto;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(14px, 3vw, 34px);
+      min-height: 78px;
+      padding: 9px clamp(14px, 3vw, 34px);
+      border-top: 1px solid var(--line);
+      background: rgba(252,249,242,.96);
+      box-shadow: 0 -10px 36px rgba(45, 51, 45, .08);
+      backdrop-filter: blur(16px);
+    }
+    .dock-action, .play {
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent-strong);
+      background: white;
+      cursor: pointer;
+    }
+    .dock-action { width: 42px; height: 42px; font-size: 19px; }
+    .audio-main { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 13px; }
+    .play { width: 46px; height: 46px; color: white; background: var(--accent); font-size: 17px; }
+    .timeline-stack { min-width: 0; }
+    .cue-name { height: 18px; margin-bottom: 3px; color: var(--accent-strong); font-size: 12px; font-weight: 650; }
+    .timeline {
+      position: relative;
+      display: flex;
+      overflow: visible;
+      width: 100%;
+      height: 22px;
+      border: 0;
+      border-radius: 999px;
+      background: #d9ddd8;
+    }
+    .cue {
+      position: relative;
+      min-width: 18px;
+      border: 0;
+      border-right: 2px solid rgba(252,249,242,.92);
+      color: transparent;
+      background: rgba(49,92,85,.14);
+      cursor: pointer;
+    }
+    .cue:first-child { border-radius: 999px 0 0 999px; }
+    .cue:last-child { border-right: 0; border-radius: 0 999px 999px 0; }
+    .cue:hover, .cue:focus-visible { background: rgba(49,92,85,.32); outline: 2px solid var(--gold); outline-offset: 2px; }
+    .cue.active { background: var(--accent); }
+    .cue.playing::after {
+      position: absolute;
+      inset: 0;
+      width: var(--cue-progress, 0%);
+      border-radius: inherit;
+      background: rgba(245,223,170,.75);
+      content: "";
+    }
+    .cue-tip {
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      z-index: 3;
+      display: none;
+      width: max-content;
+      max-width: 210px;
+      padding: 7px 10px;
+      border-radius: 9px;
+      color: white;
+      background: #263831;
+      font-size: 12px;
+      font-weight: 560;
+      text-align: center;
+      transform: translateX(-50%);
+      box-shadow: 0 5px 16px rgba(0,0,0,.18);
+    }
+    .cue:hover .cue-tip, .cue:focus-visible .cue-tip { display: block; }
+    .time { display: flex; justify-content: space-between; margin-top: 3px; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+
+    @media (max-width: 760px) {
+      .review-strip { align-items: flex-start; flex-direction: column; gap: 5px; padding: 7px 12px; }
+      .review-controls { width: 100%; justify-content: space-between; }
+      .review-controls label { font-size: 11px; }
+      .review-controls select { max-width: 112px; }
+      .app-shell { min-height: calc(100vh - 76px); padding-bottom: 88px; }
+      .topbar { min-height: 62px; padding: 6px 12px; }
+      .chapter { max-width: 115px; font-size: 12px; }
+      .sid { padding: 0 8px; font-size: 34px; }
+      .profile { display: none; }
+      .menu { width: 38px; min-width: 38px; height: 38px; }
+      main { padding: 10px 9px 22px; }
+      .count { margin-bottom: 8px; font-size: 10px; }
+      .panels { grid-template-columns: 1fr; gap: 10px; }
+      .sanskrit { grid-column: auto; min-height: 0; padding: 29px 19px 27px; }
+      .shloka-grid { display: block; order: 0; }
+      .shloka { font-size: clamp(25px, 7.6vw, 32px); line-height: 1.6; }
+      .shloka-translation { display: none; }
+      .mobile-transliteration { display: block; }
+      .sa-words { order: 1; margin: 22px 0 0; font-size: 16px; line-height: 1.85; }
+      .language-panel { min-height: 0; padding: 24px 20px; }
+      .transliteration { font-size: clamp(19px, 5.4vw, 23px); }
+      .meaning { font-size: 17px; }
+      .word-meaning { font-size: 14px; }
+      .panel-section + .panel-section { margin-top: 22px; }
+      .audio-dock { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; min-height: 76px; padding: 8px 9px; }
+      .dock-action { width: 38px; height: 38px; }
+      .audio-main { grid-template-columns: auto minmax(0, 1fr); gap: 8px; }
+      .play { width: 41px; height: 41px; }
+      .cue-name { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+      .timeline { height: 25px; }
+      .cue-tip { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="review-strip" aria-label="Visual review controls">
+    <strong>Gita-Yoga visual review · SID 6.7</strong>
+    <div class="review-controls">
+      <label>App language
+        <select id="app-language">
+          <option value="en">English</option>
+          <option value="kn">ಕನ್ನಡ</option>
+        </select>
+      </label>
+      <label>Content language
+        <select id="content-language">
+          <option value="kn">ಕನ್ನಡ first</option>
+          <option value="en">English first</option>
+        </select>
+      </label>
+    </div>
+  </aside>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="chapter" id="chapter">6 — ಧ್ಯಾನ ಯೋಗ</div>
+      <div class="sid">6.7</div>
+      <div class="top-actions">
+        <button class="profile" type="button">Vijay</button>
+        <button class="menu" type="button" aria-label="Open menu">≡</button>
+      </div>
+    </header>
+
+    <main>
+      <p class="count" id="count">Verse 261 of 746</p>
+      <div class="panels" id="panels">
+        <article class="panel sanskrit" lang="sa">
+          <p class="sa-words">जितात्मनः · प्रशान्तस्य · परमात्मा · समाहितः · शीत · उष्ण · सुख · दुःखेषु · तथा · मान · अपमानयोः</p>
+          <div class="shloka-grid">
+            <p class="shloka">जितात्मनः प्रशान्तस्य<br>परमात्मा समाहितः ।<br>शीतोष्णसुखदुःखेषु<br>तथा मानापमानयोः ॥</p>
+            <p class="shloka shloka-translation" data-shloka-language="kn" lang="kn">ಜಿತಾತ್ಮನಃ ಪ್ರಶಾನ್ತಸ್ಯ<br>ಪರಮಾತ್ಮಾ ಸಮಾಹಿತಃ<br>ಶೀತೋಷ್ಣಸುಖದುಃಖೇಷು<br>ತಥಾ ಮಾನಾಪಮಾನಯೋಃ</p>
+            <p class="shloka shloka-translation" data-shloka-language="en" lang="en">jitātmanaḥ praśhāntasya<br>paramātmā samāhitaḥ<br>śhītoṣhṇa-sukha-duḥkheṣhu<br>tathā mānāpamānayoḥ</p>
+          </div>
+        </article>
+
+        <article class="panel language-panel kannada primary" data-language-panel="kn" lang="kn">
+          <section class="panel-section mobile-transliteration">
+            <h2 class="section-label" data-label="transliteration">ಲಿಪ್ಯಂತರ</h2>
+            <p class="transliteration">ಜಿತಾತ್ಮನಃ ಪ್ರಶಾನ್ತಸ್ಯ<br>ಪರಮಾತ್ಮಾ ಸಮಾಹಿತಃ<br>ಶೀತೋಷ್ಣಸುಖದುಃಖೇಷು<br>ತಥಾ ಮಾನಾಪಮಾನಯೋಃ</p>
+          </section>
+          <section class="panel-section">
+            <h2 class="section-label" data-label="meaning">ಅರ್ಥ</h2>
+            <p class="meaning">ಮನಸ್ಸನ್ನು ಗೆದ್ದ ಯೋಗಿಗಳು ಶೀತ ಮತ್ತು ಉಷ್ಣ, ಸಂತೋಷ ಮತ್ತು ದುಃಖ, ಹಾಗೂ ಗೌರವ ಮತ್ತು ಅಪಮಾನ ಎಂಬ ದ್ವಂದ್ವಗಳನ್ನು ಮೀರಿ ಮೇಲೇರುತ್ತಾರೆ. ಅಂತಹ ಯೋಗಿಗಳು ಶಾಂತಿಯಲ್ಲಿ ನೆಲೆಗೊಂಡು, ಪರಮಾತ್ಮನ ಭಕ್ತಿಯಲ್ಲಿ ದೃಢವಾಗಿರುತ್ತಾರೆ.</p>
+          </section>
+          <section class="panel-section">
+            <h2 class="section-label" data-label="words">ಪದಾರ್ಥ</h2>
+            <p class="word-meaning">ಜಿತ-ಆತ್ಮನಃ—ಮನಸ್ಸನ್ನು ಜಯಿಸಿದವನಿಗೆ; ಪ್ರಶಾನ್ತಸ್ಯ—ಪ್ರಶಾಂತನಿಗೆ; ಪರಮ-ಆತ್ಮಾ—ಪರಮಾತ್ಮನು; ಸಮಾಹಿತಃ—ಸ್ಥಿರವಾಗಿ ನೆಲೆಸಿದ್ದಾನೆ; ಶೀತ—ಶೀತ; ಉಷ್ಣ—ಉಷ್ಣಗಳಲ್ಲಿ; ಸುಖ—ಸುಖ; ದುಃಖೇಷು—ದುಃಖಗಳಲ್ಲಿ; ತಥಾ—ಹಾಗೆಯೇ; ಮಾನ—ಮಾನ; ಅಪಮಾನಯೋಃ—ಮತ್ತು ಅಪಮಾನಗಳಲ್ಲಿ</p>
+          </section>
+        </article>
+
+        <article class="panel language-panel english" data-language-panel="en" lang="en">
+          <section class="panel-section mobile-transliteration">
+            <h2 class="section-label" data-label="transliteration">Transliteration</h2>
+            <p class="transliteration">jitātmanaḥ praśhāntasya<br>paramātmā samāhitaḥ<br>śhītoṣhṇa-sukha-duḥkheṣhu<br>tathā mānāpamānayoḥ</p>
+          </section>
+          <section class="panel-section">
+            <h2 class="section-label" data-label="meaning">Meaning</h2>
+            <p class="meaning">The yogis who have conquered the mind rise above the dualities of cold and heat, joy and sorrow, and honor and dishonor. Such yogis remain peaceful and steadfast in their devotion to God.</p>
+          </section>
+          <section class="panel-section">
+            <h2 class="section-label" data-label="words">Word meanings</h2>
+            <p class="word-meaning">jita-ātmanaḥ—one who has conquered one’s mind; praśhāntasya—of the peaceful; parama-ātmā—God; samāhitaḥ—steadfast; śhīta—in cold; uṣhṇa—heat; sukha—happiness; duḥkheṣhu—in distress; tathā—also; māna—in honor; apamānayoḥ—and dishonor</p>
+          </section>
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <footer class="audio-dock">
+    <button class="dock-action" type="button" id="goto" aria-label="Go to verse">⌖</button>
+    <div class="audio-main">
+      <button class="play" type="button" id="play" aria-label="Play">▶</button>
+      <div class="timeline-stack">
+        <div class="cue-name" id="cue-name">Select a practice segment</div>
+        <div class="timeline" id="timeline" aria-label="Audio practice segments"></div>
+        <div class="time"><span id="elapsed">0:00</span><span>6:14</span></div>
+      </div>
+    </div>
+    <button class="dock-action" type="button" id="fullscreen" aria-label="Fullscreen">⛶</button>
+  </footer>
+
+  <script>
+    const cueDefinitions = [
+      { id: 'words', weight: 16, en: 'Word familiarity', kn: 'ಪದ ಪರಿಚಯ', range: '0:00–1:00' },
+      { id: 'paada', weight: 25, en: 'Quarter verse practice', kn: 'ಪಾದದಂತೆ ಅಭ್ಯಾಸ', range: '1:00–2:34' },
+      { id: 'ardha', weight: 20, en: 'Half verse practice', kn: 'ಅರ್ಧದಂತೆ ಅಭ್ಯಾಸ', range: '2:34–3:49' },
+      { id: 'padya', weight: 16, en: 'Full verse', kn: 'ಪೂರ್ಣ ಶ್ಲೋಕ', range: '3:49–4:49' },
+      { id: 'meaning_en', weight: 11, en: 'English meaning', kn: 'ಇಂಗ್ಲಿಷ್ ಅರ್ಥ', range: '4:49–5:30' },
+      { id: 'meaning_kn', weight: 12, en: 'Kannada meaning', kn: 'ಕನ್ನಡ ಅರ್ಥ', range: '5:30–6:14' }
+    ];
+
+    const ui = {
+      en: { count: 'Verse 261 of 746', empty: 'Select a practice segment', play: 'Play', pause: 'Pause', chapter: '6 — Dhyana Yoga' },
+      kn: { count: '746ರಲ್ಲಿ 261ನೇ ಶ್ಲೋಕ', empty: 'ಅಭ್ಯಾಸದ ಭಾಗವನ್ನು ಆಯ್ಕೆಮಾಡಿ', play: 'ಪ್ಲೇ', pause: 'ವಿರಾಮ', chapter: '6 — ಧ್ಯಾನ ಯೋಗ' }
+    };
+
+    const appLanguage = document.getElementById('app-language');
+    const contentLanguage = document.getElementById('content-language');
+    const timeline = document.getElementById('timeline');
+    const cueName = document.getElementById('cue-name');
+    const play = document.getElementById('play');
+    let activeCue = null;
+    let playing = false;
+    let progress = 0;
+    let timer = null;
+
+    function label(cue) { return cue[appLanguage.value]; }
+
+    function renderCues() {
+      timeline.replaceChildren();
+      cueDefinitions.forEach((cue) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'cue' + (activeCue?.id === cue.id ? ' active' : '') + (playing && activeCue?.id === cue.id ? ' playing' : '');
+        button.style.flex = String(cue.weight);
+        button.style.setProperty('--cue-progress', activeCue?.id === cue.id ? progress + '%' : '0%');
+        button.setAttribute('aria-label', label(cue) + ', ' + cue.range);
+        button.innerHTML = '<span class="cue-tip">' + label(cue) + '<br>' + cue.range + '</span>';
+        button.addEventListener('click', () => selectAndPlay(cue));
+        timeline.append(button);
+      });
+    }
+
+    function selectAndPlay(cue) {
+      activeCue = cue;
+      progress = 0;
+      playing = true;
+      cueName.textContent = label(cue);
+      play.textContent = 'Ⅱ';
+      play.setAttribute('aria-label', ui[appLanguage.value].pause);
+      restartTimer();
+      renderCues();
+    }
+
+    function restartTimer() {
+      clearInterval(timer);
+      if (!playing || !activeCue) return;
+      timer = setInterval(() => {
+        progress += 1.25;
+        if (progress >= 100) {
+          progress = 100;
+          playing = false;
+          clearInterval(timer);
+          play.textContent = '▶';
+          play.setAttribute('aria-label', ui[appLanguage.value].play);
+        }
+        renderCues();
+      }, 90);
+    }
+
+    function applyLanguages() {
+      const app = appLanguage.value;
+      document.documentElement.lang = app;
+      document.getElementById('count').textContent = ui[app].count;
+      document.getElementById('chapter').textContent = contentLanguage.value === 'kn' ? ui.kn.chapter : ui.en.chapter;
+      if (activeCue) cueName.textContent = label(activeCue);
+      else cueName.textContent = ui[app].empty;
+      play.setAttribute('aria-label', playing ? ui[app].pause : ui[app].play);
+      renderCues();
+    }
+
+    function applyPanelOrder() {
+      const first = contentLanguage.value;
+      const second = first === 'kn' ? 'en' : 'kn';
+      const panels = document.getElementById('panels');
+      const firstPanel = document.querySelector('[data-language-panel="' + first + '"]');
+      const secondPanel = document.querySelector('[data-language-panel="' + second + '"]');
+      firstPanel.classList.add('primary');
+      secondPanel.classList.remove('primary');
+      panels.append(firstPanel, secondPanel);
+      document.querySelector('[data-shloka-language="' + first + '"]').style.order = '1';
+      document.querySelector('[data-shloka-language="' + second + '"]').style.order = '2';
+      applyLanguages();
+    }
+
+    play.addEventListener('click', () => {
+      if (!activeCue) return selectAndPlay(cueDefinitions[3]);
+      playing = !playing;
+      if (progress >= 100) progress = 0;
+      play.textContent = playing ? 'Ⅱ' : '▶';
+      play.setAttribute('aria-label', ui[appLanguage.value][playing ? 'pause' : 'play']);
+      restartTimer();
+      renderCues();
+    });
+    appLanguage.addEventListener('change', applyLanguages);
+    contentLanguage.addEventListener('change', applyPanelOrder);
+    document.getElementById('fullscreen').addEventListener('click', () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    });
+
+    applyPanelOrder();
+  </script>
+</body>
+</html>

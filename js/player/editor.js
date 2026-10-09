@@ -26,7 +26,7 @@ export class InlineEditor {
     toolbar.className = 'edit-toolbar';
     toolbar.hidden = true;
     toolbar.innerHTML =
-      '<span class="edit-status">' + this.translate('editor.editVisible', 'Edit the four visible fields') + '</span>' +
+      '<span class="edit-status">' + this.translate('editor.editVisible', 'Edit the visible fields') + '</span>' +
       '<button class="cancel-edit" type="button">' + this.translate('editor.cancel', 'Cancel') + '</button>' +
       '<button class="save-edit" type="button">' + this.translate('editor.save', 'Save row') + '</button>';
     document.body.appendChild(toolbar);

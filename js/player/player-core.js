@@ -364,7 +364,7 @@ function syncHomeCollectionSource() {
     : i18n.t('collections.message');
   document.getElementById('home-collections-button').textContent = i18n.t(ready ? 'collections.change' : 'collections.load');
   document.getElementById('home-collections-error').textContent = '';
-  document.querySelectorAll('#continue-journey-link, #gita-700-link').forEach((link) => {
+  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link').forEach((link) => {
     link.classList.toggle('needs-collections', !ready);
     link.setAttribute('aria-disabled', String(!ready));
   });
@@ -559,24 +559,37 @@ async function checkPlayerVersion() {
 }
 
 async function startRequestedExperience() {
-  const chooserLink = document.getElementById('gita-700-link');
-  const chooserResume = state.experienceResumes.get('gita-700')
-    || await profileStore.getExperienceResume(state.activeProfile.pid, 'gita-700');
-  const chooserUrl = new URL(location.href);
-  chooserUrl.searchParams.set('play', 'gita-700');
-  chooserUrl.searchParams.delete('view');
-  if (chooserResume?.sid) chooserUrl.searchParams.set('sid', chooserResume.sid);
-  else chooserUrl.searchParams.delete('sid');
-  chooserUrl.searchParams.set('pid', state.activeProfile.pid);
-  const chooserLanguage = chooserResume?.language || (requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.contentLanguage);
-  if (chooserLanguage === 'kn') chooserUrl.searchParams.set('lang', 'kn');
-  else chooserUrl.searchParams.delete('lang');
-  chooserLink.href = chooserUrl.href;
+  const experienceIds = ['gita-yoga', 'gita-700'];
+  const resumes = new Map(await Promise.all(experienceIds.map(async (experienceId) => [
+    experienceId,
+    state.experienceResumes.get(experienceId) || await profileStore.getExperienceResume(state.activeProfile.pid, experienceId)
+  ])));
+  const chooserUrls = new Map(experienceIds.map((experienceId) => {
+    const resume = resumes.get(experienceId);
+    const chooserUrl = new URL(location.href);
+    chooserUrl.searchParams.set('play', experienceId);
+    chooserUrl.searchParams.delete('view');
+    if (resume?.sid) chooserUrl.searchParams.set('sid', resume.sid);
+    else chooserUrl.searchParams.delete('sid');
+    chooserUrl.searchParams.set('pid', state.activeProfile.pid);
+    const language = resume?.language || (requestedLanguage === 'kn' || requestedLanguage === 'en' ? requestedLanguage : state.activeProfile.contentLanguage);
+    if (language === 'kn') chooserUrl.searchParams.set('lang', 'kn');
+    else chooserUrl.searchParams.delete('lang');
+    document.getElementById(experienceId + '-link').href = chooserUrl.href;
+    return [experienceId, chooserUrl];
+  }));
+  const latest = await profileStore.getResume(state.activeProfile.pid);
+  const lastExperienceId = latest?.lastExperience?.experience || (latest?.view === 'experience' ? latest.experience : null);
+  const continueExperience = getExperience(lastExperienceId)?.available
+    ? lastExperienceId
+    : 'gita-yoga';
+  const continueResume = resumes.get(continueExperience);
+  const chooserUrl = chooserUrls.get(continueExperience);
   const continueLink = document.getElementById('continue-journey-link');
   continueLink.href = chooserUrl.href;
-  continueLink.textContent = chooserResume?.sid
-    ? i18n.t('diksoochi.resume', { sid: chooserResume.sid })
-    : i18n.t('diksoochi.begin');
+  continueLink.textContent = continueResume?.sid
+    ? i18n.t('diksoochi.resumeExperience', { experience: getExperience(continueExperience).label, sid: continueResume.sid })
+    : i18n.t('diksoochi.beginExperience', { experience: getExperience(continueExperience).label });
   if (!play) {
     const summary = await profileStore.getDiksoochiSummary(state.activeProfile.pid);
     document.getElementById('diksoochi-greeting').textContent = i18n.t('diksoochi.greeting', { name: state.activeProfile.name });
@@ -611,7 +624,7 @@ async function startRequestedExperience() {
       state.locationSource = null;
       return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
     }
-    return showError('The requested experience is not available yet. Use ?play=gita-700.');
+    return showError('The requested experience is not available yet. Choose Gita Yoga or Gita 700.');
   }
 
   showOnly('loading');
@@ -702,7 +715,8 @@ function chapterIconFor(cid) {
 }
 
 function audioSource(row) {
-  return row.media.chantFullSaUrl ? new URL(row.media.chantFullSaUrl, location.href).href : '';
+  const source = row.media.primaryAudioUrl || row.media.chantFullSaUrl;
+  return source ? new URL(source, location.href).href : '';
 }
 
 function render(options = {}) {
@@ -720,6 +734,7 @@ function render(options = {}) {
   document.getElementById('position-label').textContent = (state.index + 1) + ' / ' + state.dataset.rows.length;
   document.querySelector('#language-button .top-menu-label').textContent = i18n.t('menu.contentLanguage', { language: state.language === 'kn' ? 'ಕನ್ನಡ' : 'English' });
   state.renderer.render(row, state.language);
+  document.getElementById('renderer-root').scrollTop = 0;
   state.experienceResumes.set(play, {
     experience: play,
     sid: row.sid,
@@ -1097,7 +1112,7 @@ function bindEvents() {
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
   document.getElementById('home-collections-input').addEventListener('change', (event) => useSelectedCollections(event.target.files));
   document.getElementById('home-collections-button').addEventListener('click', () => document.getElementById('home-collections-input').click());
-  document.querySelectorAll('#continue-journey-link, #gita-700-link').forEach((link) => link.addEventListener('click', (event) => {
+  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link').forEach((link) => link.addEventListener('click', (event) => {
     event.preventDefault();
     openHomeExperience(link);
   }));

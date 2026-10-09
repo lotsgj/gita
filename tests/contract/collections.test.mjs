@@ -9,6 +9,7 @@ const en = await parseTable('data/collections/verses/bhagavad-gita/master_en.csv
 const kn = await parseTable('data/collections/verses/bhagavad-gita/master_kn.csv');
 const audio = await parseTable('data/collections/experiences/gita-700/audio.csv');
 const images = await parseTable('data/collections/experiences/gita-700/images.csv');
+const yogaAudio = await parseTable('data/collections/experiences/gita-yoga/audio.csv');
 const audioRegistry = await parseTable('data/collections/audio/collection.csv');
 
 test('the Sanskrit master declares raw and display shloka fields in the collection contract order', () => {
@@ -20,12 +21,26 @@ test('the Sanskrit master declares raw and display shloka fields in the collecti
   }
 });
 
-test('all language masters and Gita-700 compositions have every SID in canonical order', () => {
-  for (const [label, dataset] of Object.entries({ sa, en, kn, audio, images })) {
+test('all language masters and experience compositions have every SID in canonical order', () => {
+  for (const [label, dataset] of Object.entries({ sa, en, kn, audio, yogaAudio, images })) {
     assert.equal(dataset.rows.length, 746, `${label} row count`);
     assertIdentitySequence(assert, sa.rows, dataset.rows, label);
     assert.equal(new Set(dataset.rows.map((row) => row.sid)).size, 746, `${label} unique SID count`);
   }
+});
+
+test('Gita-Yoga references every available learning-mode audio exactly once', async () => {
+  assert.deepEqual(yogaAudio.headers, ['cid', 'snum', 'sid', 'audio_collection', 'audio_order']);
+  const learningModeCatalog = await parseTable('data/collections/audio/chanting-aj-padma-aj-vijay-learn-mode/catalog.csv');
+  const expected = new Set(learningModeCatalog.rows.map((row) => `${row.sid}:${row.order}`));
+  const actual = new Set();
+  for (const row of yogaAudio.rows) {
+    assert.equal(Boolean(row.audio_collection), Boolean(row.audio_order), `${row.sid} audio reference completeness`);
+    if (!row.audio_order) continue;
+    assert.equal(row.audio_collection, 'chanting-aj-padma-aj-vijay-learn-mode');
+    actual.add(`${row.sid}:${row.audio_order}`);
+  }
+  assert.deepEqual(actual, expected);
 });
 
 test('English and Kannada masters provide one consistent chapter name for every chapter', () => {
@@ -60,8 +75,10 @@ test('all media catalog keys are unique and resolve to files', async () => {
 });
 
 test('every registered audio collection has a readable catalog', async () => {
+  assert.deepEqual(audioRegistry.headers, ['collection_id', 'title', 'contributor', 'language', 'catalog_url', 'cue_purpose_url', 'cue_url', 'attribution', 'license', 'source']);
   assert.equal(new Set(audioRegistry.rows.map((row) => row.collection_id)).size, audioRegistry.rows.length);
   for (const collection of audioRegistry.rows) {
+    assert.equal(Boolean(collection.cue_purpose_url), Boolean(collection.cue_url), `${collection.collection_id} cue files must be declared as a pair`);
     const catalog = await parseTable(collection.catalog_url);
     assert.deepEqual(catalog.headers, ['sid', 'order', 'language', 'audio_url']);
     assert.ok(catalog.rows.length > 0, `${collection.collection_id} catalog must not be empty`);
