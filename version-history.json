@@ -23,5 +23,10 @@
     "version": "1.09Oct2026-100830",
     "date": "2026-10-09",
     "message": "Add Gita Yoga experience"
+  },
+  {
+    "version": "1.09Oct2026-152656",
+    "date": "2026-10-09",
+    "message": "Document Gita Yoga and test workflow"
   }
 ]
