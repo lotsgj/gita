@@ -1,5 +1,6 @@
 import { createGita700Renderer } from './gita-700.js';
 import { createGitaYogaRenderer } from './gita-yoga.js';
+import { createGitaSaraRenderer } from './gita-sara.js';
 
 const experiences = {
   'gita-700': {
@@ -12,7 +13,11 @@ const experiences = {
     label: 'Gita Yoga',
     load: async () => createGitaYogaRenderer()
   },
-  'gita-sara': { available: false, label: 'Gita Sara' }
+  'gita-sara': {
+    available: true,
+    label: 'Gita Sara',
+    load: async (options) => createGitaSaraRenderer(options)
+  }
 };
 
 export function getExperience(id) {

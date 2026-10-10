@@ -1,7 +1,7 @@
 # Collections and media
 
 **Status:** Current  
-**Last updated:** 9 October 2026
+**Last updated:** 10 October 2026
 
 ## Organization
 
@@ -14,7 +14,7 @@ data/collections/<type>/<collection>/<content>
 data/collections/experiences/<experience>/...
 ```
 
-Current type registries include verses, audio, images, video, and animations. Registries locate a collection catalog; catalogs locate individual content. Experience files compose those reusable records for an experience-specific purpose.
+Current type registries include verses, audio, decks, images, text, video, and animations. Registries locate a collection catalog; catalogs locate individual content. Experience files compose those reusable records for an experience-specific purpose.
 
 ## Verse masters
 
@@ -40,6 +40,22 @@ collection_id#title#contributor#language#catalog_url#cue_purpose_url#cue_url#att
 Each audio catalog uses `sid#order#language#audio_url`. Gita 700’s composition uses the purpose-specific fields `chant_full_sa_collection` and `chant_full_sa_order`. Gita Yoga uses `audio_collection` and `audio_order`; its `experience.json` declares those names through `audioBinding.collectionField` and `audioBinding.orderField`. This generic binding lets future experiences define their own composition vocabulary without placing provider paths in a renderer.
 
 Gita 700’s image composition references its chapter icons through the same reusable-collection principle.
+
+## Gita Sara
+
+Gita Sara is a registered experience with 135 explicitly ordered SIDs: nine Dhyana verses followed by 126 selected Gita shlokas. Its `sequence.csv` owns this experience order independently of the 746-row canonical master order. The matching audio and deck compositions contain the same 135 identities in that order.
+
+Gita Sara’s audio composition references the reusable Swami Brahmananda collection for all 126 numbered shlokas. The nine Dhyana rows remain present with blank audio references because that collection has no matching recordings.
+
+The reusable `deck` type has a Google-deck collection whose catalog uses `sid#order#language#deck_url#title`. It contains one explicit slot per Gita Sara SID, with approved sample deck associations for `1.1` and `2.47`; all other slots intentionally remain blank until their deck is authored. Experience composition uses `sid#order#deck_collection#deck_order`, allowing more than one explicitly ordered deck per SID.
+
+The loader converts an approved Google Slides share URL to an HTTPS embed URL and adds `rm=minimal` together with non-autoplay parameters. A missing deck never blocks text or audio.
+
+The three-panel renderer uses reusable illustrations and contemplation lines. Illustration catalogs use `sid#order#image_url`; English and Kannada metadata use `sid#order#alt_text#caption`. Text catalogs use `sid#order#line_type`; localized masters use `sid#order#text`. Catalog and localized records must align exactly by SID plus order.
+
+Gita Sara composes source-specific assets through `illustrations.csv`, `decks.csv`, and `contemplations.csv`. Its unified `media.csv` supplies the cross-type order through `media_type`, collection, and asset order, allowing images and Google decks to appear in one stream. Every composition includes all 135 selected SIDs with blank placeholders where authored content is unavailable.
+
+Image URLs may be app-relative or absolute HTTPS URLs. Unsafe schemes, protocol-relative URLs, and root-relative paths are rejected. Normalized media retains the catalog `sourceUrl`, renderer `resolvedUrl`, and `isExternal` state. Reusable image and question defaults are declared once in `experience.json` and applied only when no authored media or question exists. The normalized model exposes `media.items` and `contemplation.lines`, including localized content and `isFallback` markers.
 
 ## Audio cues
 

@@ -1,7 +1,7 @@
 # Home and experience selection
 
 **Status:** Current  
-**Last updated:** 9 October 2026
+**Last updated:** 10 October 2026
 
 ## Diksoochi landing
 
@@ -27,7 +27,7 @@ The player’s main menu exposes **Your journey — J** immediately after **Diks
 
 The **Continue your journey** action always targets the most recently visited experience and that experience’s saved SID, even after the person explicitly returns Home. Its choice is independent of display order in the experience catalog.
 
-The **Choose an experience** section is part of Diksoochi. Gita Yoga is listed above Gita 700 as the first catalog choice; both are selectable and open the shared player with their own renderers. Gita Sara remains visible as a future choice.
+The **Choose an experience** section is part of Diksoochi. Gita Yoga is listed first, followed by Gita 700 and Gita Sara. All three are selectable and open the shared player with their own renderer and ordered dataset.
 
 Choosing an experience preserves the profile identifier and preferred content language in application navigation. The profile’s app language governs this interface; `lang` links affect content only. The **Diksoochi / Home** command (`A`) returns from the player to Diksoochi and records it as the resumable location. Direct experience URLs still open the requested experience.
 
@@ -35,7 +35,7 @@ Choosing an experience preserves the profile identifier and preferred content la
 
 Home establishes one collection source for the rest of the session. Under HTTP, HTTPS and installed-PWA use, Gitaverse automatically uses the deployed relative `data/collections` path. Under `file://`, Home shows a **Local collections** section at the bottom and asks the person to select the repository’s `data/collections` folder. Once ready, the section shows the active folder and offers **Change collections**.
 
-The selected local files, parsed experience datasets and media object URLs are reused by Your journey, Gita Yoga, Gita 700 and later experiences for the current browser session. Individual views do not show their own folder chooser. Changing the folder on Home releases local media URLs and invalidates parsed data before the replacement is validated. A direct file-mode experience URL retains its requested SID, routes through Home for the collection choice, and continues automatically afterward.
+The selected local files, parsed experience datasets and media object URLs are reused by Your journey, Gita Yoga, Gita 700 and Gita Sara for the current browser session. Individual views do not show their own folder chooser. Changing the folder on Home releases local media URLs and invalidates parsed data before the replacement is validated. A direct file-mode experience URL retains its requested SID, routes through Home for the collection choice, and continues automatically afterward.
 
 ## About
 

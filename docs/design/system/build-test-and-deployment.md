@@ -1,7 +1,7 @@
 # Build, test and deployment
 
 **Status:** Current  
-**Last updated:** 9 October 2026
+**Last updated:** 10 October 2026
 
 ## Source and generated files
 
@@ -23,7 +23,7 @@ The build copies an explicit allowlist and fails if archived `x` content enters 
 
 - Unit tests cover collection normalization, renderer behavior, cue validation/indexing, and event logic.
 - Contract tests cover schemas, collection alignment, experience audio composition, source isolation, deployment rules, and Rachana integrity.
-- Player browser regression exercises the user journey, Gita 700, Gita Yoga, and core interactions.
+- Player browser regression exercises the user journey, Gita 700, Gita Yoga, Gita Sara, and core interactions, including mixed image/deck navigation, question modes, equal desktop panels, mobile stacking, missing-media fallback, and local editing. Collection contracts additionally verify Gita Sara's 135-SID media/question coverage, SID-plus-order localization alignment, URL safety, reusable defaults, physical image assets, and normalized local-folder loading.
 - Rachana browser regression covers HTTP and `file://`, routing/history, mobile navigation, sanitization, and PWA-cache exclusion.
 
 ## How tests are triggered

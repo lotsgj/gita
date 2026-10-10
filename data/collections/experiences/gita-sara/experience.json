@@ -1,0 +1,48 @@
+{
+  "id": "gita-sara",
+  "schemaVersion": 1,
+  "title": "Gita Sara",
+  "verseCollection": "bhagavad-gita",
+  "languages": [
+    "sa",
+    "en",
+    "kn"
+  ],
+  "renderer": "gita-sara",
+  "deckCollections": [
+    "gita-sara-google-decks"
+  ],
+  "illustrationCollections": [
+    "gita-sara-illustrations",
+    "gita-sara-default-illustration"
+  ],
+  "contemplationCollections": [
+    "gita-sara-contemplations",
+    "gita-sara-default-contemplation"
+  ],
+  "fallbacks": {
+    "illustration": {
+      "collection": "gita-sara-default-illustration",
+      "sid": "DEFAULT",
+      "order": "1"
+    },
+    "contemplation": {
+      "collection": "gita-sara-default-contemplation",
+      "sid": "DEFAULT",
+      "order": "1"
+    }
+  },
+  "audioBinding": {
+    "collectionField": "audio_collection",
+    "orderField": "audio_order"
+  },
+  "resources": {
+    "sequence": "data/collections/experiences/gita-sara/sequence.csv",
+    "audio": "data/collections/experiences/gita-sara/audio.csv",
+    "decks": "data/collections/experiences/gita-sara/decks.csv",
+    "images": "data/collections/experiences/gita-700/images.csv",
+    "illustrations": "data/collections/experiences/gita-sara/illustrations.csv",
+    "contemplations": "data/collections/experiences/gita-sara/contemplations.csv",
+    "media": "data/collections/experiences/gita-sara/media.csv"
+  }
+}

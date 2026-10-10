@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { AUDIO_CUE_HEADERS, AUDIO_CUE_PURPOSE_HEADERS, buildAudioCueIndex, loadCollectionExperienceFromFiles, normalizeCollectionData, openWritableCollectionWorkspace, parseCollectionTable, serializeLanguageMaster } from '../../js/player/collection-data.js';
+import { AUDIO_CUE_HEADERS, AUDIO_CUE_PURPOSE_HEADERS, buildAudioCueIndex, loadCollectionExperienceFromFiles, normalizeCollectionData, normalizeGoogleDeckUrl, normalizeImageUrl, openWritableCollectionWorkspace, parseCollectionTable, serializeLanguageMaster } from '../../js/player/collection-data.js';
 import { projectRoot } from '../helpers/collection-data.mjs';
 
 async function table(relative) {
@@ -228,6 +228,88 @@ test('the player can load the selected collections folder for file-system use', 
   }
 });
 
+test('Google presentation URLs become minimal embed URLs without retaining share parameters', () => {
+  const normalized = new URL(normalizeGoogleDeckUrl('https://docs.google.com/presentation/d/abc123/edit?usp=sharing'));
+  assert.equal(normalized.pathname, '/presentation/d/abc123/embed');
+  assert.equal(normalized.searchParams.get('start'), 'false');
+  assert.equal(normalized.searchParams.get('loop'), 'false');
+  assert.equal(normalized.searchParams.get('delayms'), '3000');
+  assert.equal(normalized.searchParams.get('rm'), 'minimal');
+  assert.equal(normalized.searchParams.has('usp'), false);
+  assert.throws(() => normalizeGoogleDeckUrl('https://example.com/deck'), /Only https:\/\/docs\.google\.com/);
+});
+
+test('image URLs support app-relative and external HTTPS sources only', () => {
+  assert.deepEqual(normalizeImageUrl('data/collections/images/sample.webp', (url) => 'blob:' + url), {
+    sourceUrl: 'data/collections/images/sample.webp', resolvedUrl: 'blob:data/collections/images/sample.webp', isExternal: false
+  });
+  assert.deepEqual(normalizeImageUrl('https://media.example.org/sample.webp'), {
+    sourceUrl: 'https://media.example.org/sample.webp', resolvedUrl: 'https://media.example.org/sample.webp', isExternal: true
+  });
+  for (const unsafe of ['http://example.org/a.png', 'javascript:alert(1)', 'data:image/png;base64,x', '/root/image.png', '//example.org/a.png']) {
+    assert.throws(() => normalizeImageUrl(unsafe), /app-relative path or an absolute HTTPS URL/);
+  }
+});
+
+test('the Gita-Sara collection loads its ordered subset, audio, and minimal Google deck', async () => {
+  const collections = path.join(projectRoot, 'data/collections');
+  const entries = await readdir(collections, { recursive: true, withFileTypes: true });
+  const files = entries.filter((entry) => entry.isFile()).map((entry) => {
+    const absolute = path.join(entry.parentPath, entry.name);
+    const relative = path.relative(collections, absolute).split(path.sep).join('/');
+    return {
+      name: entry.name,
+      webkitRelativePath: 'collections/' + relative,
+      text: () => readFile(absolute, 'utf8'),
+      testRelativePath: relative
+    };
+  });
+  const originalCreateObjectUrl = URL.createObjectURL;
+  URL.createObjectURL = (file) => 'blob:gita-sara-test/' + file.testRelativePath;
+  try {
+    const sara = await loadCollectionExperienceFromFiles('gita-sara', files);
+    assert.equal(sara.rows.length, 135);
+    assert.deepEqual(sara.rows.slice(0, 3).map((row) => row.sid), ['D.1', 'D.2', 'D.3']);
+    assert.equal(sara.rows.at(-1).sid, '18.78');
+    assert.match(sara.rows.find((row) => row.sid === '2.47').media.primaryAudioUrl, /02-047\.mp3$/);
+    const deck = sara.rows.find((row) => row.sid === '2.47').media.decks[0];
+    assert.equal(deck.collectionId, 'gita-sara-google-decks');
+    assert.equal(new URL(deck.embedUrl).searchParams.get('rm'), 'minimal');
+    const authored = sara.rows.find((row) => row.sid === '2.47');
+    assert.equal(authored.media.illustrations.length, 2);
+    assert.ok(authored.media.illustrations.every((item) => item.isFallback === false));
+    assert.match(authored.media.illustrations[0].imageUrl, /^blob:gita-sara-test\/images\/gita-sara-illustrations\//);
+    assert.equal(authored.media.illustrations[0].localized.en.caption, '');
+    assert.match(authored.media.illustrations[1].localized.en.caption, /Care for the action/);
+    assert.equal(authored.contemplation.lines.length, 4);
+    assert.ok(authored.contemplation.lines.every((item) => item.isFallback === false && item.type === 'question'));
+    assert.match(authored.contemplation.lines[0].localized.en, /complete attention/);
+    assert.match(authored.contemplation.lines[0].localized.kn, /ಸಂಪೂರ್ಣ ಗಮನ/);
+    assert.deepEqual(authored.media.items.map((item) => item.mediaType), ['image', 'google_deck', 'image']);
+    assert.deepEqual(authored.media.items.map((item) => item.order), [1, 2, 3]);
+    assert.equal(authored.media.items[0].localized.en.caption, '');
+    assert.match(authored.media.items[1].resolvedUrl, /docs\.google\.com\/presentation/);
+
+    const fallback = sara.rows.find((row) => row.sid === 'D.1');
+    assert.equal(fallback.media.illustrations.length, 1);
+    assert.equal(fallback.media.illustrations[0].isFallback, true);
+    assert.match(fallback.media.illustrations[0].imageUrl, /gita-sara-default-illustration\/transformation-cycle-clean\.png$/);
+    assert.equal(fallback.media.items[0].localized.en.altText, 'TRUTH. REALISE. USE.');
+    assert.equal(fallback.media.items[0].localized.en.caption, 'TRUTH. REALISE. USE.');
+    assert.equal(fallback.media.items[0].localized.kn.altText, 'ಸತ್ಯ. ಅರಿವು. ಉಪಯೋಗ.');
+    assert.equal(fallback.media.items[0].localized.kn.caption, 'ಸತ್ಯ. ಅರಿವು. ಉಪಯೋಗ.');
+    assert.equal(fallback.contemplation.lines.length, 1);
+    assert.equal(fallback.contemplation.lines[0].isFallback, true);
+    assert.ok(fallback.contemplation.lines[0].localized.en);
+    assert.ok(fallback.contemplation.lines[0].localized.kn);
+    assert.equal(fallback.media.items.length, 1);
+    assert.equal(fallback.media.items[0].mediaType, 'image');
+    assert.equal(fallback.media.items[0].isFallback, true);
+  } finally {
+    URL.createObjectURL = originalCreateObjectUrl;
+  }
+});
+
 test('a writable collections workspace updates only the affected language master', async () => {
   const local = await fakeWritableCollections();
   const originalCreateObjectUrl = URL.createObjectURL;
@@ -240,6 +322,28 @@ test('a writable collections workspace updates only the affected language master
     assert.deepEqual(await workspace.saveLanguageMasters(writableDataset, ['en']), ['master_en.csv']);
     assert.match(local.contents.get('verses/bhagavad-gita/master_en.csv').toString('utf8'), /Direct workspace regression meaning/);
     assert.deepEqual(local.contents.get('verses/bhagavad-gita/master_sa.csv'), saBefore);
+  } finally {
+    URL.createObjectURL = originalCreateObjectUrl;
+  }
+});
+
+test('a writable Gita Sara workspace saves deck catalog and composition without touching verse masters', async () => {
+  const local = await fakeWritableCollections();
+  const originalCreateObjectUrl = URL.createObjectURL;
+  URL.createObjectURL = (file) => 'blob:deck-write-test/' + file.testRelativePath;
+  try {
+    const { dataset: writableDataset, workspace } = await openWritableCollectionWorkspace('gita-sara', local.handle);
+    const verseMasterBefore = Buffer.from(local.contents.get('verses/bhagavad-gita/master_sa.csv'));
+    const slot = writableDataset.rows.find((row) => row.sid === '2.47').media.deckSlots[0];
+    slot.catalogRow.deck_url = 'https://docs.google.com/presentation/d/updatedDeckId/edit';
+    slot.compositionRow.order = '1';
+    const saved = await workspace.saveCollectionTables([
+      { url: slot.compositionUrl, table: slot.compositionTable },
+      { url: slot.catalogUrl, table: slot.catalog }
+    ]);
+    assert.deepEqual(saved, ['decks.csv', 'catalog.csv']);
+    assert.match(local.contents.get('deck/gita-sara-google-decks/catalog.csv').toString('utf8'), /updatedDeckId/);
+    assert.deepEqual(local.contents.get('verses/bhagavad-gita/master_sa.csv'), verseMasterBefore);
   } finally {
     URL.createObjectURL = originalCreateObjectUrl;
   }

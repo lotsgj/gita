@@ -19,8 +19,11 @@ const sources = [
   'js/player/collection-data.js',
   'js/player/collection-source.js',
   'js/player/audio-player.js',
+  'js/player/media-player.js',
+  'js/player/text-player.js',
   'js/player/renderers/gita-700.js',
   'js/player/renderers/gita-yoga.js',
+  'js/player/renderers/gita-sara.js',
   'js/player/renderers/registry.js',
   'js/player/editor.js',
   'js/player/player-core.js'

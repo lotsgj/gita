@@ -68,7 +68,7 @@ test('every internal Markdown link resolves to a navigable Rachana document', as
 test('the handbook exposes the approved product, experience, system, and future structure', () => {
   const expected = {
     Product: ['purpose-and-principles', 'experience-model', 'terminology'],
-    Experiences: ['profiles-and-first-use', 'home-and-experience-selection', 'shared-player', 'gita-yoga', 'gita-700', 'local-content-editing', 'install-offline-and-updates'],
+    Experiences: ['profiles-and-first-use', 'home-and-experience-selection', 'shared-player', 'gita-yoga', 'gita-700', 'gita-sara', 'local-content-editing', 'install-offline-and-updates'],
     System: ['architecture-overview', 'collections-and-media', 'profiles-and-local-storage', 'events-analytics-and-resume', 'pwa-cache-and-updates', 'build-test-and-deployment'],
     'Future possibilities': ['sampada']
   };
@@ -100,6 +100,7 @@ test('Sampada preserves both future possibilities and completed enhancements wit
   assert.match(markdown, /^### 9\. Global app-language preference\n\n\*\*Status:\*\* Done/m);
   assert.match(markdown, /^### 12\. Gita Yoga foundation\n\n\*\*Status:\*\* Done/m);
   assert.match(markdown, /^### 13\. Gita Yoga cue-region playback\n\n\*\*Status:\*\* To unfold/m);
+  assert.match(markdown, /^### 14\. Gita Sara expanded media\n\n\*\*Status:\*\* To unfold/m);
   assert.equal(markdown.includes('Treasure Trove'), false);
 });
 

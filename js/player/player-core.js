@@ -364,7 +364,7 @@ function syncHomeCollectionSource() {
     : i18n.t('collections.message');
   document.getElementById('home-collections-button').textContent = i18n.t(ready ? 'collections.change' : 'collections.load');
   document.getElementById('home-collections-error').textContent = '';
-  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link').forEach((link) => {
+  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link, #gita-sara-link').forEach((link) => {
     link.classList.toggle('needs-collections', !ready);
     link.setAttribute('aria-disabled', String(!ready));
   });
@@ -559,7 +559,7 @@ async function checkPlayerVersion() {
 }
 
 async function startRequestedExperience() {
-  const experienceIds = ['gita-yoga', 'gita-700'];
+  const experienceIds = ['gita-yoga', 'gita-700', 'gita-sara'];
   const resumes = new Map(await Promise.all(experienceIds.map(async (experienceId) => [
     experienceId,
     state.experienceResumes.get(experienceId) || await profileStore.getExperienceResume(state.activeProfile.pid, experienceId)
@@ -624,7 +624,7 @@ async function startRequestedExperience() {
       state.locationSource = null;
       return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
     }
-    return showError('The requested experience is not available yet. Choose Gita Yoga or Gita 700.');
+    return showError('The requested experience is not available. Choose Gita Yoga, Gita 700, or Gita Sara.');
   }
 
   showOnly('loading');
@@ -649,7 +649,7 @@ async function startPlayer(dataset, experience, { workspace = null, sid = reques
     state.locationSource = null;
     return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
   }
-  state.renderer = await experience.load();
+  state.renderer = await experience.load({ translate });
   state.renderer.mount(document.getElementById('renderer-root'));
 
   const defaultIndex = findSid('1.B');
@@ -1112,7 +1112,7 @@ function bindEvents() {
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
   document.getElementById('home-collections-input').addEventListener('change', (event) => useSelectedCollections(event.target.files));
   document.getElementById('home-collections-button').addEventListener('click', () => document.getElementById('home-collections-input').click());
-  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link').forEach((link) => link.addEventListener('click', (event) => {
+  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link, #gita-sara-link').forEach((link) => link.addEventListener('click', (event) => {
     event.preventDefault();
     openHomeExperience(link);
   }));

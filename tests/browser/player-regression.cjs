@@ -63,6 +63,11 @@ async function run() {
   if (fs.existsSync(chromePath)) launchOptions.executablePath = chromePath;
   const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext({ acceptDownloads: true });
+  await context.route('https://docs.google.com/**', (route) => route.fulfill({
+    status: 200,
+    contentType: 'text/html',
+    body: '<!doctype html><title>Google deck fixture</title>'
+  }));
   const page = await context.newPage();
   await page.addInitScript(({ baseUrl }) => {
     const writes = {};
@@ -117,7 +122,7 @@ async function run() {
     });
     assert.ok(landingOrder[0] < landingOrder[1] && landingOrder[1] < landingOrder[2], 'Diksoochi action and journey sections must follow the approved order');
     const experienceOrder = await page.locator('.diksoochi-experiences .experience-link').evaluateAll((links) => links.map((link) => link.id));
-    assert.deepEqual(experienceOrder.slice(0, 2), ['gita-yoga-link', 'gita-700-link'], 'Gita Yoga must appear above Gita 700');
+    assert.deepEqual(experienceOrder, ['gita-yoga-link', 'gita-700-link', 'gita-sara-link'], 'the chooser must preserve the approved experience order');
     await page.locator('#gita-yoga-link').click();
     await page.locator('.gita-yoga-panel').first().waitFor();
     assert.equal(await page.locator('#sid-label').innerText(), '1.B');
@@ -154,6 +159,39 @@ async function run() {
     await page.goto(`${base}/player.html?play=gita-yoga&sid=8.1&pid=1`, { waitUntil: 'networkidle' });
     assert.equal(await page.locator('.gita-yoga-panel').count(), 3, 'missing work-in-progress audio must not prevent verse rendering');
     assert.equal(await page.locator('#play-button').isDisabled(), true, 'a verse without mapped Gita Yoga audio must disable playback');
+
+    await page.goto(`${base}/player.html?play=gita-sara&sid=2.47&lang=en&pid=1`, { waitUntil: 'networkidle' });
+    await page.locator('.gita-sara-layout').waitFor();
+    assert.equal(await page.locator('#sid-label').innerText(), '2.47');
+    assert.equal(await page.locator('[data-sara-panel]').count(), 3);
+    assert.equal(await page.locator('.gita-sara-media-image').count(), 1, 'the first mixed-media item is an image');
+    assert.equal(await page.locator('[data-media-action="previous"]').isHidden(), false);
+    await page.locator('[data-media-action="next"]').click();
+    assert.equal(await page.locator('.gita-sara-deck-frame').count(), 1, 'the second mixed-media item is a Google deck');
+    const deckUrl = new URL(await page.locator('.gita-sara-deck-frame').getAttribute('src'));
+    assert.equal(deckUrl.pathname, '/presentation/d/1M9NHIrSyx0MMUkvnzqnzgp2jCd0z3A-XE5lyao33QNc/embed');
+    assert.equal(deckUrl.searchParams.get('rm'), 'minimal');
+    await page.locator('[data-media-action="next"]').click();
+    assert.equal(await page.locator('.gita-sara-media-image').count(), 1, 'the third mixed-media item returns to an image');
+    assert.match(await page.locator('[data-role="media-caption"]').innerText(), /Care for the action/);
+    assert.match(await page.locator('[data-role="question-stage"]').innerText(), /complete attention/);
+    await page.locator('[data-text-action="next"]').click();
+    assert.match(await page.locator('[data-role="question-stage"]').innerText(), /outcome/);
+    await page.locator('[data-text-action="toggle-all"]').click();
+    assert.equal(await page.locator('[data-role="question-stage"] p').count(), 4);
+    assert.equal(await page.locator('[data-role="meaning"]').getAttribute('lang'), 'en');
+    assert.match(await page.locator('#audio').getAttribute('src'), /chanting-swami-brahmananda/);
+    const saraWidths = await page.locator('[data-sara-panel]').evaluateAll((panels) => panels.map((panel) => panel.getBoundingClientRect().width));
+    assert.ok(Math.max(...saraWidths) - Math.min(...saraWidths) < 3, 'all three desktop panels must have equal width');
+    assert.equal(await page.locator('#renderer-root').evaluate((root) => root.scrollHeight <= root.clientHeight + 1), true, 'desktop Gita Sara must fit without renderer scrolling');
+    await page.goto(`${base}/player.html?play=gita-sara&sid=D.1&lang=en&pid=1`, { waitUntil: 'networkidle' });
+    assert.match(await page.locator('.gita-sara-media-image').getAttribute('src'), /gita-sara-default-illustration\/transformation-cycle-clean\.png/);
+    assert.equal(await page.locator('.gita-sara-media-image').getAttribute('alt'), 'TRUTH. REALISE. USE.');
+    assert.equal(await page.locator('[data-role="media-caption"]').innerText(), 'TRUTH. REALISE. USE.');
+    assert.match(await page.locator('[data-role="question-stage"]').innerText(), /What is Truth/);
+    assert.equal(await page.locator('[data-text-action="toggle-all"]').isHidden(), true, 'one question must remain in single-question mode');
+    assert.equal(await page.locator('[data-media-action="next"]').isHidden(), true, 'single fallback media needs no navigation');
+    assert.equal(await page.locator('#play-button').isDisabled(), true, 'Dhyana remains usable without Swami Brahmananda audio');
 
     await page.keyboard.press('a');
     await page.locator('#gita-700-link').waitFor({ state: 'visible' });
@@ -442,6 +480,16 @@ async function run() {
     assert.equal(new Set(yogaBoxes.map(({ top }) => Math.round(top))).size, 3, 'mobile Gita Yoga panels must occupy separate rows');
     assert.equal(await mobilePage.locator('[data-role="kn-transliteration"]').isVisible(), true, 'mobile language panels must retain their transliteration');
     assert.equal(await mobilePage.locator('[data-role="sanskrit-words"]').evaluate((words) => words.getBoundingClientRect().top > document.querySelector('[data-role="shloka"]').getBoundingClientRect().top), true, 'mobile must retain shloka before Sanskrit word-by-word text');
+    await mobilePage.goto(`${base}/player.html?play=gita-sara&sid=2.47&lang=en&pid=1`, { waitUntil: 'networkidle' });
+    const saraMobileBoxes = await mobilePage.locator('[data-sara-panel]').evaluateAll((panels) => panels.map((panel) => ({ left: panel.getBoundingClientRect().left, top: panel.getBoundingClientRect().top })));
+    assert.equal(new Set(saraMobileBoxes.map(({ left }) => Math.round(left))).size, 1, 'mobile Gita Sara panels must share one column');
+    assert.ok(saraMobileBoxes.every(({ top }, index) => index === 0 || top > saraMobileBoxes[index - 1].top), 'mobile Gita Sara panels must stack in text, media, question order');
+    const saraTextBoxes = await mobilePage.locator('.gita-sara-text').evaluateAll((fields) => fields.map((field) => {
+      const box = field.getBoundingClientRect();
+      return { top: box.top, bottom: box.bottom };
+    }));
+    assert.ok(saraTextBoxes.every((box, index) => index === 0 || box.top >= saraTextBoxes[index - 1].bottom), 'mobile Gita Sara text fields must flow without overlap');
+    assert.equal(await mobilePage.locator('.gita-sara-text-panel').evaluate((panel) => panel.scrollHeight <= panel.clientHeight + 1), true, 'mobile Gita Sara text panel must grow to fit its content');
     await mobilePage.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
     const boxes = await mobilePage.locator('.gita-700-panel').evaluateAll((panels) => panels.map((panel) => panel.getBoundingClientRect().top));
     assert.ok(boxes.every((top, index) => index === 0 || top > boxes[index - 1]), 'mobile panels must stack vertically');

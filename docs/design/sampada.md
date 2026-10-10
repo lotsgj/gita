@@ -1,7 +1,7 @@
 # Sampada — Treasure trove of Gitaverse enhancements
 
 **Status:** Current  
-**Last updated:** 9 October 2026
+**Last updated:** 10 October 2026
 
 Sampada keeps both future possibilities and completed enhancements. Items retain their number after completion so decisions and delivery history remain traceable.
 
@@ -158,6 +158,28 @@ Turn a Gita Yoga composite recording into directly selectable learning regions w
 Marker text should follow the profile’s app language where a translated cue description is available. Selecting a region should start it immediately and stop at its declared end, avoiding a separate select-then-play action. Desktop markers should provide hover help; all markers need keyboard navigation, accessible names, and clear active/progress states.
 
 Missing or invalid cue metadata must not block the full recording, verse text, or navigation. The feature should work with a large complete-Gita cue catalog through the existing indexed lookup rather than scanning all records on every verse.
+
+### 14. Gita Sara expanded media
+
+**Status:** To unfold
+
+**Tag:** Major
+
+Expand Gita Sara beyond its initial Google-deck medium while preserving the canonical shloka and meaning as the complete foundational experience. Add reusable collections and player adapters for images, native video, GIF and other animation, and localized text-contemplation slides. Allow one SID to compose these types into a mixed, explicitly ordered media set without placing physical asset paths in the experience renderer.
+
+The first delivery is complete: reusable localized illustration and contemplation collections, a unified image/Google-deck sequence, safe relative or HTTPS image resolution, shared defaults, and the fixed three-panel renderer with media and question controls are in place. Native video, GIF, other media types, offline external-media packages, and collection editing remain deferred.
+
+Extend the media-set editor to add and preview compatible reusable assets, change URLs and metadata, reorder associations, remove an association without deleting its source asset, and maintain accessibility, attribution and licensing information. Media failures or unavailable items must not block verse text or navigation.
+
+#### Gita Sara media and question editing
+
+Extend row edit mode into the media and contemplation panels. The media editor should list the current mixed image/Google-deck sequence, preview each asset, add either supported type, edit its source fields and localized metadata, reorder items with up/down controls, and remove an association from the current shloka without silently deleting the reusable asset. Image editing covers a relative or HTTPS URL plus required English/Kannada alternative text and optional captions; Google-deck editing covers its source URL and title.
+
+The question editor should manage an explicitly ordered bilingual list with required English and Kannada text. It should add, edit, reorder, and remove questions. Removing every authored item remains valid: normal playback then receives the shared transformation image and Truth question. Playback navigation and the one/all question toggle remain hidden while editing.
+
+`media.csv` should be the single authority for cross-type association and order. `contemplations.csv` remains authoritative for question association and order. New image and deck assets initially belong to the existing Gita Sara collections; collection selection can follow when multiple authoring collections exist. Saving must validate the complete draft before writing the smallest affected set of composition, catalog, and localized-master files. Writable-folder and download-only modes must produce equivalent changes, retain conflict detection, and preserve unrelated rows and columns.
+
+Add native and offline-capable deck alternatives, including exported slide-image sets or video, together with explicit **Make available offline** packages and storage estimates. Reuse the shared media resolver, cache identity, event model and editing lifecycle across Gita Sara and any later Gita Yoga or Gita 700 media enhancements. Google-deck support remains the deliberately narrow first Gita Sara delivery; this item begins only after that experience is implemented and verified.
 
 ## Done
 

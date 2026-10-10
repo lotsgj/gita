@@ -1,2 +1,4 @@
-collection_id#title#catalog_url#attribution#license#source
-gita-chapter-icons#Gita Chapter Icons#data/collections/images/gita-chapter-icons/catalog.csv###
+collection_id#title#catalog_url#metadata_en_url#metadata_kn_url#attribution#license#source
+gita-chapter-icons#Gita Chapter Icons#data/collections/images/gita-chapter-icons/catalog.csv#####
+gita-sara-illustrations#Gita Sara Illustrations#data/collections/images/gita-sara-illustrations/catalog.csv#data/collections/images/gita-sara-illustrations/master_en.csv#data/collections/images/gita-sara-illustrations/master_kn.csv###
+gita-sara-default-illustration#Gita Sara Default Illustration#data/collections/images/gita-sara-default-illustration/catalog.csv#data/collections/images/gita-sara-default-illustration/master_en.csv#data/collections/images/gita-sara-default-illustration/master_kn.csv###

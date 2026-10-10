@@ -1,7 +1,7 @@
 # Experience model
 
 **Status:** Current  
-**Last updated:** 9 October 2026
+**Last updated:** 10 October 2026
 
 ## Model
 
@@ -15,7 +15,7 @@ Gitaverse separates the shared application shell from individual learning experi
 
 Its learning-audio collection is intentionally incomplete while production continues. Missing audio never blocks verse text. The data layer supports validated cue metadata, but cue-region controls and user-selectable audio collections remain future enhancements.
 
-**Gita Sara** remains a future choice. Its media and panel design can differ while reusing the shell.
+**Gita Sara** is live. It follows an explicitly ordered 135-SID subset, combines reusable Swami Brahmananda audio with an ordered image/Google-deck media stream and localized contemplation questions, and presents equal verse, media, and question panels. Missing authored media and questions resolve to shared defaults.
 
 ## URL contract
 

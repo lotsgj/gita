@@ -20,7 +20,13 @@ const EN_MESSAGES = {
   'profile.who': 'Who is using Gitaverse?', 'profile.choose': 'Choose a profile to continue.', 'profile.add': '＋ Add another profile', 'profile.back': 'Back',
   'profile.defaultBadge': 'Default', 'profile.editAction': 'Edit', 'profile.makeDefault': 'Make default', 'profile.unsetDefault': 'Unset default', 'profile.delete': 'Delete',
   'home.chooseExperience': 'Choose an experience', 'home.intro': 'Read, reflect, and listen at your own pace.',
-  'home.gitaYogaNote': 'Guided chanting and meaning experience', 'home.gita700Note': 'Four-panel study experience', 'home.future': 'Experience to be designed', 'home.coming': 'Coming later',
+  'home.gitaYogaNote': 'Guided chanting and meaning experience', 'home.gita700Note': 'Four-panel study experience', 'home.gitaSaraNote': 'Essential verses, illustrations and contemplation', 'home.future': 'Experience to be designed', 'home.coming': 'Coming later',
+  'gitaSara.deckNavigation': 'Presentation navigation', 'gitaSara.previousDeck': 'Previous presentation', 'gitaSara.nextDeck': 'Next presentation',
+  'gitaSara.swapPanels': 'Swap presentation and verse panels', 'gitaSara.deckTitle': 'Presentation for shloka {sid}',
+  'gitaSara.deckUrl': 'Google Slides URL', 'gitaSara.deckOrder': 'Order',
+  'gitaSara.deckOrderError': 'Presentation order must use unique positive numbers.', 'gitaSara.deckOrderSequenceError': 'Presentation order must be consecutive from 1.',
+  'gitaSara.media': 'Illustration', 'gitaSara.previousMedia': 'Previous illustration', 'gitaSara.nextMedia': 'Next illustration', 'gitaSara.mediaUnavailable': 'Illustration unavailable',
+  'gitaSara.questions': 'Contemplation questions', 'gitaSara.previousQuestion': 'Previous question', 'gitaSara.nextQuestion': 'Next question', 'gitaSara.showAllQuestions': 'Show all questions', 'gitaSara.showOneQuestion': 'Show one question',
   'diksoochi.title': 'Diksoochi', 'diksoochi.greeting': 'Namaste, {name}',
   'diksoochi.know': 'Know', 'diksoochi.able': 'Able', 'diksoochi.use': 'Use',
   'diksoochi.knowEmpty': 'Your map of the Gita will unfold here as you explore its chapters and spend time with its shlokas.',
@@ -63,9 +69,9 @@ const EN_MESSAGES = {
   'workspace.openFailed': 'The selected collections folder could not be opened.',
   'goto.note': 'Enter a stable shloka ID, such as 6.B, 6.7, or 6.E.', 'goto.notFound': 'That shloka ID was not found.',
   'editor.editVisible': 'Edit the visible fields', 'editor.cancel': 'Cancel', 'editor.save': 'Save row', 'editor.unsaved': 'Unsaved changes', 'editor.removeHash': 'Remove # before saving',
-  'editor.noChanges': 'No changes to save', 'editor.savingFiles': 'Saving to collections…', 'editor.savingBrowser': 'Saving in this browser…', 'editor.savedBrowser': 'Saved in this browser session', 'editor.savedFiles': 'Saved to {files}', 'editor.saveFailed': 'The local collections could not be saved.', 'editor.downloaded': 'Downloaded edited language data',
+  'editor.noChanges': 'No changes to save', 'editor.savingFiles': 'Saving to collections…', 'editor.savingBrowser': 'Saving in this browser…', 'editor.savedBrowser': 'Saved in this browser session', 'editor.savedFiles': 'Saved to {files}', 'editor.saveFailed': 'The local collections could not be saved.', 'editor.downloaded': 'Downloaded edited collection data',
   'editor.discard': 'Discard the unsaved edits to this shloka?', 'editor.discardNavigate': 'Discard the unsaved edits to this shloka and continue?',
-  'editor.download': '↓ Download edited language files', 'editor.downloadAgain': '↓ Download again',
+  'editor.download': '↓ Download edited collection files', 'editor.downloadAgain': '↓ Download again',
   'editor.returnHome': 'Changes have not been downloaded. Are you sure you want to return Home?', 'editor.dismissDownload': 'Changes have not been downloaded. Are you sure you want to dismiss this reminder?',
   'fullscreen.enter': 'Enter fullscreen', 'fullscreen.exit': 'Exit fullscreen',
   'validation.name': 'Enter a profile name.', 'validation.dob': 'Enter a valid date of birth.', 'validation.appLanguage': 'Choose an app language.', 'validation.contentLanguage': 'Choose a preferred Gita content language.', 'validation.profileSave': 'The profile could not be saved.'
@@ -87,7 +93,13 @@ const KN_MESSAGES = {
   'profile.who': 'Gitaverse ಅನ್ನು ಯಾರು ಬಳಸುತ್ತಿದ್ದಾರೆ?', 'profile.choose': 'ಮುಂದುವರಿಸಲು ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ.', 'profile.add': '＋ ಮತ್ತೊಂದು ಪ್ರೊಫೈಲ್ ಸೇರಿಸಿ', 'profile.back': 'ಹಿಂದೆ',
   'profile.defaultBadge': 'ಪೂರ್ವನಿಯೋಜಿತ', 'profile.editAction': 'ಸಂಪಾದಿಸಿ', 'profile.makeDefault': 'ಪೂರ್ವನಿಯೋಜಿತವಾಗಿಸಿ', 'profile.unsetDefault': 'ಪೂರ್ವನಿಯೋಜಿತ ತೆಗೆದುಹಾಕಿ', 'profile.delete': 'ಅಳಿಸಿ',
   'home.chooseExperience': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ', 'home.intro': 'ನಿಮ್ಮ ವೇಗದಲ್ಲಿ ಓದಿ, ಚಿಂತಿಸಿ ಮತ್ತು ಆಲಿಸಿ.',
-  'home.gitaYogaNote': 'ಮಾರ್ಗದರ್ಶಿತ ಪಠಣ ಮತ್ತು ಅರ್ಥದ ಅನುಭವ', 'home.gita700Note': 'ನಾಲ್ಕು ಫಲಕಗಳ ಅಧ್ಯಯನ ಅನುಭವ', 'home.future': 'ಅನುಭವವನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಬೇಕಿದೆ', 'home.coming': 'ಮುಂದೆ ಬರಲಿದೆ',
+  'home.gitaYogaNote': 'ಮಾರ್ಗದರ್ಶಿತ ಪಠಣ ಮತ್ತು ಅರ್ಥದ ಅನುಭವ', 'home.gita700Note': 'ನಾಲ್ಕು ಫಲಕಗಳ ಅಧ್ಯಯನ ಅನುಭವ', 'home.gitaSaraNote': 'ಆಯ್ದ ಶ್ಲೋಕಗಳು, ಚಿತ್ರಣಗಳು ಮತ್ತು ಚಿಂತನೆ', 'home.future': 'ಅನುಭವವನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಬೇಕಿದೆ', 'home.coming': 'ಮುಂದೆ ಬರಲಿದೆ',
+  'gitaSara.deckNavigation': 'ಪ್ರಸ್ತುತಿ ಸಂಚರಣೆ', 'gitaSara.previousDeck': 'ಹಿಂದಿನ ಪ್ರಸ್ತುತಿ', 'gitaSara.nextDeck': 'ಮುಂದಿನ ಪ್ರಸ್ತುತಿ',
+  'gitaSara.swapPanels': 'ಪ್ರಸ್ತುತಿ ಮತ್ತು ಶ್ಲೋಕ ಫಲಕಗಳನ್ನು ಬದಲಿಸಿ', 'gitaSara.deckTitle': 'ಶ್ಲೋಕ {sid} ಪ್ರಸ್ತುತಿ',
+  'gitaSara.deckUrl': 'Google Slides URL', 'gitaSara.deckOrder': 'ಕ್ರಮ',
+  'gitaSara.deckOrderError': 'ಪ್ರಸ್ತುತಿ ಕ್ರಮವು ಅನನ್ಯ ಧನಾತ್ಮಕ ಸಂಖ್ಯೆಗಳನ್ನು ಬಳಸಬೇಕು.', 'gitaSara.deckOrderSequenceError': 'ಪ್ರಸ್ತುತಿ ಕ್ರಮವು 1ರಿಂದ ಅನುಕ್ರಮವಾಗಿರಬೇಕು.',
+  'gitaSara.media': 'ಚಿತ್ರಣ', 'gitaSara.previousMedia': 'ಹಿಂದಿನ ಚಿತ್ರಣ', 'gitaSara.nextMedia': 'ಮುಂದಿನ ಚಿತ್ರಣ', 'gitaSara.mediaUnavailable': 'ಚಿತ್ರಣ ಲಭ್ಯವಿಲ್ಲ',
+  'gitaSara.questions': 'ಚಿಂತನೆಯ ಪ್ರಶ್ನೆಗಳು', 'gitaSara.previousQuestion': 'ಹಿಂದಿನ ಪ್ರಶ್ನೆ', 'gitaSara.nextQuestion': 'ಮುಂದಿನ ಪ್ರಶ್ನೆ', 'gitaSara.showAllQuestions': 'ಎಲ್ಲ ಪ್ರಶ್ನೆಗಳನ್ನು ತೋರಿಸಿ', 'gitaSara.showOneQuestion': 'ಒಂದು ಪ್ರಶ್ನೆಯನ್ನು ತೋರಿಸಿ',
   'diksoochi.title': 'ದಿಕ್ಸೂಚಿ', 'diksoochi.greeting': 'ನಮಸ್ತೆ, {name}',
   'diksoochi.know': 'ತಿಳಿದಿದೆ', 'diksoochi.able': 'ಸಾಧ್ಯವಾಗಿದೆ', 'diksoochi.use': 'ಬಳಸಬಲ್ಲೆ',
   'diksoochi.knowEmpty': 'ಅಧ್ಯಾಯಗಳನ್ನು ಅನ್ವೇಷಿಸಿ ಶ್ಲೋಕಗಳೊಂದಿಗೆ ಸಮಯ ಕಳೆದಂತೆ ನಿಮ್ಮ ಗೀತೆಯ ನಕ್ಷೆ ಇಲ್ಲಿ ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ.',
@@ -130,9 +142,9 @@ const KN_MESSAGES = {
   'workspace.openFailed': 'ಆಯ್ಕೆಮಾಡಿದ ಸಂಗ್ರಹಗಳ ಫೋಲ್ಡರ್ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.',
   'goto.note': '6.B, 6.7 ಅಥವಾ 6.E ನಂತಹ ಸ್ಥಿರ ಶ್ಲೋಕ ID ನಮೂದಿಸಿ.', 'goto.notFound': 'ಆ ಶ್ಲೋಕ ID ಕಂಡುಬಂದಿಲ್ಲ.',
   'editor.editVisible': 'ಕಾಣುವ ಕ್ಷೇತ್ರಗಳನ್ನು ಸಂಪಾದಿಸಿ', 'editor.cancel': 'ರದ್ದುಮಾಡಿ', 'editor.save': 'ಸಾಲು ಉಳಿಸಿ', 'editor.unsaved': 'ಉಳಿಸದ ಬದಲಾವಣೆಗಳು', 'editor.removeHash': 'ಉಳಿಸುವ ಮೊದಲು # ತೆಗೆದುಹಾಕಿ',
-  'editor.noChanges': 'ಉಳಿಸಲು ಬದಲಾವಣೆಗಳಿಲ್ಲ', 'editor.savingFiles': 'ಸಂಗ್ರಹಗಳಿಗೆ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'editor.savingBrowser': 'ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'editor.savedBrowser': 'ಈ ಬ್ರೌಸರ್ ಅವಧಿಯಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ', 'editor.savedFiles': '{files} ಗೆ ಉಳಿಸಲಾಗಿದೆ', 'editor.saveFailed': 'ಸ್ಥಳೀಯ ಸಂಗ್ರಹಗಳನ್ನು ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.', 'editor.downloaded': 'ಸಂಪಾದಿತ ಭಾಷಾ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಆಗಿದೆ',
+  'editor.noChanges': 'ಉಳಿಸಲು ಬದಲಾವಣೆಗಳಿಲ್ಲ', 'editor.savingFiles': 'ಸಂಗ್ರಹಗಳಿಗೆ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'editor.savingBrowser': 'ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'editor.savedBrowser': 'ಈ ಬ್ರೌಸರ್ ಅವಧಿಯಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ', 'editor.savedFiles': '{files} ಗೆ ಉಳಿಸಲಾಗಿದೆ', 'editor.saveFailed': 'ಸ್ಥಳೀಯ ಸಂಗ್ರಹಗಳನ್ನು ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.', 'editor.downloaded': 'ಸಂಪಾದಿತ ಸಂಗ್ರಹ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಆಗಿದೆ',
   'editor.discard': 'ಈ ಶ್ಲೋಕದ ಉಳಿಸದ ಸಂಪಾದನೆಗಳನ್ನು ತ್ಯಜಿಸುವುದೇ?', 'editor.discardNavigate': 'ಈ ಶ್ಲೋಕದ ಉಳಿಸದ ಸಂಪಾದನೆಗಳನ್ನು ತ್ಯಜಿಸಿ ಮುಂದುವರಿಯುವುದೇ?',
-  'editor.download': '↓ ಸಂಪಾದಿತ ಭಾಷಾ ಫೈಲ್‌ಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ', 'editor.downloadAgain': '↓ ಮತ್ತೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
+  'editor.download': '↓ ಸಂಪಾದಿತ ಸಂಗ್ರಹ ಫೈಲ್‌ಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ', 'editor.downloadAgain': '↓ ಮತ್ತೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
   'editor.returnHome': 'ಬದಲಾವಣೆಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿಲ್ಲ. ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗುವುದೇ?', 'editor.dismissDownload': 'ಬದಲಾವಣೆಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿಲ್ಲ. ಈ ಜ್ಞಾಪನೆಯನ್ನು ಮುಚ್ಚುವುದೇ?',
   'fullscreen.enter': 'ಪೂರ್ಣ ಪರದೆಗೆ ಹೋಗಿ', 'fullscreen.exit': 'ಪೂರ್ಣ ಪರದೆಯಿಂದ ಹೊರಬನ್ನಿ',
   'validation.name': 'ಪ್ರೊಫೈಲ್ ಹೆಸರನ್ನು ನಮೂದಿಸಿ.', 'validation.dob': 'ಮಾನ್ಯ ಜನ್ಮ ದಿನಾಂಕವನ್ನು ನಮೂದಿಸಿ.', 'validation.appLanguage': 'ಆ್ಯಪ್ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.', 'validation.contentLanguage': 'ಆದ್ಯತೆಯ ಗೀತಾ ವಿಷಯ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.', 'validation.profileSave': 'ಪ್ರೊಫೈಲ್ ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.'
@@ -1346,6 +1358,19 @@ const COLLECTION_ROOT = 'data/collections';
 const AUDIO_REGISTRY_HEADERS = ['collection_id', 'title', 'contributor', 'language', 'catalog_url', 'cue_purpose_url', 'cue_url', 'attribution', 'license', 'source'];
 const AUDIO_CUE_PURPOSE_HEADERS = ['cue_id', 'language', 'purpose', 'description'];
 const AUDIO_CUE_HEADERS = ['sid', 'asset_order', 'cue_order', 'cue_id', 'start_ms', 'end_ms'];
+const DECK_REGISTRY_HEADERS = ['collection_id', 'title', 'provider', 'language', 'catalog_url', 'attribution', 'license', 'source'];
+const DECK_CATALOG_HEADERS = ['sid', 'order', 'language', 'deck_url', 'title'];
+const DECK_COMPOSITION_HEADERS = ['cid', 'snum', 'sid', 'order', 'deck_collection', 'deck_order'];
+const IMAGE_REGISTRY_HEADERS = ['collection_id', 'title', 'catalog_url', 'metadata_en_url', 'metadata_kn_url', 'attribution', 'license', 'source'];
+const ILLUSTRATION_CATALOG_HEADERS = ['sid', 'order', 'image_url'];
+const ILLUSTRATION_METADATA_HEADERS = ['sid', 'order', 'alt_text', 'caption'];
+const ILLUSTRATION_COMPOSITION_HEADERS = ['cid', 'snum', 'sid', 'order', 'image_collection', 'image_order'];
+const TEXT_REGISTRY_HEADERS = ['collection_id', 'title', 'catalog_url', 'master_en_url', 'master_kn_url', 'attribution', 'license', 'source'];
+const CONTEMPLATION_CATALOG_HEADERS = ['sid', 'order', 'line_type'];
+const CONTEMPLATION_MASTER_HEADERS = ['sid', 'order', 'text'];
+const CONTEMPLATION_COMPOSITION_HEADERS = ['cid', 'snum', 'sid', 'order', 'text_collection', 'text_order'];
+const MEDIA_COMPOSITION_HEADERS = ['cid', 'snum', 'sid', 'order', 'media_type', 'collection', 'asset_order'];
+const SEQUENCE_HEADERS = ['position', 'cid', 'snum', 'sid'];
 
 const MASTER_HEADERS = {
   sa: ['cid', 'snum', 'sid', 'chapter_name', 'shloka_raw', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning'],
@@ -1416,6 +1441,10 @@ function catalogEntry(catalog, type, label) {
   return entry.content_url;
 }
 
+function optionalCatalogEntry(catalog, type) {
+  return catalog.rows.find((row) => row.content_type === type)?.content_url || '';
+}
+
 function languageFile(catalog, language) {
   const entry = catalog.rows.find((row) => row.language === language && row.content_type === 'master');
   if (!entry) throw new Error('Verse collection does not define master data for ' + language + '.');
@@ -1432,8 +1461,78 @@ function verifyIdentity(reference, candidate, label) {
   });
 }
 
+function verifyOrderedAssetIdentity(reference, candidate, label) {
+  if (reference.rows.length !== candidate.rows.length) throw new Error(label + ' does not contain the canonical asset count.');
+  reference.rows.forEach((row, index) => {
+    const other = candidate.rows[index];
+    if (!other || row.sid !== other.sid || row.order !== other.order) {
+      throw new Error(label + ' differs from its catalog SID and order at row ' + (index + 2) + '.');
+    }
+  });
+}
+
 function mediaKey(sid, order) {
   return sid + ':' + order;
+}
+
+function normalizeGoogleDeckUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  let url;
+  try { url = new URL(raw); } catch { throw new Error('Google deck URL is invalid.'); }
+  if (url.protocol !== 'https:' || url.hostname !== 'docs.google.com') {
+    throw new Error('Only https://docs.google.com presentation URLs are supported.');
+  }
+  const match = url.pathname.match(/^\/presentation\/d\/(e\/)?([^/]+)(?:\/[^/]*)?/);
+  if (!match) throw new Error('Google deck URL must identify a presentation.');
+  url.pathname = '/presentation/d/' + (match[1] || '') + match[2] + '/embed';
+  url.search = '';
+  url.searchParams.set('start', 'false');
+  url.searchParams.set('loop', 'false');
+  url.searchParams.set('delayms', '3000');
+  url.searchParams.set('rm', 'minimal');
+  url.hash = '';
+  return url.href;
+}
+
+function normalizeImageUrl(value, resolveRelative = (url) => url) {
+  const sourceUrl = String(value || '').trim();
+  if (!sourceUrl) throw new Error('Image URL is empty.');
+  if (/^https:\/\//i.test(sourceUrl)) return { sourceUrl, resolvedUrl: sourceUrl, isExternal: true };
+  if (/^[a-z][a-z\d+.-]*:/i.test(sourceUrl) || sourceUrl.startsWith('//') || sourceUrl.startsWith('/')) {
+    throw new Error('Image URL must be an app-relative path or an absolute HTTPS URL.');
+  }
+  return { sourceUrl, resolvedUrl: resolveRelative(sourceUrl), isExternal: false };
+}
+
+function selectedSourceRows(sa, sequence) {
+  if (!sequence) return sa.rows;
+  const bySid = new Map(sa.rows.map((row) => [row.sid, row]));
+  return sequence.rows.map((entry, index) => {
+    if (entry.position !== String(index + 1)) throw new Error('Experience sequence positions must start at 1 and remain contiguous.');
+    const row = bySid.get(entry.sid);
+    if (!row || row.cid !== entry.cid || row.snum !== entry.snum) throw new Error('Experience sequence contains an invalid identity at position ' + entry.position + '.');
+    return row;
+  });
+}
+
+function verifyOrderedComposition(referenceRows, composition, label, { multiple = false } = {}) {
+  if (!multiple) return verifyIdentity({ rows: referenceRows }, composition, label);
+  const groups = new Map();
+  composition.rows.forEach((row) => {
+    if (!groups.has(row.sid)) groups.set(row.sid, []);
+    groups.get(row.sid).push(row);
+  });
+  if (groups.size !== referenceRows.length) throw new Error(label + ' does not contain every selected SID.');
+  referenceRows.forEach((row) => {
+    const entries = groups.get(row.sid) || [];
+    entries.sort((left, right) => Number(left.order) - Number(right.order));
+    entries.forEach((entry, index) => {
+      if (entry.cid !== row.cid || entry.snum !== row.snum || entry.order !== String(index + 1)) {
+        throw new Error(label + ' has an invalid identity or order at ' + row.sid + '.');
+      }
+    });
+  });
 }
 
 function audioBinding(experience) {
@@ -1532,17 +1631,96 @@ function buildAudioCueIndex({ collectionId = 'audio collection', catalog, cuePur
   return { purposeById, cuesByAsset, errors };
 }
 
-function normalizeCollectionData({ sa, en, kn, audioComposition, imageComposition, audioCatalogs, audioCueIndexes = new Map(), audioCueErrors = new Map(), imageCatalogs, experience, resolveMediaUrl = (url) => url }) {
-  for (const [label, table] of [['English master', en], ['Kannada master', kn], ['Experience audio composition', audioComposition], ['Experience image composition', imageComposition]]) {
-    verifyIdentity(sa, table, label);
-  }
+function normalizeCollectionData({ sa, en, kn, sequence = null, audioComposition, imageComposition, deckComposition = null, illustrationComposition = null, contemplationComposition = null, mediaComposition = null, audioCatalogs, audioCueIndexes = new Map(), audioCueErrors = new Map(), imageCatalogs, deckCatalogs = new Map(), illustrationCatalogs = new Map(), contemplationCatalogs = new Map(), experience, resolveMediaUrl = (url) => url, resourceUrls = {} }) {
+  verifyIdentity(sa, en, 'English master');
+  verifyIdentity(sa, kn, 'Kannada master');
+  verifyIdentity(sa, imageComposition, 'Experience image composition');
+  const sourceRows = selectedSourceRows(sa, sequence);
+  verifyOrderedComposition(sourceRows, audioComposition, 'Experience audio composition');
+  if (deckComposition) verifyOrderedComposition(sourceRows, deckComposition, 'Experience deck composition', { multiple: true });
+  if (illustrationComposition) verifyOrderedComposition(sourceRows, illustrationComposition, 'Experience illustration composition', { multiple: true });
+  if (contemplationComposition) verifyOrderedComposition(sourceRows, contemplationComposition, 'Experience contemplation composition', { multiple: true });
+  if (mediaComposition) verifyOrderedComposition(sourceRows, mediaComposition, 'Experience media composition', { multiple: true });
   const binding = audioBinding(experience);
   const bySid = (table) => new Map(table.rows.map((row) => [row.sid, row]));
   const enBySid = bySid(en);
   const knBySid = bySid(kn);
   const audioBySid = bySid(audioComposition);
   const imageBySid = bySid(imageComposition);
-  const rows = sa.rows.map((sourceRow) => {
+  const deckRefsBySid = new Map();
+  for (const row of deckComposition?.rows || []) {
+    if (!deckRefsBySid.has(row.sid)) deckRefsBySid.set(row.sid, []);
+    deckRefsBySid.get(row.sid).push(row);
+  }
+  const groupedReferences = (composition) => {
+    const groups = new Map();
+    for (const reference of composition?.rows || []) {
+      if (!groups.has(reference.sid)) groups.set(reference.sid, []);
+      groups.get(reference.sid).push(reference);
+    }
+    groups.forEach((references) => references.sort((left, right) => Number(left.order) - Number(right.order)));
+    return groups;
+  };
+  const illustrationRefsBySid = groupedReferences(illustrationComposition);
+  const contemplationRefsBySid = groupedReferences(contemplationComposition);
+  const mediaRefsBySid = groupedReferences(mediaComposition);
+
+  function localizedRow(bundle, sid, order, language, label) {
+    const row = bundle?.localized?.[language]?.rows.find((candidate) => mediaKey(candidate.sid, candidate.order) === mediaKey(sid, order));
+    if (!row) throw new Error(label + ' does not define ' + language + ' content for ' + sid + ':' + order + '.');
+    return row;
+  }
+
+  function illustrationFromReference(reference, sourceSid, isFallback = false) {
+    const collectionId = reference.image_collection || reference.collection;
+    const assetSid = reference.sid || sourceSid;
+    const assetOrder = reference.image_order || reference.order;
+    if (!collectionId || !assetOrder) throw new Error('Incomplete illustration reference at ' + sourceSid + '.');
+    const bundle = illustrationCatalogs.get(collectionId);
+    const asset = bundle?.catalog.rows.find((candidate) => mediaKey(candidate.sid, candidate.order) === mediaKey(assetSid, assetOrder));
+    if (!asset?.image_url) throw new Error('Illustration reference does not resolve at ' + sourceSid + '.');
+    const enMetadata = localizedRow(bundle, assetSid, assetOrder, 'en', 'Illustration collection ' + collectionId);
+    const knMetadata = localizedRow(bundle, assetSid, assetOrder, 'kn', 'Illustration collection ' + collectionId);
+    if (!enMetadata.alt_text || !knMetadata.alt_text) throw new Error('Illustration alternative text is required at ' + sourceSid + '.');
+    const imageLocation = normalizeImageUrl(asset.image_url, resolveMediaUrl);
+    return {
+      mediaType: 'image',
+      collectionId,
+      assetSid,
+      assetOrder,
+      sourceUrl: imageLocation.sourceUrl,
+      resolvedUrl: imageLocation.resolvedUrl,
+      imageUrl: imageLocation.resolvedUrl,
+      isExternal: imageLocation.isExternal,
+      localized: Object.freeze({
+        en: Object.freeze({ altText: enMetadata.alt_text, caption: enMetadata.caption }),
+        kn: Object.freeze({ altText: knMetadata.alt_text, caption: knMetadata.caption })
+      }),
+      isFallback
+    };
+  }
+
+  function contemplationFromReference(reference, sourceSid, isFallback = false) {
+    const collectionId = reference.text_collection || reference.collection;
+    const assetSid = reference.sid || sourceSid;
+    const assetOrder = reference.text_order || reference.order;
+    if (!collectionId || !assetOrder) throw new Error('Incomplete contemplation reference at ' + sourceSid + '.');
+    const bundle = contemplationCatalogs.get(collectionId);
+    const asset = bundle?.catalog.rows.find((candidate) => mediaKey(candidate.sid, candidate.order) === mediaKey(assetSid, assetOrder));
+    if (!asset) throw new Error('Contemplation reference does not resolve at ' + sourceSid + '.');
+    const enText = localizedRow(bundle, assetSid, assetOrder, 'en', 'Contemplation collection ' + collectionId).text;
+    const knText = localizedRow(bundle, assetSid, assetOrder, 'kn', 'Contemplation collection ' + collectionId).text;
+    if (!enText || !knText) throw new Error('Contemplation text is required at ' + sourceSid + '.');
+    return Object.freeze({
+      collectionId,
+      assetSid,
+      assetOrder,
+      type: asset.line_type,
+      localized: Object.freeze({ en: enText, kn: knText }),
+      isFallback
+    });
+  }
+  const rows = sourceRows.map((sourceRow) => {
     const enRow = enBySid.get(sourceRow.sid);
     const knRow = knBySid.get(sourceRow.sid);
     const audioRef = audioBySid.get(sourceRow.sid);
@@ -1577,6 +1755,64 @@ function normalizeCollectionData({ sa, en, kn, audioComposition, imageCompositio
       if (!asset) throw new Error('Image reference does not resolve at ' + sourceRow.sid + '.');
       chapterIconUrl = resolveMediaUrl(asset.image_url);
     }
+    const compositionRows = (deckRefsBySid.get(sourceRow.sid) || []).sort((left, right) => Number(left.order) - Number(right.order));
+    const deckSlots = [];
+    for (const [deckCollection, catalog] of deckCatalogs) {
+      const assets = catalog.rows.filter((asset) => asset.sid === sourceRow.sid).sort((left, right) => Number(left.order) - Number(right.order));
+      assets.forEach((asset, index) => {
+        const compositionRow = compositionRows.find((entry) => entry.deck_collection === deckCollection && entry.deck_order === asset.order) || compositionRows[index];
+        let embedUrl = '';
+        if (asset.deck_url) embedUrl = normalizeGoogleDeckUrl(asset.deck_url);
+        deckSlots.push({
+          order: Number(compositionRow?.order || index + 1),
+          collectionId: deckCollection,
+          catalogOrder: asset.order,
+          sourceUrl: asset.deck_url,
+          embedUrl,
+          title: asset.title,
+          language: asset.language,
+          compositionRow,
+          compositionTable: deckComposition,
+          compositionUrl: resourceUrls.decks,
+          catalogRow: asset,
+          catalog,
+          catalogUrl: catalog.url || ''
+        });
+      });
+    }
+    deckSlots.sort((left, right) => left.order - right.order);
+    const illustrationReferences = (illustrationRefsBySid.get(sourceRow.sid) || []).filter((reference) => reference.image_collection || reference.image_order);
+    const illustrations = illustrationReferences.map((reference) => illustrationFromReference(reference, sourceRow.sid));
+    if (!illustrations.length && experience?.fallbacks?.illustration) {
+      illustrations.push(illustrationFromReference(experience.fallbacks.illustration, sourceRow.sid, true));
+    }
+    const contemplationReferences = (contemplationRefsBySid.get(sourceRow.sid) || []).filter((reference) => reference.text_collection || reference.text_order);
+    const contemplationLines = contemplationReferences.map((reference) => contemplationFromReference(reference, sourceRow.sid));
+    if (!contemplationLines.length && experience?.fallbacks?.contemplation) {
+      contemplationLines.push(contemplationFromReference(experience.fallbacks.contemplation, sourceRow.sid, true));
+    }
+    const mediaItems = [];
+    for (const reference of (mediaRefsBySid.get(sourceRow.sid) || []).filter((entry) => entry.media_type || entry.collection || entry.asset_order)) {
+      if (!reference.media_type || !reference.collection || !reference.asset_order) throw new Error('Incomplete media reference at ' + sourceRow.sid + '.');
+      if (reference.media_type === 'image') {
+        const item = illustrationFromReference({ image_collection: reference.collection, image_order: reference.asset_order, sid: sourceRow.sid }, sourceRow.sid);
+        mediaItems.push({ ...item, order: Number(reference.order) });
+      } else if (reference.media_type === 'google_deck') {
+        const deck = deckSlots.find((item) => item.collectionId === reference.collection && item.catalogOrder === reference.asset_order);
+        if (!deck?.sourceUrl) throw new Error('Google deck media reference does not resolve at ' + sourceRow.sid + '.');
+        mediaItems.push({
+          mediaType: 'google_deck', order: Number(reference.order), collectionId: deck.collectionId,
+          assetSid: sourceRow.sid, assetOrder: deck.catalogOrder, sourceUrl: deck.sourceUrl,
+          resolvedUrl: deck.embedUrl, embedUrl: deck.embedUrl, title: deck.title,
+          localized: Object.freeze({ en: Object.freeze({ altText: deck.title || '', caption: '' }), kn: Object.freeze({ altText: deck.title || '', caption: '' }) }),
+          isExternal: true, isFallback: false
+        });
+      } else throw new Error('Unsupported media type at ' + sourceRow.sid + ': ' + reference.media_type + '.');
+    }
+    if (!mediaItems.length && experience?.fallbacks?.illustration) {
+      mediaItems.push({ ...illustrationFromReference(experience.fallbacks.illustration, sourceRow.sid, true), order: 1 });
+    }
+    mediaItems.sort((left, right) => left.order - right.order);
     return {
       cid: sourceRow.cid,
       snum: sourceRow.snum,
@@ -1600,25 +1836,58 @@ function normalizeCollectionData({ sa, en, kn, audioComposition, imageCompositio
         primaryAudioCues,
         chantFullSaUrl,
         chantFullSaCues,
-        chapterIconUrl
-      }
+        chapterIconUrl,
+        illustrations: Object.freeze(illustrations),
+        items: Object.freeze(mediaItems),
+        decks: deckSlots.filter((deck) => deck.sourceUrl),
+        deckSlots
+      },
+      contemplation: { lines: Object.freeze(contemplationLines) }
     };
   });
   return {
     schemaVersion: 3,
     experience,
     rows,
+    authoring: {
+      deckComposition: deckComposition && { url: resourceUrls.decks, table: deckComposition },
+      illustrationComposition: illustrationComposition && { url: resourceUrls.illustrations, table: illustrationComposition },
+      contemplationComposition: contemplationComposition && { url: resourceUrls.contemplations, table: contemplationComposition },
+      mediaComposition: mediaComposition && { url: resourceUrls.media, table: mediaComposition },
+      deckCatalogs: new Map([...deckCatalogs].map(([id, table]) => [id, { url: table.url || '', table }]))
+    },
     diagnostics: { audioCues: Object.fromEntries(audioCueErrors) }
   };
 }
 
-async function loadMediaCatalogs(type, composition, collectionField, headers, version) {
-  const collectionIds = new Set(composition.rows.map((row) => row[collectionField]).filter(Boolean));
+async function loadMediaCatalogs(type, composition, collectionField, headers, version, declaredIds = []) {
+  const collectionIds = new Set([...declaredIds, ...composition.rows.map((row) => row[collectionField]).filter(Boolean)]);
   const registry = await fetchTable(COLLECTION_ROOT + '/' + type + '/collection.csv', null, version);
   const catalogs = new Map();
   for (const id of collectionIds) {
     const entry = registryEntry(registry, id, type);
-    catalogs.set(id, await fetchTable(entry.catalog_url, headers, version));
+    const catalog = await fetchTable(entry.catalog_url, headers, version);
+    catalog.url = entry.catalog_url;
+    catalogs.set(id, catalog);
+  }
+  return catalogs;
+}
+
+async function loadLocalizedCatalogs({ type, composition, collectionField, catalogHeaders, localizedHeaders, localizedFields, registryHeaders, version, declaredIds = [] }) {
+  const collectionIds = new Set([...declaredIds, ...composition.rows.map((row) => row[collectionField]).filter(Boolean)]);
+  const registry = await fetchTable(COLLECTION_ROOT + '/' + type + '/collection.csv', registryHeaders, version);
+  const catalogs = new Map();
+  for (const id of collectionIds) {
+    const entry = registryEntry(registry, id, type);
+    const catalog = await fetchTable(entry.catalog_url, catalogHeaders, version);
+    const localized = {};
+    for (const language of ['en', 'kn']) {
+      const url = entry[localizedFields[language]];
+      if (!url) throw new Error(type + ' collection ' + id + ' does not define ' + language + ' content.');
+      localized[language] = await fetchTable(url, localizedHeaders, version);
+      verifyOrderedAssetIdentity(catalog, localized[language], type + ' collection ' + id + ' ' + language);
+    }
+    catalogs.set(id, { catalog, localized });
   }
   return catalogs;
 }
@@ -1665,23 +1934,49 @@ async function loadCollectionExperience(experienceId, { version = '' } = {}) {
   const verseRegistry = await fetchTable(COLLECTION_ROOT + '/verses/collection.csv', null, version);
   const verseEntry = registryEntry(verseRegistry, experience.verseCollection, 'Verse');
   const verseCatalog = await fetchTable(verseEntry.catalog_url, ['language', 'content_type', 'content_url'], version);
-  const [sa, en, kn, audioComposition, imageComposition] = await Promise.all([
+  const sequenceUrl = optionalCatalogEntry(experienceCatalog, 'sequence');
+  const deckCompositionUrl = optionalCatalogEntry(experienceCatalog, 'decks');
+  const illustrationCompositionUrl = optionalCatalogEntry(experienceCatalog, 'illustrations');
+  const contemplationCompositionUrl = optionalCatalogEntry(experienceCatalog, 'contemplations');
+  const mediaCompositionUrl = optionalCatalogEntry(experienceCatalog, 'media');
+  const audioCompositionUrl = catalogEntry(experienceCatalog, 'audio', experienceId);
+  const imageCompositionUrl = catalogEntry(experienceCatalog, 'images', experienceId);
+  const [sa, en, kn, sequence, audioComposition, imageComposition, deckComposition, illustrationComposition, contemplationComposition, mediaComposition] = await Promise.all([
     fetchTable(languageFile(verseCatalog, 'sa'), MASTER_HEADERS.sa, version),
     fetchTable(languageFile(verseCatalog, 'en'), MASTER_HEADERS.en, version),
     fetchTable(languageFile(verseCatalog, 'kn'), MASTER_HEADERS.kn, version),
-    fetchTable(catalogEntry(experienceCatalog, 'audio', experienceId), audioCompositionHeaders(experience), version),
-    fetchTable(catalogEntry(experienceCatalog, 'images', experienceId), ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order'], version)
+    sequenceUrl ? fetchTable(sequenceUrl, SEQUENCE_HEADERS, version) : null,
+    fetchTable(audioCompositionUrl, audioCompositionHeaders(experience), version),
+    fetchTable(imageCompositionUrl, ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order'], version),
+    deckCompositionUrl ? fetchTable(deckCompositionUrl, DECK_COMPOSITION_HEADERS, version) : null,
+    illustrationCompositionUrl ? fetchTable(illustrationCompositionUrl, ILLUSTRATION_COMPOSITION_HEADERS, version) : null,
+    contemplationCompositionUrl ? fetchTable(contemplationCompositionUrl, CONTEMPLATION_COMPOSITION_HEADERS, version) : null,
+    mediaCompositionUrl ? fetchTable(mediaCompositionUrl, MEDIA_COMPOSITION_HEADERS, version) : null
   ]);
-  const [audioCollections, imageCatalogs] = await Promise.all([
+  const [audioCollections, imageCatalogs, deckCatalogs, illustrationCatalogs, contemplationCatalogs] = await Promise.all([
     loadAudioCatalogs(audioComposition, audioBinding(experience).collectionField, version),
-    loadMediaCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url'], version)
+    loadMediaCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url'], version),
+    deckComposition ? loadMediaCatalogs('deck', deckComposition, 'deck_collection', DECK_CATALOG_HEADERS, version, experience.deckCollections || []) : new Map(),
+    illustrationComposition ? loadLocalizedCatalogs({
+      type: 'images', composition: illustrationComposition, collectionField: 'image_collection',
+      catalogHeaders: ILLUSTRATION_CATALOG_HEADERS, localizedHeaders: ILLUSTRATION_METADATA_HEADERS,
+      localizedFields: { en: 'metadata_en_url', kn: 'metadata_kn_url' }, registryHeaders: IMAGE_REGISTRY_HEADERS,
+      version, declaredIds: experience.illustrationCollections || []
+    }) : new Map(),
+    contemplationComposition ? loadLocalizedCatalogs({
+      type: 'text', composition: contemplationComposition, collectionField: 'text_collection',
+      catalogHeaders: CONTEMPLATION_CATALOG_HEADERS, localizedHeaders: CONTEMPLATION_MASTER_HEADERS,
+      localizedFields: { en: 'master_en_url', kn: 'master_kn_url' }, registryHeaders: TEXT_REGISTRY_HEADERS,
+      version, declaredIds: experience.contemplationCollections || []
+    }) : new Map()
   ]);
   return normalizeCollectionData({
-    sa, en, kn, audioComposition, imageComposition,
+    sa, en, kn, sequence, audioComposition, imageComposition, deckComposition, illustrationComposition, contemplationComposition, mediaComposition,
     audioCatalogs: audioCollections.catalogs,
     audioCueIndexes: audioCollections.cueIndexes,
     audioCueErrors: audioCollections.cueErrors,
-    imageCatalogs, experience
+    imageCatalogs, deckCatalogs, illustrationCatalogs, contemplationCatalogs, experience,
+    resourceUrls: { sequence: sequenceUrl, audio: audioCompositionUrl, images: imageCompositionUrl, decks: deckCompositionUrl, illustrations: illustrationCompositionUrl, contemplations: contemplationCompositionUrl, media: mediaCompositionUrl }
   });
 }
 
@@ -1708,18 +2003,33 @@ async function loadCollectionExperienceWithReader(experienceId, { text, resolveM
   const verseCatalog = await table(verseEntry.catalog_url, ['language', 'content_type', 'content_url']);
   const languageUrls = Object.fromEntries(['sa', 'en', 'kn'].map((language) => [language, languageFile(verseCatalog, language)]));
   Object.entries(languageUrls).forEach(([language, url]) => onLanguageFile(language, url));
-  const [sa, en, kn, audioComposition, imageComposition] = await Promise.all([
+  const sequenceUrl = optionalCatalogEntry(experienceCatalog, 'sequence');
+  const deckCompositionUrl = optionalCatalogEntry(experienceCatalog, 'decks');
+  const illustrationCompositionUrl = optionalCatalogEntry(experienceCatalog, 'illustrations');
+  const contemplationCompositionUrl = optionalCatalogEntry(experienceCatalog, 'contemplations');
+  const mediaCompositionUrl = optionalCatalogEntry(experienceCatalog, 'media');
+  const audioCompositionUrl = catalogEntry(experienceCatalog, 'audio', experienceId);
+  const imageCompositionUrl = catalogEntry(experienceCatalog, 'images', experienceId);
+  const [sa, en, kn, sequence, audioComposition, imageComposition, deckComposition, illustrationComposition, contemplationComposition, mediaComposition] = await Promise.all([
     table(languageUrls.sa, MASTER_HEADERS.sa),
     table(languageUrls.en, MASTER_HEADERS.en),
     table(languageUrls.kn, MASTER_HEADERS.kn),
-    table(catalogEntry(experienceCatalog, 'audio', experienceId), audioCompositionHeaders(experience)),
-    table(catalogEntry(experienceCatalog, 'images', experienceId), ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order'])
+    sequenceUrl ? table(sequenceUrl, SEQUENCE_HEADERS) : null,
+    table(audioCompositionUrl, audioCompositionHeaders(experience)),
+    table(imageCompositionUrl, ['cid', 'snum', 'sid', 'chapter_icon_collection', 'chapter_icon_order']),
+    deckCompositionUrl ? table(deckCompositionUrl, DECK_COMPOSITION_HEADERS) : null,
+    illustrationCompositionUrl ? table(illustrationCompositionUrl, ILLUSTRATION_COMPOSITION_HEADERS) : null,
+    contemplationCompositionUrl ? table(contemplationCompositionUrl, CONTEMPLATION_COMPOSITION_HEADERS) : null,
+    mediaCompositionUrl ? table(mediaCompositionUrl, MEDIA_COMPOSITION_HEADERS) : null
   ]);
-  async function localCatalogs(type, composition, collectionField, headers) {
+  async function localCatalogs(type, composition, collectionField, headers, declaredIds = []) {
     const registry = await table(COLLECTION_ROOT + '/' + type + '/collection.csv');
     const catalogs = new Map();
-    for (const id of new Set(composition.rows.map((row) => row[collectionField]).filter(Boolean))) {
-      catalogs.set(id, await table(registryEntry(registry, id, type).catalog_url, headers));
+    for (const id of new Set([...declaredIds, ...composition.rows.map((row) => row[collectionField]).filter(Boolean)])) {
+      const entry = registryEntry(registry, id, type);
+      const catalog = await table(entry.catalog_url, headers);
+      catalog.url = entry.catalog_url;
+      catalogs.set(id, catalog);
     }
     return catalogs;
   }
@@ -1752,16 +2062,47 @@ async function loadCollectionExperienceWithReader(experienceId, { text, resolveM
     }
     return { catalogs, cueIndexes, cueErrors };
   }
-  const [audioCollections, imageCatalogs] = await Promise.all([
+  async function localLocalizedCatalogs({ type, composition, collectionField, catalogHeaders, localizedHeaders, localizedFields, registryHeaders, declaredIds = [] }) {
+    const registry = await table(COLLECTION_ROOT + '/' + type + '/collection.csv', registryHeaders);
+    const catalogs = new Map();
+    for (const id of new Set([...declaredIds, ...composition.rows.map((row) => row[collectionField]).filter(Boolean)])) {
+      const entry = registryEntry(registry, id, type);
+      const catalog = await table(entry.catalog_url, catalogHeaders);
+      const localized = {};
+      for (const language of ['en', 'kn']) {
+        const url = entry[localizedFields[language]];
+        if (!url) throw new Error(type + ' collection ' + id + ' does not define ' + language + ' content.');
+        localized[language] = await table(url, localizedHeaders);
+        verifyOrderedAssetIdentity(catalog, localized[language], type + ' collection ' + id + ' ' + language);
+      }
+      catalogs.set(id, { catalog, localized });
+    }
+    return catalogs;
+  }
+  const [audioCollections, imageCatalogs, deckCatalogs, illustrationCatalogs, contemplationCatalogs] = await Promise.all([
     localAudioCatalogs(),
-    localCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url'])
+    localCatalogs('images', imageComposition, 'chapter_icon_collection', ['sid', 'order', 'image_url']),
+    deckComposition ? localCatalogs('deck', deckComposition, 'deck_collection', DECK_CATALOG_HEADERS, experience.deckCollections || []) : new Map(),
+    illustrationComposition ? localLocalizedCatalogs({
+      type: 'images', composition: illustrationComposition, collectionField: 'image_collection',
+      catalogHeaders: ILLUSTRATION_CATALOG_HEADERS, localizedHeaders: ILLUSTRATION_METADATA_HEADERS,
+      localizedFields: { en: 'metadata_en_url', kn: 'metadata_kn_url' }, registryHeaders: IMAGE_REGISTRY_HEADERS,
+      declaredIds: experience.illustrationCollections || []
+    }) : new Map(),
+    contemplationComposition ? localLocalizedCatalogs({
+      type: 'text', composition: contemplationComposition, collectionField: 'text_collection',
+      catalogHeaders: CONTEMPLATION_CATALOG_HEADERS, localizedHeaders: CONTEMPLATION_MASTER_HEADERS,
+      localizedFields: { en: 'master_en_url', kn: 'master_kn_url' }, registryHeaders: TEXT_REGISTRY_HEADERS,
+      declaredIds: experience.contemplationCollections || []
+    }) : new Map()
   ]);
   return normalizeCollectionData({
-    sa, en, kn, audioComposition, imageComposition,
+    sa, en, kn, sequence, audioComposition, imageComposition, deckComposition, illustrationComposition, contemplationComposition, mediaComposition,
     audioCatalogs: audioCollections.catalogs,
     audioCueIndexes: audioCollections.cueIndexes,
     audioCueErrors: audioCollections.cueErrors,
-    imageCatalogs, experience, resolveMediaUrl
+    imageCatalogs, deckCatalogs, illustrationCatalogs, contemplationCatalogs, experience, resolveMediaUrl,
+    resourceUrls: { sequence: sequenceUrl, audio: audioCompositionUrl, images: imageCompositionUrl, decks: deckCompositionUrl, illustrations: illustrationCompositionUrl, contemplations: contemplationCompositionUrl, media: mediaCompositionUrl }
   });
 }
 
@@ -1833,7 +2174,7 @@ class WritableCollectionWorkspace {
     const dataset = await loadCollectionExperienceWithReader(experienceId, {
       text: async (url) => {
         const value = await this.readText(url);
-        if ([...this.languageFiles.values()].includes(url)) this.baselines.set(url, value);
+        this.baselines.set(url, value);
         return value;
       },
       onLanguageFile: (language, url) => this.languageFiles.set(language, url),
@@ -1848,6 +2189,13 @@ class WritableCollectionWorkspace {
     for (const row of dataset.rows) {
       for (const field of ['primaryAudioUrl', 'chantFullSaUrl', 'chapterIconUrl']) {
         if (row.media[field] instanceof Promise) row.media[field] = await row.media[field];
+      }
+      for (const illustration of row.media.illustrations || []) {
+        if (illustration.imageUrl instanceof Promise) illustration.imageUrl = await illustration.imageUrl;
+      }
+      for (const item of row.media.items || []) {
+        if (item.resolvedUrl instanceof Promise) item.resolvedUrl = await item.resolvedUrl;
+        if (item.imageUrl instanceof Promise) item.imageUrl = await item.imageUrl;
       }
     }
     return dataset;
@@ -1866,6 +2214,30 @@ class WritableCollectionWorkspace {
         throw error;
       }
       pending.push({ language, url, handle, content: serializeLanguageMaster(dataset, language) });
+    }
+    for (const entry of pending) {
+      const writable = await entry.handle.createWritable();
+      await writable.write(entry.content);
+      await writable.close();
+      const verified = await (await entry.handle.getFile()).text();
+      if (verified !== entry.content) throw new Error('Could not verify the saved ' + entry.url.split('/').pop() + '.');
+      this.baselines.set(entry.url, verified);
+    }
+    return pending.map((entry) => entry.url.split('/').pop());
+  }
+
+  async saveCollectionTables(entries) {
+    const pending = [];
+    for (const entry of entries) {
+      if (!entry?.url || !entry.table) throw new Error('Collection table save target is incomplete.');
+      const handle = await fileHandleAt(this.rootHandle, entry.url);
+      const current = await (await handle.getFile()).text();
+      if (current !== this.baselines.get(entry.url)) {
+        const error = new Error('The local ' + entry.url.split('/').pop() + ' changed outside Gitaverse. Reload the collections folder before saving.');
+        error.code = 'WORKSPACE_CONFLICT';
+        throw error;
+      }
+      pending.push({ ...entry, handle, content: serializeCollectionTable(entry.table) });
     }
     for (const entry of pending) {
       const writable = await entry.handle.createWritable();
@@ -1897,6 +2269,14 @@ function serializeLanguageMaster(dataset, language) {
     return [row.cid, row.snum, row.sid, content.chapterName, content.transliteration, content.meaning, content.wordByWordMeaning];
   });
   return [headers, ...rows].map((row) => row.map(encode).join('#')).join('\n') + '\n';
+}
+
+function serializeCollectionTable(table) {
+  if (!table?.headers?.length || !Array.isArray(table.rows)) throw new Error('Collection table cannot be serialized.');
+  return [
+    table.headers,
+    ...table.rows.map((row) => table.headers.map((header) => row[header] ?? ''))
+  ].map((row) => row.map(encode).join('#')).join('\n') + '\n';
 }
 
 // Source: js/player/collection-source.js
@@ -2065,6 +2445,136 @@ class AudioPlayer {
     const remainder = Math.floor(seconds % 60);
     return String(minutes).padStart(2, '0') + ':' + String(remainder).padStart(2, '0');
   }
+}
+
+// Source: js/player/media-player.js
+function createMediaPlayer({ translate = (_key, fallback) => fallback } = {}) {
+  let panel;
+  let items = [];
+  let index = 0;
+  let language = 'en';
+
+  function mount(container) {
+    panel = container;
+    panel.querySelector('[data-media-action="previous"]').addEventListener('click', () => select(index - 1));
+    panel.querySelector('[data-media-action="next"]').addEventListener('click', () => select(index + 1));
+  }
+
+  function select(next) {
+    if (items.length < 2) return;
+    index = (next + items.length) % items.length;
+    paint();
+  }
+
+  function paint() {
+    if (!panel) return;
+    const stage = panel.querySelector('[data-role="media-stage"]');
+    const caption = panel.querySelector('[data-role="media-caption"]');
+    const previous = panel.querySelector('[data-media-action="previous"]');
+    const next = panel.querySelector('[data-media-action="next"]');
+    stage.innerHTML = '';
+    const item = items[index];
+    previous.hidden = items.length < 2;
+    next.hidden = items.length < 2;
+    caption.hidden = true;
+    caption.textContent = '';
+    if (!item) return;
+    if (item.mediaType === 'image') {
+      const image = document.createElement('img');
+      const localized = item.localized?.[language] || item.localized?.en || {};
+      image.className = 'gita-sara-media-image';
+      image.src = item.resolvedUrl || item.imageUrl;
+      image.alt = localized.altText || '';
+      image.addEventListener('error', () => {
+        stage.innerHTML = `<p class="gita-sara-media-error">${translate('gitaSara.mediaUnavailable', 'Illustration unavailable')}</p>`;
+      }, { once: true });
+      stage.appendChild(image);
+      if (localized.caption) {
+        caption.textContent = localized.caption;
+        caption.hidden = false;
+      }
+    } else if (item.mediaType === 'google_deck') {
+      const frame = document.createElement('iframe');
+      frame.className = 'gita-sara-deck-frame';
+      frame.src = item.resolvedUrl || item.embedUrl;
+      frame.title = item.title || translate('gitaSara.deckTitle', 'Presentation');
+      frame.loading = 'eager';
+      frame.allowFullscreen = true;
+      frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      stage.appendChild(frame);
+    }
+  }
+
+  return {
+    mount,
+    render(nextItems, nextLanguage, reset = false) {
+      items = nextItems || [];
+      language = nextLanguage === 'kn' ? 'kn' : 'en';
+      if (reset || index >= items.length) index = 0;
+      paint();
+    },
+    select,
+    currentIndex: () => index
+  };
+}
+
+// Source: js/player/text-player.js
+function createTextPlayer({ translate = (_key, fallback) => fallback } = {}) {
+  let panel;
+  let lines = [];
+  let index = 0;
+  let language = 'en';
+  let showAll = false;
+
+  function mount(container) {
+    panel = container;
+    panel.querySelector('[data-text-action="previous"]').addEventListener('click', () => select(index - 1));
+    panel.querySelector('[data-text-action="next"]').addEventListener('click', () => select(index + 1));
+    panel.querySelector('[data-text-action="toggle-all"]').addEventListener('click', () => {
+      showAll = !showAll;
+      paint();
+    });
+  }
+
+  function select(next) {
+    if (showAll || lines.length < 2) return;
+    index = (next + lines.length) % lines.length;
+    paint();
+  }
+
+  function paint() {
+    if (!panel) return;
+    const stage = panel.querySelector('[data-role="question-stage"]');
+    const toggle = panel.querySelector('[data-text-action="toggle-all"]');
+    const previous = panel.querySelector('[data-text-action="previous"]');
+    const next = panel.querySelector('[data-text-action="next"]');
+    if (lines.length <= 1) showAll = false;
+    const visible = showAll ? lines : lines.slice(index, index + 1);
+    stage.replaceChildren(...visible.map((line) => {
+      const item = document.createElement('p');
+      item.textContent = line.localized?.[language] || line.localized?.en || '';
+      return item;
+    }));
+    stage.classList.toggle('show-all', showAll);
+    toggle.setAttribute('aria-pressed', String(showAll));
+    toggle.setAttribute('aria-label', showAll ? translate('gitaSara.showOneQuestion', 'Show one question') : translate('gitaSara.showAllQuestions', 'Show all questions'));
+    toggle.hidden = lines.length < 2;
+    previous.hidden = showAll || lines.length < 2;
+    next.hidden = showAll || lines.length < 2;
+  }
+
+  return {
+    mount,
+    render(nextLines, nextLanguage, reset = false) {
+      lines = nextLines || [];
+      language = nextLanguage === 'kn' ? 'kn' : 'en';
+      if (reset || index >= lines.length) { index = 0; showAll = false; }
+      paint();
+    },
+    select,
+    currentIndex: () => index,
+    showingAll: () => showAll
+  };
 }
 
 // Source: js/player/renderers/gita-700.js
@@ -2318,6 +2828,105 @@ function createGitaYogaRenderer() {
   };
 }
 
+// Source: js/player/renderers/gita-sara.js
+const TEXT_FIELDS = [
+  { role: 'shloka', field: () => 'source.shloka', language: () => 'sa' },
+  { role: 'transliteration', field: (language) => `languages.${language}.transliteration`, language: (language) => language },
+  { role: 'meaning', field: (language) => `languages.${language}.meaning`, language: (language) => language },
+  { role: 'word', field: (language) => `languages.${language}.wordByWordMeaning`, language: (language) => language }
+];
+
+function fieldValue(row, field) { return field.split('.').reduce((value, part) => value && value[part], row) || ''; }
+
+function createGitaSaraRenderer({ translate = (_key, fallback) => fallback } = {}) {
+  let root;
+  let editing = false;
+  let renderedSid = '';
+  const mediaPlayer = createMediaPlayer({ translate });
+  const textPlayer = createTextPlayer({ translate });
+
+  function mount(container) {
+    root = container;
+    root.classList.add('gita-sara-root');
+    root.innerHTML = `
+      <div class="gita-sara-layout">
+        <article class="gita-sara-panel gita-sara-text-panel" data-sara-panel="text">
+          <div class="gita-sara-text gita-sara-shloka" data-role="shloka"></div>
+          <div class="gita-sara-text gita-sara-transliteration" data-role="transliteration"></div>
+          <div class="gita-sara-text gita-sara-meaning" data-role="meaning"></div>
+          <div class="gita-sara-text gita-sara-word" data-role="word"></div>
+        </article>
+        <section class="gita-sara-panel gita-sara-media-panel" data-sara-panel="media" aria-label="${translate('gitaSara.media', 'Illustration')}">
+          <div class="gita-sara-media-stage" data-role="media-stage"></div>
+          <p class="gita-sara-media-caption" data-role="media-caption" hidden></p>
+          <button class="gita-sara-corner-nav previous" type="button" data-media-action="previous" aria-label="${translate('gitaSara.previousMedia', 'Previous illustration')}">‹</button>
+          <button class="gita-sara-corner-nav next" type="button" data-media-action="next" aria-label="${translate('gitaSara.nextMedia', 'Next illustration')}">›</button>
+        </section>
+        <section class="gita-sara-panel gita-sara-question-panel" data-sara-panel="questions" aria-label="${translate('gitaSara.questions', 'Contemplation questions')}">
+          <button class="gita-sara-question-toggle" type="button" data-text-action="toggle-all" aria-label="${translate('gitaSara.showAllQuestions', 'Show all questions')}" aria-pressed="false">✦</button>
+          <div class="gita-sara-question-stage" data-role="question-stage"></div>
+          <button class="gita-sara-corner-nav previous" type="button" data-text-action="previous" aria-label="${translate('gitaSara.previousQuestion', 'Previous question')}">‹</button>
+          <button class="gita-sara-corner-nav next" type="button" data-text-action="next" aria-label="${translate('gitaSara.nextQuestion', 'Next question')}">›</button>
+        </section>
+      </div>`;
+    mediaPlayer.mount(root.querySelector('[data-sara-panel="media"]'));
+    textPlayer.mount(root.querySelector('[data-sara-panel="questions"]'));
+  }
+
+  function makeEditable(element) {
+    element.contentEditable = 'true'; element.spellcheck = false; element.dataset.editField = element.dataset.field;
+    element.classList.remove('empty'); if (element.textContent === '—') element.textContent = '';
+  }
+
+  function render(row, contentLanguage) {
+    const reset = renderedSid !== row.sid;
+    renderedSid = row.sid;
+    const language = contentLanguage === 'kn' ? 'kn' : 'en';
+    TEXT_FIELDS.forEach((specification) => {
+      const field = specification.field(language);
+      const element = root.querySelector(`[data-role="${specification.role}"]`);
+      const text = fieldValue(row, field);
+      element.dataset.field = field; element.lang = specification.language(language); element.textContent = text || '—';
+      element.classList.toggle('empty', !text); if (editing) makeEditable(element);
+    });
+    mediaPlayer.render(row.media?.items || [], language, reset);
+    textPlayer.render(row.contemplation?.lines || [], language, reset);
+    if (!editing) requestAnimationFrame(fitText);
+  }
+
+  function setEditing(enabled) {
+    editing = enabled;
+    root.querySelectorAll('[data-field]').forEach((element) => {
+      if (enabled) makeEditable(element); else { element.contentEditable = 'false'; delete element.dataset.editField; }
+    });
+    if (!enabled) requestAnimationFrame(fitText);
+  }
+
+  function editableElements() { return Array.from(root.querySelectorAll('[data-edit-field]')); }
+  function fitElement(role, maximum, minimum) {
+    const element = root.querySelector(`[data-role="${role}"]`);
+    if (!element?.clientHeight || getComputedStyle(element).display === 'none') return;
+    let low = minimum; let high = maximum; let best = minimum;
+    while (low <= high) {
+      const size = Math.floor((low + high) / 2); element.style.fontSize = `${size}px`;
+      if (element.scrollHeight <= element.clientHeight + 1 && element.scrollWidth <= element.clientWidth + 1) { best = size; low = size + 1; } else high = size - 1;
+    }
+    element.style.fontSize = `${best}px`;
+  }
+  function fitText() {
+    if (editing || !root) return;
+    root.querySelectorAll('[data-field]').forEach((element) => { element.style.fontSize = ''; });
+    if (matchMedia('(max-width: 760px)').matches || globalThis.document?.documentElement?.classList.contains('mobile-layout')) return;
+    fitElement('shloka', 26, 13); fitElement('transliteration', 17, 10); fitElement('meaning', 20, 11); fitElement('word', 14, 9);
+  }
+
+  return {
+    id: 'gita-sara', mount, render, setEditing, editableElements, fitText,
+    additionalEditableElements: () => [], collectAdditionalEdits: () => ({ changes: [], files: [] }), refreshAdditionalData() {},
+    destroy() { if (root) { root.classList.remove('gita-sara-root'); root.textContent = ''; } root = null; }
+  };
+}
+
 // Source: js/player/renderers/registry.js
 const experiences = {
   'gita-700': {
@@ -2330,7 +2939,11 @@ const experiences = {
     label: 'Gita Yoga',
     load: async () => createGitaYogaRenderer()
   },
-  'gita-sara': { available: false, label: 'Gita Sara' }
+  'gita-sara': {
+    available: true,
+    label: 'Gita Sara',
+    load: async (options) => createGitaSaraRenderer(options)
+  }
 };
 
 function getExperience(id) {
@@ -2357,6 +2970,7 @@ class InlineEditor {
     this.pendingDownload = false;
     this.savedRevision = 0;
     this.changedLanguages = new Set();
+    this.changedDataFiles = new Map();
     this.toolbar = this.createToolbar();
     this.handleInput = this.handleInput.bind(this);
     this.beforeUnload = this.beforeUnload.bind(this);
@@ -2384,15 +2998,15 @@ class InlineEditor {
     document.body.classList.add('editing');
     this.toolbar.hidden = false;
     this.renderer.setEditing(true);
-    this.renderer.editableElements().forEach((element) => element.addEventListener('input', this.handleInput));
-    const first = this.renderer.editableElements()[0];
+    this.allEditableElements().forEach((element) => element.addEventListener('input', this.handleInput));
+    const first = this.allEditableElements()[0];
     if (first) first.focus();
     this.updateUi();
   }
 
   exit() {
     if (!this.active) return;
-    this.renderer.editableElements().forEach((element) => element.removeEventListener('input', this.handleInput));
+    this.allEditableElements().forEach((element) => element.removeEventListener('input', this.handleInput));
     this.active = false;
     this.dirty = false;
     document.body.classList.remove('editing');
@@ -2411,7 +3025,8 @@ class InlineEditor {
 
   handleInput(event) {
     this.dirty = true;
-    const invalid = event.currentTarget.innerText.includes('#');
+    const value = 'value' in event.currentTarget ? event.currentTarget.value : event.currentTarget.innerText;
+    const invalid = String(value || '').includes('#');
     event.currentTarget.setAttribute('aria-invalid', invalid ? 'true' : 'false');
     this.toolbar.querySelector('.edit-status').textContent = invalid
       ? this.translate('editor.removeHash', 'Remove # before saving')
@@ -2422,7 +3037,7 @@ class InlineEditor {
   async save() {
     if (!this.active) return true;
     const elements = this.renderer.editableElements();
-    const invalid = elements.find((element) => element.innerText.includes('#'));
+    const invalid = this.allEditableElements().find((element) => String('value' in element ? element.value : element.innerText || '').includes('#'));
     if (invalid) {
       invalid.focus();
       this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.removeHash', 'Remove # before saving');
@@ -2445,7 +3060,16 @@ class InlineEditor {
       }
       element.setAttribute('aria-invalid', 'false');
     });
-    if (!changes.length) {
+    let additional = { changes: [], files: [] };
+    try {
+      additional = this.renderer.collectAdditionalEdits?.() || additional;
+    } catch (error) {
+      changes.forEach(({ target, property, previous }) => { target[property] = previous; });
+      this.toolbar.querySelector('.edit-status').textContent = error.message || this.translate('editor.saveFailed', 'The local collections could not be saved.');
+      return false;
+    }
+    const allChanges = [...changes, ...additional.changes];
+    if (!allChanges.length) {
       this.dirty = false;
       this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.noChanges', 'No changes to save');
       this.updateUi();
@@ -2456,8 +3080,10 @@ class InlineEditor {
     this.toolbar.querySelector('.edit-status').textContent = this.workspace ? this.translate('editor.savingFiles', 'Saving to collections…') : this.translate('editor.savingBrowser', 'Saving in this browser…');
     try {
       let savedFiles = [];
-      if (this.workspace) savedFiles = await this.workspace.saveLanguageMasters(this.dataset, languages);
+      if (this.workspace && languages.size) savedFiles.push(...await this.workspace.saveLanguageMasters(this.dataset, languages));
+      if (this.workspace && additional.files.length) savedFiles.push(...await this.workspace.saveCollectionTables(additional.files));
       languages.forEach((language) => this.changedLanguages.add(language));
+      additional.files.forEach((entry) => this.changedDataFiles.set(entry.url, entry.table));
       this.dirty = false;
       this.savedChanges = true;
       this.pendingDownload = !this.workspace;
@@ -2469,7 +3095,8 @@ class InlineEditor {
       this.updateUi();
       return true;
     } catch (error) {
-      changes.forEach(({ target, property, previous }) => { target[property] = previous; });
+      allChanges.forEach(({ target, property, previous }) => { target[property] = previous; });
+      this.renderer.refreshAdditionalData?.();
       this.toolbar.querySelector('.edit-status').textContent = error.message || this.translate('editor.saveFailed', 'The local collections could not be saved.');
       this.dirty = true;
       this.updateUi();
@@ -2506,6 +3133,18 @@ class InlineEditor {
       link.remove();
       URL.revokeObjectURL(url);
     });
+    for (const [path, table] of this.changedDataFiles) {
+      const blob = new Blob([serializeCollectionTable(table)], { type: 'text/csv;charset=utf-8' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      const parts = path.split('/');
+      link.href = url;
+      link.download = parts.slice(-2).join('-');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
     this.pendingDownload = false;
     this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.downloaded', 'Downloaded edited language data');
     this.updateUi();
@@ -2521,6 +3160,10 @@ class InlineEditor {
       workspace: Boolean(this.workspace),
       savedRevision: this.savedRevision
     });
+  }
+
+  allEditableElements() {
+    return [...this.renderer.editableElements(), ...(this.renderer.additionalEditableElements?.() || [])];
   }
 
   beforeUnload(event) {
@@ -2885,7 +3528,7 @@ function syncHomeCollectionSource() {
     : i18n.t('collections.message');
   document.getElementById('home-collections-button').textContent = i18n.t(ready ? 'collections.change' : 'collections.load');
   document.getElementById('home-collections-error').textContent = '';
-  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link').forEach((link) => {
+  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link, #gita-sara-link').forEach((link) => {
     link.classList.toggle('needs-collections', !ready);
     link.setAttribute('aria-disabled', String(!ready));
   });
@@ -3080,7 +3723,7 @@ async function checkPlayerVersion() {
 }
 
 async function startRequestedExperience() {
-  const experienceIds = ['gita-yoga', 'gita-700'];
+  const experienceIds = ['gita-yoga', 'gita-700', 'gita-sara'];
   const resumes = new Map(await Promise.all(experienceIds.map(async (experienceId) => [
     experienceId,
     state.experienceResumes.get(experienceId) || await profileStore.getExperienceResume(state.activeProfile.pid, experienceId)
@@ -3145,7 +3788,7 @@ async function startRequestedExperience() {
       state.locationSource = null;
       return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
     }
-    return showError('The requested experience is not available yet. Choose Gita Yoga or Gita 700.');
+    return showError('The requested experience is not available. Choose Gita Yoga, Gita 700, or Gita Sara.');
   }
 
   showOnly('loading');
@@ -3170,7 +3813,7 @@ async function startPlayer(dataset, experience, { workspace = null, sid = reques
     state.locationSource = null;
     return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
   }
-  state.renderer = await experience.load();
+  state.renderer = await experience.load({ translate });
   state.renderer.mount(document.getElementById('renderer-root'));
 
   const defaultIndex = findSid('1.B');
@@ -3633,7 +4276,7 @@ function bindEvents() {
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
   document.getElementById('home-collections-input').addEventListener('change', (event) => useSelectedCollections(event.target.files));
   document.getElementById('home-collections-button').addEventListener('click', () => document.getElementById('home-collections-input').click());
-  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link').forEach((link) => link.addEventListener('click', (event) => {
+  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link, #gita-sara-link').forEach((link) => link.addEventListener('click', (event) => {
     event.preventDefault();
     openHomeExperience(link);
   }));

@@ -1,7 +1,7 @@
 # Shared player
 
 **Status:** Current  
-**Last updated:** 9 October 2026
+**Last updated:** 10 October 2026
 
 ## Persistent frame
 
@@ -23,4 +23,4 @@ The complete player uses bundled Noto Sans faces for English, Sanskrit and Kanna
 
 The shell selects a renderer through the experience registry. Each renderer owns its layout and editable-field map, while experience configuration declares reusable content and audio bindings. Renderers must represent each semantic field once; responsive CSS may reposition that node but must not create hidden duplicate data views.
 
-See [Gita Yoga](gita-yoga.md) and [Gita 700](gita-700.md) for the current renderers.
+See [Gita Yoga](gita-yoga.md), [Gita 700](gita-700.md), and [Gita Sara](gita-sara.md) for the current renderers.

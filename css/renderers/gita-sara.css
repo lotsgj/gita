@@ -1,0 +1,60 @@
+.gita-sara-root { height: 100%; min-height: 0; }
+.gita-sara-layout { height: 100%; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.gita-sara-panel { position: relative; min-width: 0; min-height: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--panel-radius); box-shadow: var(--shadow); }
+
+.gita-sara-text-panel {
+  display: grid; grid-template-rows: minmax(0, 1.35fr) minmax(0, .72fr) minmax(0, 1.12fr) minmax(0, .81fr);
+  padding: clamp(16px, 2vw, 30px); background: #fbf6ea; color: #26384a; text-align: center;
+}
+.gita-sara-text { min-width: 0; min-height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; white-space: pre-wrap; overflow-wrap: anywhere; text-wrap: balance; }
+.gita-sara-shloka { color: #33261e; font-size: clamp(19px, 1.55vw, 26px); font-weight: 560; line-height: 1.5; }
+.gita-sara-transliteration { color: #5e5145; font-size: clamp(13px, 1.08vw, 17px); line-height: 1.5; }
+.gita-sara-meaning { color: #26384a; font-size: clamp(16px, 1.3vw, 20px); line-height: 1.5; }
+.gita-sara-word { color: #56646a; font-size: clamp(11px, .92vw, 14px); line-height: 1.5; opacity: .9; }
+.gita-sara-text.empty { color: #8c877d; font-style: italic; font-weight: 400; opacity: .68; }
+
+.gita-sara-media-panel { display: grid; background: #f6efe4; }
+.gita-sara-media-stage { grid-area: 1 / 1; min-width: 0; min-height: 0; overflow: hidden; border-radius: inherit; display: grid; place-items: center; }
+.gita-sara-media-image { width: 100%; height: 100%; display: block; object-fit: cover; }
+.gita-sara-deck-frame { width: 100%; height: 100%; display: block; border: 0; background: #fbf6ea; }
+.gita-sara-media-caption { position: absolute; left: 14px; right: 14px; bottom: 12px; margin: 0; padding: 8px 12px; border-radius: 12px; background: rgba(255,253,248,.88); color: #3d4a50; font-size: 12px; line-height: 1.4; text-align: center; backdrop-filter: blur(10px); }
+.gita-sara-media-error { color: var(--muted); padding: 24px; text-align: center; }
+
+.gita-sara-question-panel { display: grid; place-items: stretch; background: #eaefee; color: #26384a; }
+.gita-sara-question-stage { min-height: 0; overflow: hidden; display: grid; place-items: center; padding: clamp(36px, 4vw, 62px) clamp(24px, 3vw, 46px); }
+.gita-sara-question-stage.show-all { display: block; overflow-y: auto; padding-top: 54px; padding-bottom: 54px; }
+.gita-sara-question-stage p { margin: 0; font-size: clamp(20px, 1.75vw, 29px); line-height: 1.55; text-align: center; text-wrap: balance; }
+.gita-sara-question-stage.show-all p { margin: 0 0 1.15em; font-size: clamp(15px, 1.2vw, 20px); }
+.gita-sara-question-toggle { position: absolute; z-index: 2; top: 12px; right: 14px; width: 34px; height: 34px; border: 0; border-radius: 999px; background: transparent; color: var(--saffron); font-size: 18px; cursor: pointer; }
+.gita-sara-question-toggle:hover, .gita-sara-question-toggle:focus-visible { background: rgba(255,255,255,.58); outline: none; }
+.gita-sara-question-toggle[aria-pressed="true"] { color: var(--indigo); }
+
+.gita-sara-corner-nav { position: absolute; z-index: 3; bottom: 10px; width: 34px; height: 34px; border: 0; border-radius: 999px; background: rgba(255,253,248,.76); color: var(--indigo); font-size: 25px; line-height: 1; cursor: pointer; backdrop-filter: blur(8px); }
+.gita-sara-corner-nav.previous { left: 12px; }
+.gita-sara-corner-nav.next { right: 12px; }
+.gita-sara-corner-nav:hover, .gita-sara-corner-nav:focus-visible { background: #fffdf8; color: var(--saffron); outline: 2px solid rgba(183,93,42,.2); }
+
+@media (max-width: 760px) {
+  .gita-sara-root { height: auto; }
+  .gita-sara-layout { height: auto; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; gap: 9px; }
+  .gita-sara-panel { height: clamp(350px, 68vh, 620px); }
+  .gita-sara-text-panel {
+    height: auto; min-height: 0; grid-template-rows: none; align-content: start;
+    gap: 22px; padding: 32px 22px;
+  }
+  .gita-sara-text { min-height: 0; overflow: visible; display: block; }
+  .gita-sara-shloka { font-size: clamp(23px, 6.5vw, 31px); }
+  .gita-sara-transliteration { font-size: 17px; }
+  .gita-sara-meaning { font-size: 20px; }
+  .gita-sara-word { font-size: 14px; }
+  .gita-sara-question-stage p { font-size: clamp(22px, 6vw, 30px); }
+}
+
+html.mobile-layout .gita-sara-root { height: auto; }
+html.mobile-layout .gita-sara-layout { height: auto; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; gap: 9px; }
+html.mobile-layout .gita-sara-panel { height: clamp(350px, 68vh, 620px); }
+html.mobile-layout .gita-sara-text-panel {
+  height: auto; min-height: 0; grid-template-rows: none; align-content: start;
+  gap: 22px; padding: 32px 22px;
+}
+html.mobile-layout .gita-sara-text { min-height: 0; overflow: visible; display: block; }

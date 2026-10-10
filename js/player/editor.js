@@ -1,4 +1,4 @@
-import { serializeLanguageMaster } from './collection-data.js';
+import { serializeCollectionTable, serializeLanguageMaster } from './collection-data.js';
 
 export class InlineEditor {
   constructor({ dataset, renderer, currentRow, rerender, workspace = null, onStateChange, translate = (key, fallback) => fallback }) {
@@ -15,6 +15,7 @@ export class InlineEditor {
     this.pendingDownload = false;
     this.savedRevision = 0;
     this.changedLanguages = new Set();
+    this.changedDataFiles = new Map();
     this.toolbar = this.createToolbar();
     this.handleInput = this.handleInput.bind(this);
     this.beforeUnload = this.beforeUnload.bind(this);
@@ -42,15 +43,15 @@ export class InlineEditor {
     document.body.classList.add('editing');
     this.toolbar.hidden = false;
     this.renderer.setEditing(true);
-    this.renderer.editableElements().forEach((element) => element.addEventListener('input', this.handleInput));
-    const first = this.renderer.editableElements()[0];
+    this.allEditableElements().forEach((element) => element.addEventListener('input', this.handleInput));
+    const first = this.allEditableElements()[0];
     if (first) first.focus();
     this.updateUi();
   }
 
   exit() {
     if (!this.active) return;
-    this.renderer.editableElements().forEach((element) => element.removeEventListener('input', this.handleInput));
+    this.allEditableElements().forEach((element) => element.removeEventListener('input', this.handleInput));
     this.active = false;
     this.dirty = false;
     document.body.classList.remove('editing');
@@ -69,7 +70,8 @@ export class InlineEditor {
 
   handleInput(event) {
     this.dirty = true;
-    const invalid = event.currentTarget.innerText.includes('#');
+    const value = 'value' in event.currentTarget ? event.currentTarget.value : event.currentTarget.innerText;
+    const invalid = String(value || '').includes('#');
     event.currentTarget.setAttribute('aria-invalid', invalid ? 'true' : 'false');
     this.toolbar.querySelector('.edit-status').textContent = invalid
       ? this.translate('editor.removeHash', 'Remove # before saving')
@@ -80,7 +82,7 @@ export class InlineEditor {
   async save() {
     if (!this.active) return true;
     const elements = this.renderer.editableElements();
-    const invalid = elements.find((element) => element.innerText.includes('#'));
+    const invalid = this.allEditableElements().find((element) => String('value' in element ? element.value : element.innerText || '').includes('#'));
     if (invalid) {
       invalid.focus();
       this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.removeHash', 'Remove # before saving');
@@ -103,7 +105,16 @@ export class InlineEditor {
       }
       element.setAttribute('aria-invalid', 'false');
     });
-    if (!changes.length) {
+    let additional = { changes: [], files: [] };
+    try {
+      additional = this.renderer.collectAdditionalEdits?.() || additional;
+    } catch (error) {
+      changes.forEach(({ target, property, previous }) => { target[property] = previous; });
+      this.toolbar.querySelector('.edit-status').textContent = error.message || this.translate('editor.saveFailed', 'The local collections could not be saved.');
+      return false;
+    }
+    const allChanges = [...changes, ...additional.changes];
+    if (!allChanges.length) {
       this.dirty = false;
       this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.noChanges', 'No changes to save');
       this.updateUi();
@@ -114,8 +125,10 @@ export class InlineEditor {
     this.toolbar.querySelector('.edit-status').textContent = this.workspace ? this.translate('editor.savingFiles', 'Saving to collections…') : this.translate('editor.savingBrowser', 'Saving in this browser…');
     try {
       let savedFiles = [];
-      if (this.workspace) savedFiles = await this.workspace.saveLanguageMasters(this.dataset, languages);
+      if (this.workspace && languages.size) savedFiles.push(...await this.workspace.saveLanguageMasters(this.dataset, languages));
+      if (this.workspace && additional.files.length) savedFiles.push(...await this.workspace.saveCollectionTables(additional.files));
       languages.forEach((language) => this.changedLanguages.add(language));
+      additional.files.forEach((entry) => this.changedDataFiles.set(entry.url, entry.table));
       this.dirty = false;
       this.savedChanges = true;
       this.pendingDownload = !this.workspace;
@@ -127,7 +140,8 @@ export class InlineEditor {
       this.updateUi();
       return true;
     } catch (error) {
-      changes.forEach(({ target, property, previous }) => { target[property] = previous; });
+      allChanges.forEach(({ target, property, previous }) => { target[property] = previous; });
+      this.renderer.refreshAdditionalData?.();
       this.toolbar.querySelector('.edit-status').textContent = error.message || this.translate('editor.saveFailed', 'The local collections could not be saved.');
       this.dirty = true;
       this.updateUi();
@@ -164,6 +178,18 @@ export class InlineEditor {
       link.remove();
       URL.revokeObjectURL(url);
     });
+    for (const [path, table] of this.changedDataFiles) {
+      const blob = new Blob([serializeCollectionTable(table)], { type: 'text/csv;charset=utf-8' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      const parts = path.split('/');
+      link.href = url;
+      link.download = parts.slice(-2).join('-');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
     this.pendingDownload = false;
     this.toolbar.querySelector('.edit-status').textContent = this.translate('editor.downloaded', 'Downloaded edited language data');
     this.updateUi();
@@ -179,6 +205,10 @@ export class InlineEditor {
       workspace: Boolean(this.workspace),
       savedRevision: this.savedRevision
     });
+  }
+
+  allEditableElements() {
+    return [...this.renderer.editableElements(), ...(this.renderer.additionalEditableElements?.() || [])];
   }
 
   beforeUnload(event) {

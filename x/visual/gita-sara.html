@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gita Sara three-panel prototype</title>
+  <link rel="stylesheet" href="gita-sara.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <button class="chapter" type="button" aria-label="Open chapters"><span class="chapter-mark" aria-hidden="true">⌁</span><span>2 — Sāṅkhya Yoga</span></button>
+      <div class="sid-block"><strong>2.47</strong><small>12 / 135</small></div>
+      <div class="top-actions">
+        <button id="main-menu-button" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+        <div id="main-menu" class="main-menu" hidden>
+          <button id="preview-complete" type="button"><span>Complete content</span><small>✓</small></button>
+          <button id="preview-no-image" type="button"><span>Preview default illustration</span><small>I</small></button>
+          <button id="preview-no-questions" type="button"><span>Preview default contemplation</span><small>Q</small></button>
+        </div>
+        <button class="profile" type="button" aria-label="Open profile">VJ</button>
+      </div>
+    </header>
+
+    <section class="experience" aria-label="Gita Sara shloka 2.47">
+      <article class="panel shloka-panel" aria-label="Shloka">
+        <section class="shloka"><p>कर्मण्येवाधिकारस्ते<br>मा फलेषु कदाचन ।<br>मा कर्मफलहेतुर्भूः<br>मा ते सङ्गोऽस्त्वकर्मणि ॥</p></section>
+        <section class="meaning"><p>You have a right to action alone, never to its fruits. Let not the fruits of action be your motive, nor let your attachment be to inaction.</p></section>
+        <section class="supporting transliteration"><p>karmaṇy-evādhikāras te<br>mā phaleṣu kadācana<br>mā karma-phala-hetur bhūr<br>mā te saṅgo ’stv akarmaṇi</p></section>
+        <section class="supporting words"><p><b>karmaṇi</b>—in action; <b>adhikāraḥ</b>—right; <b>phaleṣu</b>—in the fruits; <b>saṅgaḥ</b>—attachment; <b>akarmaṇi</b>—to inaction</p></section>
+      </article>
+
+      <section class="panel illustration-panel" aria-label="Illustrations">
+        <div id="illustration-stage" class="illustration-stage" aria-live="polite"></div>
+        <nav id="illustration-controls" class="panel-navigator" aria-label="Illustration navigation">
+          <button id="previous-illustration" type="button" aria-label="Previous illustration">‹</button>
+          <button id="next-illustration" type="button" aria-label="Next illustration">›</button>
+        </nav>
+      </section>
+
+      <section class="panel contemplation-panel" aria-label="Contemplation">
+        <div class="contemplation-head">
+          <button id="question-mode" class="mode-toggle" type="button" aria-label="Show all contemplations" title="Show all contemplations">✦</button>
+        </div>
+        <div id="question-stage" class="question-stage" aria-live="polite"></div>
+        <nav id="question-controls" class="panel-navigator question-navigator" aria-label="Question navigation">
+          <button id="previous-question" type="button" aria-label="Previous contemplation">‹</button>
+          <button id="next-question" type="button" aria-label="Next contemplation">›</button>
+        </nav>
+      </section>
+    </section>
+
+    <footer class="audio-bar">
+      <button type="button" aria-label="Go to shloka">⌾</button><button class="play" type="button" aria-label="Play audio">▶</button>
+      <div class="audio-progress" aria-hidden="true"><span></span></div><time>00:00 / 01:04</time><button type="button" aria-label="Fullscreen">⛶</button>
+    </footer>
+  </main>
+  <script src="gita-sara.js"></script>
+</body>
+</html>
