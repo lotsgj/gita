@@ -56,32 +56,64 @@
   .retry-button:hover { border-color: rgba(183, 93, 42, .48); color: var(--ink); }
   .file-note { margin-top: 1rem !important; font-size: 11px; }
   .file-error { min-height: 18px; margin-top: .8rem; color: #a64032; font-size: 12px; line-height: 1.45; }
-  .experience-list { display: grid; gap: .75rem; margin-top: 1.6rem; }
-  .experience-link {
-    display: flex; align-items: center; justify-content: space-between;
-    border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.1rem;
-    background: white; color: var(--ink); text-decoration: none; text-align: left;
-  }
-  .experience-link:hover { border-color: rgba(183, 93, 42, .48); }
-  .experience-link small { color: var(--muted); }
-  .experience-link.disabled { opacity: .48; pointer-events: none; }
-  .diksoochi { min-height: 100vh; padding: clamp(72px, 9vw, 96px) clamp(18px, 5vw, 56px) 32px; align-items: start; }
-  .diksoochi-shell { width: min(650px, 100%); margin: 0 auto; padding: clamp(22px, 4vw, 38px); border: 1px solid var(--line); border-radius: 24px; background: rgba(255,253,248,.94); box-shadow: var(--shadow); }
-  .diksoochi-head { text-align: center; }
-  .diksoochi-head p { margin: 0; color: var(--muted); line-height: 1.55; }
-  #diksoochi-greeting { color: var(--saffron); font-size: 13px; font-weight: 650; }
-  .diksoochi-flute { margin-top: 12px !important; }
-  .diksoochi-next h2, .diksoochi-experiences > h2, .diksoochi-journey > h2 { margin: 0 0 10px; font: 500 22px var(--font-sans, sans-serif); }
-  .diksoochi-journey-statements { border-top: 1px solid var(--line); }
-  .diksoochi-journey-statements p { margin: 0; padding: 15px 0; border-bottom: 1px solid var(--line); color: var(--ink); font-size: 14px; line-height: 1.65; }
-  .diksoochi-journey-empty { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+  .diksoochi { min-height: 100vh; display: block; padding: 0 0 32px; }
+  .home-masthead { width: min(1460px, 100%); height: 86px; margin: 0 auto; padding: 18px clamp(22px, 4vw, 64px); display: flex; align-items: center; justify-content: space-between; }
+  .home-brand { display: flex; align-items: center; gap: 11px; font-size: 20px; }
+  .home-brand .diksoochi-flute { width: 42px; height: 42px; margin: 0; border: 0; box-shadow: none; background: rgba(255,253,248,.78); }
+  .home-brand .diksoochi-flute img { width: 30px; height: 30px; }
+  .diksoochi .landing-profile-pill { position: static; }
+  .diksoochi-shell { width: min(1460px, 100%); margin: 0 auto; padding: 20px clamp(22px, 4vw, 64px) 60px; }
+  .diksoochi-head { min-height: 18px; }
+  .diksoochi-head p { margin: 0; color: var(--saffron); font-size: 11px; font-weight: 650; line-height: 1.55; }
+  .diksoochi-journey-group > h2, .diksoochi-experiences > h2 { margin: 0 0 20px; font: 500 clamp(34px, 4vw, 58px)/1.05 var(--font-sans, sans-serif); }
+  .diksoochi-journey-grid { display: grid; grid-template-columns: minmax(0,1.75fr) minmax(300px,.8fr); gap: 18px; }
+  .continue-journey-link, .diksoochi-journey { min-height: 350px; border-radius: 26px; overflow: hidden; box-shadow: 0 24px 60px rgba(58,43,25,.13); }
+  .continue-journey-link { position: relative; display: block; isolation: isolate; color: white; text-decoration: none; background: #193445; }
+  .continue-journey-image { position: absolute; inset: 0; z-index: -2; background: url('../assets/images/experience-cards/gita-yoga-card.jpg') center/cover; transform: scale(1.01); transition: transform .5s ease; }
+  .continue-journey-link[data-experience="gita-700"] .continue-journey-image { background-image: url('../assets/images/experience-cards/gita-700-card.jpg'); }
+  .continue-journey-link[data-experience="gita-sara"] .continue-journey-image { background-image: url('../assets/images/experience-cards/gita-sara-card.jpg'); }
+  .continue-journey-link:hover .continue-journey-image, .continue-journey-link:focus-visible .continue-journey-image { transform: scale(1.05); }
+  .continue-journey-shade { position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg,rgba(10,23,31,.91),rgba(10,23,31,.45) 56%,rgba(10,23,31,.06)); }
+  .continue-journey-copy { position: absolute; left: clamp(25px,4vw,56px); right: 24px; bottom: 38px; display: grid; justify-items: start; }
+  .continue-journey-copy small { color: #e49a6f; text-transform: uppercase; letter-spacing: .14em; font-size: 10px; font-weight: 700; }
+  .continue-journey-copy strong { margin: 8px 0 10px; font-size: clamp(36px,5vw,68px); line-height: 1; font-weight: 580; }
+  .continue-journey-action { margin-top: 10px; padding: 10px 18px; border-radius: 999px; background: white; color: var(--indigo); font-size: 13px; font-weight: 700; }
+  .continue-journey-action b { margin-right: 6px; color: var(--saffron); font-size: 11px; }
+  .diksoochi-journey { position: relative; padding: 38px; display: flex; flex-direction: column; background: linear-gradient(145deg,#fffaf1,#efe4d3); border: 1px solid rgba(141,105,61,.15); }
+  .journey-card-label { margin: 12px 0 22px; font-size: 11px; color: var(--saffron); text-transform: uppercase; letter-spacing: .15em; }
+  .journey-spark { position: absolute; right: 28px; top: 20px; color: #d09a52; font-size: 34px; }
+  .diksoochi-journey-statements p { margin: 0; color: var(--ink); font-size: clamp(22px,2.3vw,36px); font-weight: 520; line-height: 1.35; }
+  .diksoochi-journey-empty { margin: auto 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
   .journey-details-link { border: 0; background: transparent; color: var(--saffron); padding: 2px 4px; font: inherit; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-  .diksoochi-next, .diksoochi-experiences, .diksoochi-journey { margin-top: 28px; }
-  .continue-journey-link { display: flex; align-items: center; justify-content: space-between; min-height: 58px; padding: 14px 18px; border-radius: 16px; background: var(--indigo); color: white; text-decoration: none; }
-  .continue-journey-link::after { content: '→'; font-size: 20px; }
-  .diksoochi-experiences .experience-list { grid-template-columns: 1fr; margin-top: 12px; }
-  .diksoochi .landing-links { margin-top: 22px; }
+  .diksoochi-experiences { margin-top: 70px; }
+  .experience-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+  .experience-link { position: relative; min-height: 270px; overflow: hidden; border: 0; border-radius: 22px; padding: 26px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; isolation: isolate; color: white; text-decoration: none; text-align: left; box-shadow: 0 16px 38px rgba(40,32,24,.13); transition: transform .25s ease, box-shadow .25s ease; }
+  .experience-link::before { content: ''; position: absolute; inset: 0; z-index: -2; background-position: center; background-size: cover; transition: transform .5s ease; }
+  .experience-link::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg,rgba(8,17,23,.94),rgba(8,17,23,.06) 82%); }
+  .experience-yoga::before { background-image: url('../assets/images/experience-cards/gita-yoga-card.jpg'); }
+  .experience-700::before { background-image: url('../assets/images/experience-cards/gita-700-card.jpg'); }
+  .experience-sara::before { background-image: url('../assets/images/experience-cards/gita-sara-card.jpg'); }
+  .experience-link:hover, .experience-link:focus-visible, .experience-link.active { transform: translateY(-6px); box-shadow: 0 25px 48px rgba(40,32,24,.2); outline: none; }
+  .experience-link:hover::before, .experience-link.active::before { transform: scale(1.04); }
+  .experience-link small { color: rgba(255,255,255,.82); font-size: 11px; }
+  .experience-link strong { margin: 5px 0; font-size: clamp(28px,3vw,42px); font-weight: 560; }
+  .experience-link > span { max-width: calc(100% - 38px); color: rgba(255,255,255,.74); font-size: 11px; }
+  .experience-link i { position: absolute; right: 23px; bottom: 23px; width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; font-style: normal; }
+  .experience-link.disabled { opacity: .48; pointer-events: none; }
+  .diksoochi .landing-links { margin-top: 42px; }
   .experience-link.needs-collections { border-style: dashed; }
+  .experience-detail { position: relative; margin-top: 18px; min-height: 350px; overflow: hidden; display: grid; grid-template-columns: minmax(260px,.85fr) minmax(0,1.5fr); border-radius: 26px; background: #fffaf1; box-shadow: var(--shadow); }
+  .experience-detail-art { min-height: 350px; background: center/cover no-repeat; }
+  .experience-detail[data-experience="gita-yoga"] .experience-detail-art { background-image: url('../assets/images/experience-cards/gita-yoga-card.jpg'); }
+  .experience-detail[data-experience="gita-700"] .experience-detail-art { background-image: url('../assets/images/experience-cards/gita-700-card.jpg'); }
+  .experience-detail[data-experience="gita-sara"] .experience-detail-art { background-image: url('../assets/images/experience-cards/gita-sara-card.jpg'); }
+  .experience-detail-copy { position: relative; padding: 38px clamp(28px,4vw,60px); }
+  .experience-detail-copy > small { color: var(--saffron); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  .experience-detail-copy h3 { margin: 8px 0 12px; font-size: 40px; font-weight: 540; }
+  .experience-detail-copy p { color: var(--muted); line-height: 1.6; }
+  .experience-detail-copy ul { columns: 2; margin: 20px 0 0; padding-left: 18px; color: #4d5960; line-height: 1.8; }
+  .experience-detail-close { position: absolute; right: 17px; top: 15px; border: 0; background: transparent; font-size: 27px; cursor: pointer; }
+  .experience-detail-action { float: right; margin-top: 24px; padding: 11px 18px; border-radius: 999px; background: var(--indigo); color: white; text-decoration: none; }
   .home-collections { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px 16px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
   .home-collections h2 { margin: 0 0 4px; font: 500 18px var(--font-sans, sans-serif); }
   .home-collections p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
@@ -437,9 +469,20 @@
   }
 
   @media (max-width: 760px) {
-    .diksoochi { padding: 68px 14px 24px; }
-    .diksoochi-experiences .experience-list { grid-template-columns: 1fr; }
-    .diksoochi-shell { padding: 22px 18px; }
+    .home-masthead { height: 72px; padding: 12px 22px; }
+    .home-brand strong { font-size: 18px; }
+    .diksoochi-shell { padding: 10px 22px 48px; }
+    .diksoochi-head { min-height: 10px; }
+    .diksoochi-journey-grid { grid-template-columns: 1fr; }
+    .continue-journey-link, .diksoochi-journey { min-height: 300px; }
+    .diksoochi-journey { min-height: 285px; }
+    .diksoochi-experiences { margin-top: 52px; }
+    .experience-list { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 5px 18vw 18px 0; }
+    .experience-link { flex: 0 0 82vw; scroll-snap-align: start; }
+    .experience-detail { grid-template-columns: 1fr; }
+    .experience-detail-art { min-height: 230px; }
+    .experience-detail-copy ul { columns: 1; }
+    .experience-detail-action { float: none; display: block; text-align: center; }
     .home-collections { grid-template-columns: 1fr; }
     .home-collections .secondary-button { width: 100%; }
     .journey-details { padding: 68px 14px 24px; }

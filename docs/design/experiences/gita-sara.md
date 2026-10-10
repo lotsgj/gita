@@ -21,7 +21,7 @@ Images may use app-relative collection paths or absolute HTTPS URLs. Unsafe prot
 
 Google Slides share URLs are normalized to `/embed` URLs with `rm=minimal`, autoplay disabled, looping disabled, and a stable delay parameter. Google still controls the embedded presentation surface, so Gitaverse cannot guarantee suppression of every provider control.
 
-If a SID has no authored media of either type, the shared Gitajyoti caterpillar–chrysalis–butterfly transformation image is supplied from the default illustration collection. Its caption and alternative text are `TRUTH. REALISE. USE.` in English and `ಸತ್ಯ. ಅರಿವು. ಉಪಯೋಗ.` in Kannada.
+If a SID has no authored media of either type, the default illustration collection supplies a quiet portrait watercolour transformation scene: a caterpillar on a lower leaf, a central chrysalis and a butterfly moving upward toward soft light. Its misty negative space, faded edges and restrained sage–ivory–indigo palette make it contemplative rather than diagrammatic; it contains no circle, arrows or embedded text. Its caption and alternative text are `TRUTH. REALISE. USE.` in English and `ಸತ್ಯ. ಅರಿವು. ಉಪಯೋಗ.` in Kannada.
 
 ## Contemplation player
 

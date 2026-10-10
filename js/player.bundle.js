@@ -21,6 +21,9 @@ const EN_MESSAGES = {
   'profile.defaultBadge': 'Default', 'profile.editAction': 'Edit', 'profile.makeDefault': 'Make default', 'profile.unsetDefault': 'Unset default', 'profile.delete': 'Delete',
   'home.chooseExperience': 'Choose an experience', 'home.intro': 'Read, reflect, and listen at your own pace.',
   'home.gitaYogaNote': 'Guided chanting and meaning experience', 'home.gita700Note': 'Four-panel study experience', 'home.gitaSaraNote': 'Essential verses, illustrations and contemplation', 'home.future': 'Experience to be designed', 'home.coming': 'Coming later',
+  'home.gitaYogaKicker': 'Learn to chant with clarity', 'home.gita700Kicker': 'Stay close to every shloka', 'home.gitaSaraKicker': 'Meet the essence through contemplation',
+  'home.gitaYogaDetail': 'Build familiarity with the sound, words and meaning of each shloka through guided learning.', 'home.gita700Detail': 'Explore the complete Gita one shloka at a time, with meaning and word-by-word understanding.', 'home.gitaSaraDetail': 'Follow a curated path through essential shlokas with illustrations and reflective questions.',
+  'home.gitaYogaFeatures': 'Three languages|Word-by-word learning|Guided chanting audio', 'home.gita700Features': 'All Gita shlokas|Preferred-language meaning|Word-by-word understanding', 'home.gitaSaraFeatures': 'A curated shloka path|Illustrations|Questions for contemplation',
   'gitaSara.deckNavigation': 'Presentation navigation', 'gitaSara.previousDeck': 'Previous presentation', 'gitaSara.nextDeck': 'Next presentation',
   'gitaSara.swapPanels': 'Swap presentation and verse panels', 'gitaSara.deckTitle': 'Presentation for shloka {sid}',
   'gitaSara.deckUrl': 'Google Slides URL', 'gitaSara.deckOrder': 'Order',
@@ -40,7 +43,7 @@ const EN_MESSAGES = {
   'diksoochi.shloka': 'Shloka', 'diksoochi.sanskritShloka': 'Sanskrit shloka', 'diksoochi.meaning': 'Meaning', 'diksoochi.count': 'Count',
   'diksoochi.countNote': 'Count shows meaningful engagements with each shloka.',
   'diksoochi.resume': 'Resume Gita 700 · Shloka {sid}', 'diksoochi.begin': 'Begin with Gita 700', 'diksoochi.choose': 'Choose an experience',
-  'diksoochi.resumeExperience': 'Resume {experience} · Shloka {sid}', 'diksoochi.beginExperience': 'Begin with {experience}',
+  'diksoochi.resumeExperience': 'Resume {experience} · Shloka {sid}', 'diksoochi.beginExperience': 'Begin with {experience}', 'diksoochi.resumeLabel': 'Continue {experience}', 'diksoochi.beginLabel': 'Begin your journey', 'diksoochi.shlokaLabel': 'Shloka {sid}', 'diksoochi.continue': 'Continue',
   'common.about': 'About Gitaverse', 'common.install': 'Install Gitaverse', 'common.close': 'Close', 'common.back': '← Back',
   'loading.title': 'Opening the Gita', 'loading.message': 'Preparing the verses…', 'error.title': 'Unable to open the player',
   'menu.chapters': 'Chapters', 'menu.goto': 'Go to shloka', 'menu.contentLanguage': 'Content language ({language})',
@@ -94,6 +97,9 @@ const KN_MESSAGES = {
   'profile.defaultBadge': 'ಪೂರ್ವನಿಯೋಜಿತ', 'profile.editAction': 'ಸಂಪಾದಿಸಿ', 'profile.makeDefault': 'ಪೂರ್ವನಿಯೋಜಿತವಾಗಿಸಿ', 'profile.unsetDefault': 'ಪೂರ್ವನಿಯೋಜಿತ ತೆಗೆದುಹಾಕಿ', 'profile.delete': 'ಅಳಿಸಿ',
   'home.chooseExperience': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ', 'home.intro': 'ನಿಮ್ಮ ವೇಗದಲ್ಲಿ ಓದಿ, ಚಿಂತಿಸಿ ಮತ್ತು ಆಲಿಸಿ.',
   'home.gitaYogaNote': 'ಮಾರ್ಗದರ್ಶಿತ ಪಠಣ ಮತ್ತು ಅರ್ಥದ ಅನುಭವ', 'home.gita700Note': 'ನಾಲ್ಕು ಫಲಕಗಳ ಅಧ್ಯಯನ ಅನುಭವ', 'home.gitaSaraNote': 'ಆಯ್ದ ಶ್ಲೋಕಗಳು, ಚಿತ್ರಣಗಳು ಮತ್ತು ಚಿಂತನೆ', 'home.future': 'ಅನುಭವವನ್ನು ವಿನ್ಯಾಸಗೊಳಿಸಬೇಕಿದೆ', 'home.coming': 'ಮುಂದೆ ಬರಲಿದೆ',
+  'home.gitaYogaKicker': 'ಸ್ಪಷ್ಟವಾಗಿ ಪಠಿಸಲು ಕಲಿಯಿರಿ', 'home.gita700Kicker': 'ಪ್ರತಿ ಶ್ಲೋಕದೊಂದಿಗೆ ಉಳಿಯಿರಿ', 'home.gitaSaraKicker': 'ಚಿಂತನೆಯ ಮೂಲಕ ಸಾರವನ್ನು ಅರಿಯಿರಿ',
+  'home.gitaYogaDetail': 'ಮಾರ್ಗದರ್ಶಿತ ಕಲಿಕೆಯ ಮೂಲಕ ಪ್ರತಿ ಶ್ಲೋಕದ ಧ್ವನಿ, ಪದಗಳು ಮತ್ತು ಅರ್ಥದ ಪರಿಚಯ ಬೆಳೆಸಿಕೊಳ್ಳಿ.', 'home.gita700Detail': 'ಅರ್ಥ ಮತ್ತು ಪದಪದಾರ್ಥದೊಂದಿಗೆ ಸಂಪೂರ್ಣ ಗೀತೆಯನ್ನು ಒಂದೊಂದು ಶ್ಲೋಕವಾಗಿ ಅನ್ವೇಷಿಸಿ.', 'home.gitaSaraDetail': 'ಚಿತ್ರಣಗಳು ಮತ್ತು ಚಿಂತನೆಯ ಪ್ರಶ್ನೆಗಳೊಂದಿಗೆ ಆಯ್ದ ಪ್ರಮುಖ ಶ್ಲೋಕಗಳ ಪಯಣವನ್ನು ಅನುಸರಿಸಿ.',
+  'home.gitaYogaFeatures': 'ಮೂರು ಭಾಷೆಗಳು|ಪದಪದಾರ್ಥ ಕಲಿಕೆ|ಮಾರ್ಗದರ್ಶಿತ ಪಠಣ ಧ್ವನಿ', 'home.gita700Features': 'ಎಲ್ಲಾ ಗೀತಾ ಶ್ಲೋಕಗಳು|ಆಯ್ಕೆಯ ಭಾಷೆಯಲ್ಲಿ ಅರ್ಥ|ಪದಪದಾರ್ಥ ತಿಳುವಳಿಕೆ', 'home.gitaSaraFeatures': 'ಆಯ್ದ ಶ್ಲೋಕಗಳ ಪಯಣ|ಚಿತ್ರಣಗಳು|ಚಿಂತನೆಯ ಪ್ರಶ್ನೆಗಳು',
   'gitaSara.deckNavigation': 'ಪ್ರಸ್ತುತಿ ಸಂಚರಣೆ', 'gitaSara.previousDeck': 'ಹಿಂದಿನ ಪ್ರಸ್ತುತಿ', 'gitaSara.nextDeck': 'ಮುಂದಿನ ಪ್ರಸ್ತುತಿ',
   'gitaSara.swapPanels': 'ಪ್ರಸ್ತುತಿ ಮತ್ತು ಶ್ಲೋಕ ಫಲಕಗಳನ್ನು ಬದಲಿಸಿ', 'gitaSara.deckTitle': 'ಶ್ಲೋಕ {sid} ಪ್ರಸ್ತುತಿ',
   'gitaSara.deckUrl': 'Google Slides URL', 'gitaSara.deckOrder': 'ಕ್ರಮ',
@@ -113,7 +119,7 @@ const KN_MESSAGES = {
   'diksoochi.shloka': 'ಶ್ಲೋಕ', 'diksoochi.sanskritShloka': 'ಸಂಸ್ಕೃತ ಶ್ಲೋಕ', 'diksoochi.meaning': 'ಅರ್ಥ', 'diksoochi.count': 'ಎಣಿಕೆ',
   'diksoochi.countNote': 'ಪ್ರತಿ ಶ್ಲೋಕದ ಅರ್ಥಪೂರ್ಣ ತೊಡಗಿಸಿಕೊಳ್ಳುವಿಕೆಗಳನ್ನು ಎಣಿಕೆ ತೋರಿಸುತ್ತದೆ.',
   'diksoochi.resume': 'ಗೀತಾ 700 ಮುಂದುವರಿಸಿ · ಶ್ಲೋಕ {sid}', 'diksoochi.begin': 'ಗೀತಾ 700ರಿಂದ ಆರಂಭಿಸಿ', 'diksoochi.choose': 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
-  'diksoochi.resumeExperience': '{experience} ಮುಂದುವರಿಸಿ · ಶ್ಲೋಕ {sid}', 'diksoochi.beginExperience': '{experience} ಆರಂಭಿಸಿ',
+  'diksoochi.resumeExperience': '{experience} ಮುಂದುವರಿಸಿ · ಶ್ಲೋಕ {sid}', 'diksoochi.beginExperience': '{experience} ಆರಂಭಿಸಿ', 'diksoochi.resumeLabel': '{experience} ಮುಂದುವರಿಸಿ', 'diksoochi.beginLabel': 'ನಿಮ್ಮ ಪಯಣ ಆರಂಭಿಸಿ', 'diksoochi.shlokaLabel': 'ಶ್ಲೋಕ {sid}', 'diksoochi.continue': 'ಮುಂದುವರಿಸಿ',
   'common.about': 'Gitaverse ಕುರಿತು', 'common.install': 'Gitaverse ಸ್ಥಾಪಿಸಿ', 'common.close': 'ಮುಚ್ಚಿ', 'common.back': '← ಹಿಂದೆ',
   'loading.title': 'ಗೀತೆಯನ್ನು ತೆರೆಯಲಾಗುತ್ತಿದೆ', 'loading.message': 'ಶ್ಲೋಕಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ…', 'error.title': 'ಪ್ಲೇಯರ್ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ',
   'menu.chapters': 'ಅಧ್ಯಾಯಗಳು', 'menu.goto': 'ಶ್ಲೋಕಕ್ಕೆ ಹೋಗಿ', 'menu.contentLanguage': 'ವಿಷಯ ಭಾಷೆ ({language})',
@@ -3722,6 +3728,40 @@ async function checkPlayerVersion() {
   return true;
 }
 
+const homeExperienceDetails = {
+  'gita-yoga': { kicker: 'home.gitaYogaKicker', description: 'home.gitaYogaDetail', features: 'home.gitaYogaFeatures' },
+  'gita-700': { kicker: 'home.gita700Kicker', description: 'home.gita700Detail', features: 'home.gita700Features' },
+  'gita-sara': { kicker: 'home.gitaSaraKicker', description: 'home.gitaSaraDetail', features: 'home.gitaSaraFeatures' }
+};
+
+function closeHomeExperienceDetail({ focus = false } = {}) {
+  const panel = document.getElementById('experience-detail');
+  const active = document.querySelector('[data-experience-card].active');
+  panel.hidden = true;
+  delete panel.dataset.experience;
+  document.querySelectorAll('[data-experience-card]').forEach((card) => card.classList.remove('active'));
+  if (focus) active?.focus();
+}
+
+function showHomeExperienceDetail(link) {
+  const experienceId = link.dataset.experienceCard;
+  const detail = homeExperienceDetails[experienceId];
+  const panel = document.getElementById('experience-detail');
+  document.querySelectorAll('[data-experience-card]').forEach((card) => card.classList.toggle('active', card === link));
+  panel.dataset.experience = experienceId;
+  document.getElementById('experience-detail-kicker').textContent = i18n.t(detail.kicker);
+  document.getElementById('experience-detail-title').textContent = getExperience(experienceId).label;
+  document.getElementById('experience-detail-description').textContent = i18n.t(detail.description);
+  document.getElementById('experience-detail-features').replaceChildren(...i18n.t(detail.features).split('|').map((text) => {
+    const item = document.createElement('li');
+    item.textContent = text;
+    return item;
+  }));
+  document.getElementById('experience-detail-action').href = link.href;
+  panel.hidden = false;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 async function startRequestedExperience() {
   const experienceIds = ['gita-yoga', 'gita-700', 'gita-sara'];
   const resumes = new Map(await Promise.all(experienceIds.map(async (experienceId) => [
@@ -3751,9 +3791,16 @@ async function startRequestedExperience() {
   const chooserUrl = chooserUrls.get(continueExperience);
   const continueLink = document.getElementById('continue-journey-link');
   continueLink.href = chooserUrl.href;
-  continueLink.textContent = continueResume?.sid
+  continueLink.dataset.experience = continueExperience;
+  continueLink.setAttribute('aria-label', continueResume?.sid
     ? i18n.t('diksoochi.resumeExperience', { experience: getExperience(continueExperience).label, sid: continueResume.sid })
-    : i18n.t('diksoochi.beginExperience', { experience: getExperience(continueExperience).label });
+    : i18n.t('diksoochi.beginExperience', { experience: getExperience(continueExperience).label }));
+  document.getElementById('continue-journey-kicker').textContent = continueResume?.sid
+    ? i18n.t('diksoochi.resumeLabel', { experience: getExperience(continueExperience).label })
+    : i18n.t('diksoochi.beginLabel');
+  document.getElementById('continue-journey-title').textContent = continueResume?.sid
+    ? i18n.t('diksoochi.shlokaLabel', { sid: continueResume.sid })
+    : getExperience(continueExperience).label;
   if (!play) {
     const summary = await profileStore.getDiksoochiSummary(state.activeProfile.pid);
     document.getElementById('diksoochi-greeting').textContent = i18n.t('diksoochi.greeting', { name: state.activeProfile.name });
@@ -3771,6 +3818,7 @@ async function startRequestedExperience() {
     knowSummary.hidden = !hasJourneyDetails;
     journeyStatements.hidden = !hasJourneyDetails;
     journeyEmpty.hidden = hasJourneyDetails;
+    closeHomeExperienceDetail();
     syncHomeCollectionSource();
     return showOnly('diksoochi');
   }
@@ -4276,10 +4324,15 @@ function bindEvents() {
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
   document.getElementById('home-collections-input').addEventListener('change', (event) => useSelectedCollections(event.target.files));
   document.getElementById('home-collections-button').addEventListener('click', () => document.getElementById('home-collections-input').click());
-  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link, #gita-sara-link').forEach((link) => link.addEventListener('click', (event) => {
+  document.querySelectorAll('#continue-journey-link, #experience-detail-action').forEach((link) => link.addEventListener('click', (event) => {
     event.preventDefault();
     openHomeExperience(link);
   }));
+  document.querySelectorAll('[data-experience-card]').forEach((link) => link.addEventListener('click', (event) => {
+    event.preventDefault();
+    showHomeExperienceDetail(link);
+  }));
+  document.getElementById('experience-detail-close').addEventListener('click', () => closeHomeExperienceDetail({ focus: true }));
   updateDeviceLayout();
   document.getElementById('menu-button').addEventListener('click', (event) => { event.stopPropagation(); toggleMenu(); });
   document.getElementById('chapter-trigger').addEventListener('click', () => openOverlay('chapters-overlay'));

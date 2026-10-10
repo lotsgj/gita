@@ -116,14 +116,16 @@ async function run() {
     assert.equal(await page.locator('.diksoochi-flute').isVisible(), true);
     assert.equal(await page.locator('.diksoochi-flute img').evaluate((image) => getComputedStyle(image).animationIterationCount), 'infinite');
     assert.equal(await page.getByText('A personal compass, not a test.').count(), 0);
-    const landingOrder = await page.evaluate(() => {
-      const ids = ['.diksoochi-next', '.diksoochi-experiences', '.diksoochi-journey'];
-      return ids.map((selector) => document.querySelector(selector).getBoundingClientRect().top);
-    });
-    assert.ok(landingOrder[0] < landingOrder[1] && landingOrder[1] < landingOrder[2], 'Diksoochi action and journey sections must follow the approved order');
+    const landingOrder = await page.evaluate(() => ['.diksoochi-journey-group', '.diksoochi-experiences'].map((selector) => document.querySelector(selector).getBoundingClientRect().top));
+    assert.ok(landingOrder[0] < landingOrder[1], 'Your Journey must appear before Choose an Experience');
+    assert.equal(await page.getByText('Come back to what matters', { exact: true }).count(), 0);
+    assert.equal(await page.getByText('Choose your way in', { exact: true }).count(), 0);
     const experienceOrder = await page.locator('.diksoochi-experiences .experience-link').evaluateAll((links) => links.map((link) => link.id));
-    assert.deepEqual(experienceOrder, ['gita-yoga-link', 'gita-700-link', 'gita-sara-link'], 'the chooser must preserve the approved experience order');
+    assert.deepEqual(experienceOrder, ['gita-yoga-link', 'gita-sara-link', 'gita-700-link'], 'the chooser must preserve the approved experience order');
     await page.locator('#gita-yoga-link').click();
+    assert.equal(await page.locator('#experience-detail').isVisible(), true, 'experience selection must reveal its details before entering');
+    assert.equal(await page.locator('#experience-detail-title').innerText(), 'Gita Yoga');
+    await page.locator('#experience-detail-action').click();
     await page.locator('.gita-yoga-panel').first().waitFor();
     assert.equal(await page.locator('#sid-label').innerText(), '1.B');
     assert.equal(await page.locator('.gita-yoga-panel').count(), 3);
@@ -196,6 +198,7 @@ async function run() {
     await page.keyboard.press('a');
     await page.locator('#gita-700-link').waitFor({ state: 'visible' });
     await page.locator('#gita-700-link').click();
+    await page.locator('#experience-detail-action').click();
     await assert.doesNotReject(() => page.locator('#sid-label').waitFor());
     assert.equal(await page.locator('#sid-label').innerText(), '1.B');
 
@@ -342,7 +345,8 @@ async function run() {
     assert.equal(await page.locator('#sid-label').innerText(), '6.7');
     await page.keyboard.press('a');
     await page.getByRole('heading', { name: 'Diksoochi', exact: true }).waitFor();
-    assert.equal(await page.locator('#continue-journey-link').innerText(), 'Resume Gita 700 · Shloka 6.7', 'Home must continue the most recently visited experience rather than the first chooser item');
+    assert.equal(await page.locator('#continue-journey-link').getAttribute('data-experience'), 'gita-700', 'Home must continue the most recently visited experience rather than the first chooser item');
+    assert.equal(await page.locator('#continue-journey-title').innerText(), 'Shloka 6.7');
     await page.evaluate(() => new Promise((resolve, reject) => {
       const request = indexedDB.open('gitaverse-profiles');
       request.onerror = () => reject(request.error);
@@ -407,6 +411,7 @@ async function run() {
     await page.getByRole('button', { name: '← Back' }).click();
     assert.match(await page.locator('#gita-700-link').getAttribute('href'), /[?&]sid=6\.7(?:&|$)/, 'experience link must carry the saved SID');
     await page.locator('#gita-700-link').click();
+    await page.locator('#experience-detail-action').click();
     await page.locator('#sid-label').waitFor();
     assert.equal(await page.locator('#sid-label').innerText(), '6.7', 'experience selection must preserve the per-experience resume point');
     await page.locator('#play-button').click();
@@ -562,6 +567,7 @@ async function run() {
     await languagePage.getByRole('heading', { name: 'ದಿಕ್ಸೂಚಿ', exact: true }).waitFor();
     await languagePage.getByRole('heading', { name: 'ಅನುಭವವನ್ನು ಆಯ್ಕೆಮಾಡಿ' }).waitFor();
     await languagePage.locator('#gita-700-link').click();
+    await languagePage.locator('#experience-detail-action').click();
     await languagePage.locator('#sid-label').waitFor();
     assert.equal(await languagePage.locator('#help-button .top-menu-label').innerText(), 'ಸಹಾಯ');
     assert.equal(await languagePage.locator('#language-button .top-menu-label').innerText(), 'ವಿಷಯ ಭಾಷೆ (English)');
@@ -612,6 +618,7 @@ async function run() {
     assert.equal(await filePage.locator('#workspace-overlay').isVisible(), false, 'edit shortcut is inactive on Home');
     await filePage.locator('#home-collections-input').setInputFiles(path.join(root, 'data/collections'));
     await filePage.locator('#gita-700-link').click();
+    await filePage.locator('#experience-detail-action').click();
     await filePage.locator('#sid-label').waitFor();
     assert.notEqual(await filePage.locator('#audio').getAttribute('src'), originalLocalAudio, 'changing collections must replace cached local media URLs');
     await filePage.keyboard.press('e');

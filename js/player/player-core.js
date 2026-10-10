@@ -558,6 +558,40 @@ async function checkPlayerVersion() {
   return true;
 }
 
+const homeExperienceDetails = {
+  'gita-yoga': { kicker: 'home.gitaYogaKicker', description: 'home.gitaYogaDetail', features: 'home.gitaYogaFeatures' },
+  'gita-700': { kicker: 'home.gita700Kicker', description: 'home.gita700Detail', features: 'home.gita700Features' },
+  'gita-sara': { kicker: 'home.gitaSaraKicker', description: 'home.gitaSaraDetail', features: 'home.gitaSaraFeatures' }
+};
+
+function closeHomeExperienceDetail({ focus = false } = {}) {
+  const panel = document.getElementById('experience-detail');
+  const active = document.querySelector('[data-experience-card].active');
+  panel.hidden = true;
+  delete panel.dataset.experience;
+  document.querySelectorAll('[data-experience-card]').forEach((card) => card.classList.remove('active'));
+  if (focus) active?.focus();
+}
+
+function showHomeExperienceDetail(link) {
+  const experienceId = link.dataset.experienceCard;
+  const detail = homeExperienceDetails[experienceId];
+  const panel = document.getElementById('experience-detail');
+  document.querySelectorAll('[data-experience-card]').forEach((card) => card.classList.toggle('active', card === link));
+  panel.dataset.experience = experienceId;
+  document.getElementById('experience-detail-kicker').textContent = i18n.t(detail.kicker);
+  document.getElementById('experience-detail-title').textContent = getExperience(experienceId).label;
+  document.getElementById('experience-detail-description').textContent = i18n.t(detail.description);
+  document.getElementById('experience-detail-features').replaceChildren(...i18n.t(detail.features).split('|').map((text) => {
+    const item = document.createElement('li');
+    item.textContent = text;
+    return item;
+  }));
+  document.getElementById('experience-detail-action').href = link.href;
+  panel.hidden = false;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 async function startRequestedExperience() {
   const experienceIds = ['gita-yoga', 'gita-700', 'gita-sara'];
   const resumes = new Map(await Promise.all(experienceIds.map(async (experienceId) => [
@@ -587,9 +621,16 @@ async function startRequestedExperience() {
   const chooserUrl = chooserUrls.get(continueExperience);
   const continueLink = document.getElementById('continue-journey-link');
   continueLink.href = chooserUrl.href;
-  continueLink.textContent = continueResume?.sid
+  continueLink.dataset.experience = continueExperience;
+  continueLink.setAttribute('aria-label', continueResume?.sid
     ? i18n.t('diksoochi.resumeExperience', { experience: getExperience(continueExperience).label, sid: continueResume.sid })
-    : i18n.t('diksoochi.beginExperience', { experience: getExperience(continueExperience).label });
+    : i18n.t('diksoochi.beginExperience', { experience: getExperience(continueExperience).label }));
+  document.getElementById('continue-journey-kicker').textContent = continueResume?.sid
+    ? i18n.t('diksoochi.resumeLabel', { experience: getExperience(continueExperience).label })
+    : i18n.t('diksoochi.beginLabel');
+  document.getElementById('continue-journey-title').textContent = continueResume?.sid
+    ? i18n.t('diksoochi.shlokaLabel', { sid: continueResume.sid })
+    : getExperience(continueExperience).label;
   if (!play) {
     const summary = await profileStore.getDiksoochiSummary(state.activeProfile.pid);
     document.getElementById('diksoochi-greeting').textContent = i18n.t('diksoochi.greeting', { name: state.activeProfile.name });
@@ -607,6 +648,7 @@ async function startRequestedExperience() {
     knowSummary.hidden = !hasJourneyDetails;
     journeyStatements.hidden = !hasJourneyDetails;
     journeyEmpty.hidden = hasJourneyDetails;
+    closeHomeExperienceDetail();
     syncHomeCollectionSource();
     return showOnly('diksoochi');
   }
@@ -1112,10 +1154,15 @@ function bindEvents() {
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
   document.getElementById('home-collections-input').addEventListener('change', (event) => useSelectedCollections(event.target.files));
   document.getElementById('home-collections-button').addEventListener('click', () => document.getElementById('home-collections-input').click());
-  document.querySelectorAll('#continue-journey-link, #gita-yoga-link, #gita-700-link, #gita-sara-link').forEach((link) => link.addEventListener('click', (event) => {
+  document.querySelectorAll('#continue-journey-link, #experience-detail-action').forEach((link) => link.addEventListener('click', (event) => {
     event.preventDefault();
     openHomeExperience(link);
   }));
+  document.querySelectorAll('[data-experience-card]').forEach((link) => link.addEventListener('click', (event) => {
+    event.preventDefault();
+    showHomeExperienceDetail(link);
+  }));
+  document.getElementById('experience-detail-close').addEventListener('click', () => closeHomeExperienceDetail({ focus: true }));
   updateDeviceLayout();
   document.getElementById('menu-button').addEventListener('click', (event) => { event.stopPropagation(); toggleMenu(); });
   document.getElementById('chapter-trigger').addEventListener('click', () => openOverlay('chapters-overlay'));

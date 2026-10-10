@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gitaverse landing experience prototype</title>
+  <link rel="stylesheet" href="../../css/fonts.css">
+  <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="#" aria-label="Gitaverse home">
+      <span class="flute"><img src="../../assets/images/krishna-flute.svg" alt=""><i>♪</i><i>♫</i></span>
+      <span>Gitaverse</span>
+    </a>
+    <button class="profile" type="button"><span>VJ</span><strong>Vijay</strong></button>
+  </header>
+
+  <main>
+    <section class="journey-section" aria-labelledby="journey-title">
+      <div class="section-heading"><div><p class="eyebrow">Come back to what matters</p><h1 id="journey-title">Your Journey</h1></div></div>
+      <div class="journey-grid">
+        <a class="resume-card cinematic-card" href="#" aria-label="Continue Gita Sara at shloka 2.47">
+          <div class="card-image"></div><div class="shade"></div>
+          <div class="resume-copy"><span class="card-kicker">Continue Gita Sara</span><h2>Shloka 2.47</h2><p>2 — Sankhya Yoga</p><span class="play-action"><b>▶</b> Continue</span></div>
+        </a>
+        <article class="achievement-card">
+          <div class="achievement-mark">✦</div><p class="card-kicker">Your journey</p>
+          <h2>You have explored<br><strong>3 chapters</strong> and <strong>12 shlokas.</strong></h2>
+          <p class="return-line">You returned to the Gita on 5 different days.</p>
+          <a href="#">View journey <span>→</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="experience-section" aria-labelledby="experience-title">
+      <div class="section-heading"><div><p class="eyebrow">Choose your way in</p><h2 id="experience-title">Choose An Experience</h2></div><p>Select a card to discover what it offers.</p></div>
+      <div class="experience-row">
+        <button class="experience-card yoga" type="button" data-experience="yoga"><span class="card-number">01</span><span class="experience-copy"><small>Learn to chant with clarity</small><strong>Gita Yoga</strong><em>Guided chanting · Three languages</em></span><span class="open-mark">＋</span></button>
+        <button class="experience-card study" type="button" data-experience="study"><span class="card-number">02</span><span class="experience-copy"><small>Stay close to every shloka</small><strong>Gita 700</strong><em>Verse · Meaning · Word by word</em></span><span class="open-mark">＋</span></button>
+        <button class="experience-card sara" type="button" data-experience="sara"><span class="card-number">03</span><span class="experience-copy"><small>Meet the essence through contemplation</small><strong>Gita Sara</strong><em>Shloka · Illustration · Reflection</em></span><span class="open-mark">＋</span></button>
+      </div>
+      <article class="experience-detail" id="experience-detail" hidden aria-live="polite">
+        <button class="detail-close" type="button" aria-label="Close experience details">×</button>
+        <div class="detail-art" aria-hidden="true"></div>
+        <div class="detail-copy"><p class="card-kicker" id="detail-kicker"></p><h3 id="detail-title"></h3><p id="detail-description"></p><h4>You will experience</h4><ul id="detail-list"></ul><p class="last-place" id="detail-last"></p><div class="detail-actions"><button class="secondary" type="button">Start from beginning</button><button class="primary" type="button">Continue <span>▶</span></button></div></div>
+      </article>
+    </section>
+  </main>
+  <footer><button type="button">About Gitaverse</button><span>·</span><button type="button">Install app</button></footer>
+  <script src="landing.js"></script>
+</body>
+</html>

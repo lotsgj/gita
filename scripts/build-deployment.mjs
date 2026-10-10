@@ -174,6 +174,7 @@ const precache = Object.keys(assets).filter((relative) => {
     || relative === 'js/player.bundle.js'
     || (relative.startsWith('css/') && relative !== 'css/docs.css')
     || relative.startsWith('assets/icons/')
+    || relative.startsWith('assets/images/experience-cards/')
     || relative.startsWith('data/collections/');
 });
 const assetManifest = { version, generatedAt: builtAt, assets, precache };

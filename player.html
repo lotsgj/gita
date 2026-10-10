@@ -87,33 +87,63 @@
 </main>
 
 <main id="diksoochi" class="diksoochi" hidden>
-  <button class="profile-pill landing-profile-pill" type="button" data-profile-pill data-clarity-mask="true"></button>
-  <section class="diksoochi-shell">
-    <header class="diksoochi-head">
-      <p id="diksoochi-greeting"></p>
-      <h1 class="sr-only" data-i18n="diksoochi.title">Diksoochi</h1>
-      <div class="about-flute diksoochi-flute" aria-hidden="true">
+  <header class="home-masthead">
+    <div class="home-brand" aria-label="Gitaverse">
+      <span class="about-flute diksoochi-flute" aria-hidden="true">
         <img src="assets/images/krishna-flute.svg" alt="">
         <i class="about-note about-note-one">♪</i>
         <i class="about-note about-note-two">♫</i>
         <i class="about-note about-note-three">♩</i>
-      </div>
+      </span>
+      <strong>Gitaverse</strong>
+    </div>
+    <button class="profile-pill landing-profile-pill" type="button" data-profile-pill data-clarity-mask="true"></button>
+  </header>
+  <section class="diksoochi-shell">
+    <header class="diksoochi-head">
+      <p id="diksoochi-greeting"></p>
+      <h1 class="sr-only" data-i18n="diksoochi.title">Diksoochi</h1>
     </header>
-    <section class="diksoochi-next"><h2 data-i18n="diksoochi.next">Continue your journey</h2><a id="continue-journey-link" class="continue-journey-link" href="?play=gita-700"></a></section>
+    <section class="diksoochi-journey-group">
+      <h2 data-i18n="diksoochi.journey">Your journey</h2>
+      <div class="diksoochi-journey-grid">
+        <a id="continue-journey-link" class="continue-journey-link" href="?play=gita-700">
+          <span class="continue-journey-image" aria-hidden="true"></span>
+          <span class="continue-journey-shade" aria-hidden="true"></span>
+          <span class="continue-journey-copy">
+            <small id="continue-journey-kicker"></small>
+            <strong id="continue-journey-title"></strong>
+            <span class="continue-journey-action"><b>▶</b> <span data-i18n="diksoochi.continue">Continue</span></span>
+          </span>
+        </a>
+        <section class="diksoochi-journey">
+          <span class="journey-spark" aria-hidden="true">✦</span>
+          <p class="journey-card-label" data-i18n="diksoochi.journey">Your journey</p>
+          <div class="diksoochi-journey-statements" id="diksoochi-journey-statements" hidden>
+            <p id="diksoochi-know-summary" hidden><span id="diksoochi-know-summary-text"></span> <button class="journey-details-link" id="journey-details-button" type="button" data-i18n="diksoochi.details">Details</button></p>
+          </div>
+          <p class="diksoochi-journey-empty" id="diksoochi-journey-empty" data-i18n="diksoochi.journeyEmpty">Your journey details will be updated here.</p>
+        </section>
+      </div>
+    </section>
     <section class="diksoochi-experiences">
       <h2 data-i18n="diksoochi.choose">Choose an experience</h2>
-    <div class="experience-list">
-      <a class="experience-link" id="gita-yoga-link" href="?play=gita-yoga"><span>Gita Yoga<br><small data-i18n="home.gitaYogaNote">Guided chanting and meaning experience</small></span><span>→</span></a>
-      <a class="experience-link" id="gita-700-link" href="?play=gita-700"><span>Gita 700<br><small data-i18n="home.gita700Note">Four-panel study experience</small></span><span>→</span></a>
-      <a class="experience-link" id="gita-sara-link" href="?play=gita-sara"><span>Gita Sara<br><small data-i18n="home.gitaSaraNote">Essential verses, illustrations and contemplation</small></span><span>→</span></a>
-    </div>
-    </section>
-    <section class="diksoochi-journey">
-      <h2 data-i18n="diksoochi.journey">Your journey</h2>
-      <div class="diksoochi-journey-statements" id="diksoochi-journey-statements" hidden>
-        <p id="diksoochi-know-summary" hidden><span id="diksoochi-know-summary-text"></span> <button class="journey-details-link" id="journey-details-button" type="button" data-i18n="diksoochi.details">Details</button></p>
+      <div class="experience-list">
+        <a class="experience-link experience-yoga" id="gita-yoga-link" data-experience-card="gita-yoga" href="?play=gita-yoga"><small data-i18n="home.gitaYogaKicker">Learn to chant with clarity</small><strong>Gita Yoga</strong><span data-i18n="home.gitaYogaNote">Guided chanting and meaning experience</span><i aria-hidden="true">＋</i></a>
+        <a class="experience-link experience-sara" id="gita-sara-link" data-experience-card="gita-sara" href="?play=gita-sara"><small data-i18n="home.gitaSaraKicker">Meet the essence through contemplation</small><strong>Gita Sara</strong><span data-i18n="home.gitaSaraNote">Essential verses, illustrations and contemplation</span><i aria-hidden="true">＋</i></a>
+        <a class="experience-link experience-700" id="gita-700-link" data-experience-card="gita-700" href="?play=gita-700"><small data-i18n="home.gita700Kicker">Stay close to every shloka</small><strong>Gita 700</strong><span data-i18n="home.gita700Note">Four-panel study experience</span><i aria-hidden="true">＋</i></a>
       </div>
-      <p class="diksoochi-journey-empty" id="diksoochi-journey-empty" data-i18n="diksoochi.journeyEmpty">Your journey details will be updated here.</p>
+      <section class="experience-detail" id="experience-detail" hidden>
+        <div class="experience-detail-art" aria-hidden="true"></div>
+        <div class="experience-detail-copy">
+          <button class="experience-detail-close" id="experience-detail-close" type="button" aria-label="Close">×</button>
+          <small id="experience-detail-kicker"></small>
+          <h3 id="experience-detail-title"></h3>
+          <p id="experience-detail-description"></p>
+          <ul id="experience-detail-features"></ul>
+          <a class="experience-detail-action" id="experience-detail-action" href="?play=gita-yoga"><span data-i18n="diksoochi.continue">Continue</span> →</a>
+        </div>
+      </section>
     </section>
     <div class="landing-links"><button class="about-link" type="button" data-about data-i18n="common.about">About Gitaverse</button><button class="about-link" type="button" data-install data-i18n="common.install" hidden>Install Gitaverse</button></div>
     <section class="home-collections" id="home-collections" hidden>

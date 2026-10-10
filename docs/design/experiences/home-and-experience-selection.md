@@ -5,9 +5,11 @@
 
 ## Diksoochi landing
 
-After a profile is active, Diksoochi is the application landing experience. A continuously but gently animated Krishna flute replaces the visible page title while a visually hidden heading preserves screen-reader and navigation semantics. Reduced-motion preferences stop the animation. The profile pill stays visible at the upper right.
+After a profile is active, Diksoochi is the application landing experience. A compact Gitaverse masthead uses the continuously but gently animated Krishna flute as its brand mark while a visually hidden heading preserves screen-reader and navigation semantics. Reduced-motion preferences stop the animation. The profile pill stays visible at the upper right.
 
-The page uses the same centred responsive card language as profile setup: the same maximum width, surface, border, radius, shadow and mobile spacing. It prioritizes action in one vertical column: **Continue your journey** appears first, followed by **Choose an experience** and a compact **Your journey** section. Experience choices remain single-column on desktop and mobile. About Gitaverse and installation remain available below it.
+The page has two primary sections. **Your journey** combines a large cinematic resume card with a warm achievement card. The resume card uses the image belonging to the most recently visited experience and always retains that experience’s saved SID. **Choose an experience** follows as three image-led cards in the order Gita Yoga, Gita Sara and Gita 700: water ripples for Gita Yoga, caterpillar–chrysalis–butterfly transformation for Gita Sara, and an illuminated path for Gita 700. The generated watercolour images share a muted indigo, sage, sand and copper language. The small prototype eyebrow phrases are intentionally omitted.
+
+On desktop the resume and achievement cards share a row and the three experience cards share a row. On mobile the journey cards stack, while experience cards form a touch-friendly horizontal snap carousel. Selecting an experience card reveals an inline description and capability summary before the person continues into it. About Gitaverse, installation and local collection selection remain available below the two sections.
 
 Know counts distinct chapters and shlokas only after at least ten seconds of meaningful visible engagement. Brief navigation does not count. When no journey dimension has data, the section says, “Your journey details will be updated here.” Once data exists, only the available dimensions appear as encouraging sentences—for example, “You have explored 2 chapters and 2 shlokas.” The interface does not show Know, Able or Use cards, labels, or zero values. The data model retains those dimensions so Able and Use can appear later when supported by explicit evidence; they are never inferred from time or playback.
 
@@ -27,7 +29,7 @@ The player’s main menu exposes **Your journey — J** immediately after **Diks
 
 The **Continue your journey** action always targets the most recently visited experience and that experience’s saved SID, even after the person explicitly returns Home. Its choice is independent of display order in the experience catalog.
 
-The **Choose an experience** section is part of Diksoochi. Gita Yoga is listed first, followed by Gita 700 and Gita Sara. All three are selectable and open the shared player with their own renderer and ordered dataset.
+The **Choose an experience** section is part of Diksoochi. Gita Yoga is listed first, followed by Gita Sara and Gita 700. All three are selectable and open the shared player with their own renderer and ordered dataset.
 
 Choosing an experience preserves the profile identifier and preferred content language in application navigation. The profile’s app language governs this interface; `lang` links affect content only. The **Diksoochi / Home** command (`A`) returns from the player to Diksoochi and records it as the resumable location. Direct experience URLs still open the requested experience.
 

@@ -1,0 +1,10 @@
+const details = {
+  yoga: { kicker:'Learn to chant with clarity', title:'Gita Yoga', description:'Build familiarity with the sound, words and meaning of each shloka through guided learning.', list:['Sanskrit, Kannada and English together','Word-by-word learning','Guided chanting audio','Meaning in both languages'], last:'Your last place: Shloka 1.5' },
+  study: { kicker:'Stay close to every shloka', title:'Gita 700', description:'Explore the complete Gita one shloka at a time, with meaning and word-by-word understanding.', list:['All 700 Gita shlokas','Sanskrit verse','Preferred-language meaning','Word-by-word understanding'], last:'Your last place: Shloka 8.3' },
+  sara: { kicker:'Meet the essence through contemplation', title:'Gita Sara', description:'Follow a curated path through essential shlokas with chanting, illustration and reflective questions.', list:['A curated path through 135 shlokas','Sanskrit, transliteration and meaning','Illustrations and presentations','Questions for contemplation'], last:'Your last place: Shloka 2.47' }
+};
+const panel = document.querySelector('#experience-detail');
+const cards = [...document.querySelectorAll('[data-experience]')];
+function openDetail(id){const item=details[id];cards.forEach(card=>card.classList.toggle('active',card.dataset.experience===id));panel.dataset.experience=id;document.querySelector('#detail-kicker').textContent=item.kicker;document.querySelector('#detail-title').textContent=item.title;document.querySelector('#detail-description').textContent=item.description;document.querySelector('#detail-list').replaceChildren(...item.list.map(text=>{const li=document.createElement('li');li.textContent=text;return li;}));document.querySelector('#detail-last').textContent=item.last;panel.hidden=false;panel.scrollIntoView({behavior:'smooth',block:'nearest'});}
+cards.forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.experience)));
+document.querySelector('.detail-close').addEventListener('click',()=>{panel.hidden=true;cards.forEach(card=>card.classList.remove('active'));});
