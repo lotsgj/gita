@@ -1,7 +1,7 @@
 # Shared player
 
 **Status:** Current  
-**Last updated:** 10 October 2026
+**Last updated:** 12 October 2026
 
 ## Persistent frame
 
@@ -9,7 +9,7 @@ The top bar shows the active chapter at left, a large SID in the center, the mai
 
 ## Navigation
 
-Users can select a chapter, go directly to an SID, or move to adjacent records. Desktop keyboard shortcuts include arrows, `G`, `C`, `L`, `A`, `P` or Space, `F`, `H`, `K`, `M`, `E`, and Escape. The menu supports arrow-key movement and Enter. Chapter cards support keyboard selection. Mobile horizontal swipes move between verses.
+Users can select a chapter, go directly to an SID, or move to adjacent records. Desktop keyboard shortcuts include arrows, `G`, `C`, `L`, `A`, `P` or Space, `F`, `H`, `K`, `M`, `E`, and Escape. `Q` is available when the active renderer supports contemplation questions. The menu supports arrow-key movement and Enter. Chapter cards support keyboard selection. Mobile horizontal swipes move between verses.
 
 ## Dialog and fullscreen behavior
 
@@ -22,5 +22,7 @@ The shell supplies content-language choice, chapter and SID routing, audio contr
 The complete player uses bundled Noto Sans faces for English, Sanskrit and Kannada. Script-specific faces are selected without changing the common visual family, and are available offline with the application shell.
 
 The shell selects a renderer through the experience registry. Each renderer owns its layout and editable-field map, while experience configuration declares reusable content and audio bindings. Renderers must represent each semantic field once; responsive CSS may reposition that node but must not create hidden duplicate data views.
+
+Optional content capabilities are renderer-declared. A renderer that supports contemplation questions exposes its visible state and toggle action; the shared shell then shows **Questions (On/Off) — Q**. Experiences without that capability do not show the item. This lets Gita 700 and Gita Yoga adopt a question panel later without duplicating menu or keyboard behavior.
 
 See [Gita Yoga](gita-yoga.md), [Gita 700](gita-700.md), and [Gita Sara](gita-sara.md) for the current renderers.

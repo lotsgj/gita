@@ -134,48 +134,45 @@ test('Gita-Sara preserves the approved 135-SID sequence and master identities', 
   assert.equal(sidDigest, 'ef26e43bb8aa24b539aa7cbcbea1c806533e5c103c82cecd42876e263d77fbdf');
 });
 
-test('Gita-Sara audio and deck compositions retain every selected SID in sequence order', () => {
+test('Gita-Sara audio is complete while deck composition contains only associations', () => {
   assert.deepEqual(saraAudio.headers, ['cid', 'snum', 'sid', 'audio_collection', 'audio_order']);
   assert.deepEqual(saraDecks.headers, ['cid', 'snum', 'sid', 'order', 'deck_collection', 'deck_order']);
   assertIdentitySequence(assert, saraSequence.rows, saraAudio.rows, 'Gita-Sara audio');
-  assertIdentitySequence(assert, saraSequence.rows, saraDecks.rows, 'Gita-Sara decks');
+  assert.deepEqual(saraDecks.rows, [{ cid: '2', snum: '47', sid: '2.47', order: '1', deck_collection: 'gita-sara-google-decks', deck_order: '1' }]);
 });
 
-test('Gita-Sara illustration and contemplation compositions cover all selected SIDs in order', () => {
+test('Gita-Sara illustration and contemplation compositions contain only associations', () => {
   assert.deepEqual(saraIllustrations.headers, ['cid', 'snum', 'sid', 'order', 'image_collection', 'image_order']);
   assert.deepEqual(saraContemplations.headers, ['cid', 'snum', 'sid', 'order', 'text_collection', 'text_order']);
-  for (const [label, composition] of [['illustrations', saraIllustrations], ['contemplations', saraContemplations]]) {
+  for (const composition of [saraIllustrations, saraContemplations]) {
     const groups = new Map();
     composition.rows.forEach((row) => {
       if (!groups.has(row.sid)) groups.set(row.sid, []);
       groups.get(row.sid).push(row);
     });
-    assert.equal(groups.size, 135, `${label} selected SID coverage`);
-    assert.deepEqual([...groups.keys()], saraSequence.rows.map((row) => row.sid), `${label} SID order`);
-    for (const selected of saraSequence.rows) {
+    for (const selected of saraSequence.rows.filter((row) => groups.has(row.sid))) {
       const rows = groups.get(selected.sid);
-      assert.ok(rows?.length, `${label} ${selected.sid} placeholder`);
       rows.forEach((row, index) => {
-        assert.deepEqual([row.cid, row.snum], [selected.cid, selected.snum], `${label} ${selected.sid} identity`);
-        assert.equal(row.order, String(index + 1), `${label} ${selected.sid} order`);
+        assert.deepEqual([row.cid, row.snum], [selected.cid, selected.snum], `${selected.sid} identity`);
+        assert.equal(row.order, String(index + 1), `${selected.sid} order`);
       });
     }
   }
-  assert.equal(saraIllustrations.rows.filter((row) => row.sid === '2.47').length, 2);
+  assert.deepEqual(saraIllustrations.rows, [{ cid: '1', snum: '1', sid: '1.1', order: '1', image_collection: 'gita-sara-illustrations', image_order: '1' }]);
+  assert.equal(saraContemplations.rows.filter((row) => row.sid === '1.1').length, 5);
   assert.equal(saraContemplations.rows.filter((row) => row.sid === '2.47').length, 4);
 });
 
-test('Gita-Sara unified media composition covers every SID and orders mixed media explicitly', () => {
+test('Gita-Sara unified media composition contains only ordered associations', () => {
   assert.deepEqual(saraMedia.headers, ['cid', 'snum', 'sid', 'order', 'media_type', 'collection', 'asset_order']);
   const groups = new Map();
   saraMedia.rows.forEach((row) => {
     if (!groups.has(row.sid)) groups.set(row.sid, []);
     groups.get(row.sid).push(row);
   });
-  assert.deepEqual([...groups.keys()], saraSequence.rows.map((row) => row.sid));
-  saraSequence.rows.forEach((selected) => {
+  assert.deepEqual([...groups.keys()], ['1.1', '2.47']);
+  saraSequence.rows.filter((row) => groups.has(row.sid)).forEach((selected) => {
     const rows = groups.get(selected.sid);
-    assert.ok(rows?.length, `${selected.sid} media placeholder`);
     rows.forEach((row, index) => {
       assert.deepEqual([row.cid, row.snum, row.order], [selected.cid, selected.snum, String(index + 1)]);
       assert.equal(Boolean(row.media_type), Boolean(row.collection));
@@ -184,9 +181,7 @@ test('Gita-Sara unified media composition covers every SID and orders mixed medi
     });
   });
   assert.deepEqual(groups.get('2.47').map(({ media_type, collection, asset_order }) => [media_type, collection, asset_order]), [
-    ['image', 'gita-sara-illustrations', '1'],
-    ['google_deck', 'gita-sara-google-decks', '1'],
-    ['image', 'gita-sara-illustrations', '2']
+    ['google_deck', 'gita-sara-google-decks', '1']
   ]);
 });
 
@@ -206,7 +201,7 @@ test('Gita-Sara localized illustration and contemplation collections resolve by 
       const localized = await parseTable(entry[field]);
       assert.deepEqual(localized.headers, localizedHeaders);
       assert.deepEqual(localized.rows.map((row) => `${row.sid}:${row.order}`), catalogKeys, `${id} ${field} alignment`);
-      assert.ok(localized.rows.every((row) => row[requireField]), `${id} ${field} ${requireField}`);
+      if (requireField) assert.ok(localized.rows.every((row) => row[requireField]), `${id} ${field} ${requireField}`);
     }
     return catalog;
   };
@@ -224,15 +219,18 @@ test('Gita-Sara localized illustration and contemplation collections resolve by 
   const contemplations = await checkCollection({
     registry: textRegistry, id: 'gita-sara-contemplations',
     catalogHeaders: ['sid', 'order', 'line_type'], localizedFields: ['master_en_url', 'master_kn_url'],
-    localizedHeaders: ['sid', 'order', 'text'], requireField: 'text'
+    localizedHeaders: ['sid', 'order', 'text'], requireField: null
   });
   const defaultContemplation = await checkCollection({
     registry: textRegistry, id: 'gita-sara-default-contemplation',
     catalogHeaders: ['sid', 'order', 'line_type'], localizedFields: ['master_en_url', 'master_kn_url'],
     localizedHeaders: ['sid', 'order', 'text'], requireField: 'text'
   });
-  assert.deepEqual(illustrations.rows.map((row) => `${row.sid}:${row.order}`), ['2.47:1', '2.47:2']);
-  assert.deepEqual(contemplations.rows.map((row) => `${row.sid}:${row.order}`), ['2.47:1', '2.47:2', '2.47:3', '2.47:4']);
+  assert.deepEqual(illustrations.rows.map((row) => `${row.sid}:${row.order}`), ['1.1:1']);
+  assert.ok(illustrations.rows.every((row) => row.image_url === `data/collections/images/gita-sara-illustrations/${row.sid}-${row.order}.webp`));
+  assert.deepEqual(contemplations.rows.map((row) => `${row.sid}:${row.order}`).sort(), [
+    '1.1:1', '1.1:2', '1.1:3', '1.1:4', '1.1:5', '2.47:1', '2.47:2', '2.47:3', '2.47:4'
+  ].sort());
   assert.deepEqual(defaultIllustration.rows.map((row) => `${row.sid}:${row.order}`), ['DEFAULT:1']);
   assert.deepEqual(defaultContemplation.rows.map((row) => `${row.sid}:${row.order}`), ['DEFAULT:1']);
 });
@@ -257,18 +255,18 @@ test('Gita-Sara resolves Swami Brahmananda audio and preserves explicit Dhyana g
   assert.equal(missing, 9);
 });
 
-test('Gita-Sara Google-deck collection is complete with explicit optional slots', () => {
+test('Gita-Sara Google-deck catalog contains only real reusable assets', () => {
   assert.deepEqual(deckRegistry.headers, ['collection_id', 'title', 'provider', 'language', 'catalog_url', 'attribution', 'license', 'source']);
   assert.deepEqual(deckRegistry.rows.map((row) => row.collection_id), ['gita-sara-google-decks']);
   assert.deepEqual(saraDeckCatalog.headers, ['sid', 'order', 'language', 'deck_url', 'title']);
-  assert.equal(saraDeckCatalog.rows.length, 135);
-  assert.deepEqual(saraDeckCatalog.rows.map((row) => row.sid), saraSequence.rows.map((row) => row.sid));
+  assert.equal(saraDeckCatalog.rows.length, 2);
+  assert.deepEqual(saraDeckCatalog.rows.map((row) => row.sid), ['1.1', '2.47']);
   assert.ok(saraDeckCatalog.rows.every((row) => row.order === '1'));
   const populated = saraDeckCatalog.rows.filter((row) => row.deck_url);
   assert.deepEqual(populated.map((row) => row.sid), ['1.1', '2.47']);
   assert.ok(populated.every((row) => /^https:\/\/docs\.google\.com\/presentation\/d\//.test(row.deck_url)));
   assert.deepEqual(
     saraDecks.rows.filter((row) => row.deck_collection).map(({ sid, deck_collection, deck_order }) => [sid, deck_collection, deck_order]),
-    [['1.1', 'gita-sara-google-decks', '1'], ['2.47', 'gita-sara-google-decks', '1']]
+    [['2.47', 'gita-sara-google-decks', '1']]
   );
 });

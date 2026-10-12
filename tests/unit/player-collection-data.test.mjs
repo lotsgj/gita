@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { AUDIO_CUE_HEADERS, AUDIO_CUE_PURPOSE_HEADERS, buildAudioCueIndex, loadCollectionExperienceFromFiles, normalizeCollectionData, normalizeGoogleDeckUrl, normalizeImageUrl, openWritableCollectionWorkspace, parseCollectionTable, serializeLanguageMaster } from '../../js/player/collection-data.js';
+import { AUDIO_CUE_HEADERS, AUDIO_CUE_PURPOSE_HEADERS, buildAudioCueIndex, loadCollectionExperienceFromFiles, normalizeCollectionData, normalizeGoogleDeckUrl, normalizeImageUrl, openWritableCollectionWorkspace, parseCollectionTable, resolveCollectionsDirectoryHandle, serializeLanguageMaster } from '../../js/player/collection-data.js';
 import { projectRoot } from '../helpers/collection-data.mjs';
 
 async function table(relative) {
@@ -48,8 +48,9 @@ async function fakeWritableCollections() {
       kind: 'directory',
       name: prefix.split('/').filter(Boolean).at(-1) || 'collections',
       async getDirectoryHandle(name) { return directory(prefix + name + '/'); },
-      async getFileHandle(name) {
+      async getFileHandle(name, options = {}) {
         const relative = prefix + name;
+        if (!contents.has(relative) && options.create) contents.set(relative, Buffer.alloc(0));
         if (!contents.has(relative)) throw new Error('Not found: ' + relative);
         return {
           kind: 'file',
@@ -58,13 +59,14 @@ async function fakeWritableCollections() {
             const content = contents.get(relative);
             return {
               testRelativePath: relative,
+              size: content.length,
               async text() { return Buffer.from(content).toString('utf8'); }
             };
           },
           async createWritable() {
             let next;
             return {
-              async write(value) { next = Buffer.from(String(value)); },
+              async write(value) { next = value?.arrayBuffer ? Buffer.from(await value.arrayBuffer()) : Buffer.from(String(value)); },
               async close() { contents.set(relative, next); }
             };
           }
@@ -89,7 +91,23 @@ test('the player builds its normalized model from collection data', () => {
   assert.deepEqual(verse.media.chantFullSaCues, []);
   const chapter = dataset.rows.find((row) => row.sid === '6.B');
   assert.equal(chapter.media.chapterIconUrl, 'data/collections/images/gita-chapter-icons/chapter-06.svg');
+  assert.equal(dataset.chapterIcons.get('6'), 'data/collections/images/gita-chapter-icons/chapter-06.svg');
   assert.equal(chapter.media.chantFullSaUrl, '');
+});
+
+test('chapter icons remain available when a curated sequence omits chapter-opening rows', async () => {
+  const sequence = await table('data/collections/experiences/gita-sara/sequence.csv');
+  const saraAudio = await table('data/collections/experiences/gita-sara/audio.csv');
+  const curated = normalizeCollectionData({
+    sa, en, kn, sequence, audioComposition: saraAudio, imageComposition,
+    audioCatalogs: new Map([['chanting-swami-brahmananda', audioCatalog]]),
+    imageCatalogs: new Map([['gita-chapter-icons', imageCatalog]]),
+    experience: { id: 'gita-sara' }
+  });
+  assert.equal(curated.rows.some((row) => row.sid === '1.B'), false);
+  assert.equal(curated.chapterIcons.size, 19);
+  assert.equal(curated.chapterIcons.get('1'), 'data/collections/images/gita-chapter-icons/chapter-01.svg');
+  assert.equal(curated.chapterIcons.get('18'), 'data/collections/images/gita-chapter-icons/chapter-18.svg');
 });
 
 test('audio cues resolve purpose metadata and are indexed by SID plus asset order', () => {
@@ -276,19 +294,16 @@ test('the Gita-Sara collection loads its ordered subset, audio, and minimal Goog
     assert.equal(deck.collectionId, 'gita-sara-google-decks');
     assert.equal(new URL(deck.embedUrl).searchParams.get('rm'), 'minimal');
     const authored = sara.rows.find((row) => row.sid === '2.47');
-    assert.equal(authored.media.illustrations.length, 2);
-    assert.ok(authored.media.illustrations.every((item) => item.isFallback === false));
-    assert.match(authored.media.illustrations[0].imageUrl, /^blob:gita-sara-test\/images\/gita-sara-illustrations\//);
-    assert.equal(authored.media.illustrations[0].localized.en.caption, '');
-    assert.match(authored.media.illustrations[1].localized.en.caption, /Care for the action/);
+    assert.equal(authored.media.illustrations.length, 1);
+    assert.equal(authored.media.illustrations[0].isFallback, true);
+    assert.match(authored.media.illustrations[0].imageUrl, /gita-sara-default-illustration\/transformation-cycle-clean\.png$/);
     assert.equal(authored.contemplation.lines.length, 4);
     assert.ok(authored.contemplation.lines.every((item) => item.isFallback === false && item.type === 'question'));
     assert.match(authored.contemplation.lines[0].localized.en, /complete attention/);
     assert.match(authored.contemplation.lines[0].localized.kn, /ಸಂಪೂರ್ಣ ಗಮನ/);
-    assert.deepEqual(authored.media.items.map((item) => item.mediaType), ['image', 'google_deck', 'image']);
-    assert.deepEqual(authored.media.items.map((item) => item.order), [1, 2, 3]);
-    assert.equal(authored.media.items[0].localized.en.caption, '');
-    assert.match(authored.media.items[1].resolvedUrl, /docs\.google\.com\/presentation/);
+    assert.deepEqual(authored.media.items.map((item) => item.mediaType), ['google_deck']);
+    assert.deepEqual(authored.media.items.map((item) => item.order), [1]);
+    assert.match(authored.media.items[0].resolvedUrl, /docs\.google\.com\/presentation/);
 
     const fallback = sara.rows.find((row) => row.sid === 'D.1');
     assert.equal(fallback.media.illustrations.length, 1);
@@ -349,6 +364,21 @@ test('a writable Gita Sara workspace saves deck catalog and composition without 
   }
 });
 
+test('a writable Gita Sara workspace creates and verifies a selected media asset', async () => {
+  const local = await fakeWritableCollections();
+  const originalCreateObjectUrl = URL.createObjectURL;
+  URL.createObjectURL = (file) => 'blob:asset-write-test/' + file.testRelativePath;
+  try {
+    const { workspace } = await openWritableCollectionWorkspace('gita-sara', local.handle);
+    const file = new Blob(['webp fixture'], { type: 'image/webp' });
+    const url = 'data/collections/images/gita-sara-illustrations/test-1.webp';
+    assert.deepEqual(await workspace.saveAssets([{ url, file }]), ['test-1.webp']);
+    assert.equal(local.contents.get('images/gita-sara-illustrations/test-1.webp').toString(), 'webp fixture');
+  } finally {
+    URL.createObjectURL = originalCreateObjectUrl;
+  }
+});
+
 test('a Sanskrit workspace save preserves raw text while updating display text', async () => {
   const local = await fakeWritableCollections();
   const originalCreateObjectUrl = URL.createObjectURL;
@@ -393,5 +423,21 @@ test('a writable collections workspace validates the selected folder structure',
     async getDirectoryHandle() { return this; },
     async getFileHandle() { throw new Error('missing'); }
   };
-  await assert.rejects(openWritableCollectionWorkspace('gita-700', empty), /missing experiences\/collection\.csv/);
+  await assert.rejects(openWritableCollectionWorkspace('gita-700', empty), /does not contain data\/collections\/experiences\/collection\.csv/);
+});
+
+test('a writable collections workspace accepts collections, data, or repository root', async () => {
+  const local = await fakeWritableCollections();
+  const missing = async () => { throw new Error('Not found'); };
+  const dataHandle = {
+    kind: 'directory', name: 'data',
+    async getDirectoryHandle(name) { if (name === 'collections') return local.handle; return missing(); }
+  };
+  const repositoryHandle = {
+    kind: 'directory', name: 'repository',
+    async getDirectoryHandle(name) { if (name === 'data') return dataHandle; return missing(); }
+  };
+  assert.equal(await resolveCollectionsDirectoryHandle(local.handle), local.handle);
+  assert.equal(await resolveCollectionsDirectoryHandle(dataHandle), local.handle);
+  assert.equal(await resolveCollectionsDirectoryHandle(repositoryHandle), local.handle);
 });

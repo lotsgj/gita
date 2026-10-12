@@ -409,6 +409,40 @@ async function useSelectedCollections(fileList) {
   }
 }
 
+async function useSelectedCollectionsDirectory(handle) {
+  const error = document.getElementById('home-collections-error');
+  error.textContent = '';
+  try {
+    collectionSource.selectDirectory(handle);
+    state.journeyDataset = null;
+    await collectionSource.loadExperience('gita-700');
+    syncHomeCollectionSource();
+    if (state.pendingLocalDestination) {
+      ({ play, requestedSid, requestedLanguage } = state.pendingLocalDestination);
+      state.pendingLocalDestination = null;
+      return startRequestedExperience();
+    }
+  } catch (failure) {
+    collectionSource.clear();
+    collectionSource.directoryHandle = null;
+    syncHomeCollectionSource();
+    error.textContent = failure.message || i18n.t('collections.invalid');
+  }
+}
+
+async function chooseHomeCollections() {
+  if (typeof window.showDirectoryPicker !== 'function') {
+    document.getElementById('home-collections-input').click();
+    return;
+  }
+  try {
+    const handle = await window.showDirectoryPicker({ id: 'gitaverse-collections', mode: 'readwrite' });
+    await useSelectedCollectionsDirectory(handle);
+  } catch (error) {
+    if (error?.name !== 'AbortError') document.getElementById('home-collections-error').textContent = error.message || i18n.t('collections.invalid');
+  }
+}
+
 function updateProfileUrl(profile) {
   const next = new URL(location.href);
   next.searchParams.set('pid', profile.pid);
@@ -671,7 +705,7 @@ async function startRequestedExperience() {
 
   showOnly('loading');
   try {
-    await startPlayer(await collectionSource.loadExperience(play), experience);
+    await startPlayer(await collectionSource.loadExperience(play), experience, { workspace: collectionSource.workspaceFor(play) });
   } catch (error) {
     emitEvent('data_load_failed', {
       context: { experience: play, language: requestedLanguage || state.activeProfile.contentLanguage },
@@ -691,8 +725,23 @@ async function startPlayer(dataset, experience, { workspace = null, sid = reques
     state.locationSource = null;
     return goToExperienceSelection(state.activeProfile, { source: 'invalid_resume' });
   }
-  state.renderer = await experience.load({ translate });
+  const gitaSaraView = play === 'gita-sara'
+    ? (await profileStore.getGitaSaraView(state.activeProfile.pid).catch(() => null)) || 'three_panel'
+    : null;
+  state.renderer = await experience.load({
+    translate,
+    gitaSaraView,
+    onGitaSaraViewChange: (view) => {
+      profileStore.setGitaSaraView(state.activeProfile.pid, view).catch(() => {});
+      emitEvent('gita_sara_view_changed', {
+        context: verseContext(),
+        details: { view }
+      });
+      syncQuestionsMenu();
+    }
+  });
   state.renderer.mount(document.getElementById('renderer-root'));
+  syncQuestionsMenu();
 
   const defaultIndex = findSid('1.B');
   state.index = requestedIndex >= 0 ? requestedIndex : (defaultIndex >= 0 ? defaultIndex : 0);
@@ -752,6 +801,8 @@ function chapterNameFor(cid, language) {
 }
 
 function chapterIconFor(cid) {
+  const chapterIcon = state.dataset.chapterIcons?.get(cid);
+  if (chapterIcon) return chapterIcon;
   const row = state.dataset.rows.find((candidate) => candidate.cid === cid && candidate.media.chapterIconUrl);
   return row ? row.media.chapterIconUrl : '';
 }
@@ -759,6 +810,26 @@ function chapterIconFor(cid) {
 function audioSource(row) {
   const source = row.media.primaryAudioUrl || row.media.chantFullSaUrl;
   return source ? new URL(source, location.href).href : '';
+}
+
+function syncQuestionsMenu() {
+  const button = document.getElementById('questions-button');
+  const supported = Boolean(state.renderer?.supportsQuestions);
+  button.hidden = !supported;
+  if (!supported) return;
+  const visible = state.renderer.questionsVisible?.() !== false;
+  button.setAttribute('aria-pressed', String(visible));
+  button.querySelector('.top-menu-label').textContent = i18n.t(visible ? 'menu.questionsOn' : 'menu.questionsOff');
+}
+
+function toggleQuestions() {
+  if (!state.renderer?.supportsQuestions || state.editor?.active) return false;
+  const changed = state.renderer.toggleQuestions?.();
+  if (changed) {
+    syncQuestionsMenu();
+    setMenuOpen(false);
+  }
+  return Boolean(changed);
 }
 
 function render(options = {}) {
@@ -776,6 +847,7 @@ function render(options = {}) {
   document.getElementById('position-label').textContent = (state.index + 1) + ' / ' + state.dataset.rows.length;
   document.querySelector('#language-button .top-menu-label').textContent = i18n.t('menu.contentLanguage', { language: state.language === 'kn' ? 'ಕನ್ನಡ' : 'English' });
   state.renderer.render(row, state.language);
+  syncQuestionsMenu();
   document.getElementById('renderer-root').scrollTop = 0;
   state.experienceResumes.set(play, {
     experience: play,
@@ -932,6 +1004,7 @@ function closeOverlays({ restoreFocus = true } = {}) {
 async function requestEditMode() {
   setMenuOpen(false);
   if (state.editor.active) return state.editor.toggle();
+  if (state.editor.workspace) return state.editor.enter();
   openOverlay('workspace-overlay');
 }
 
@@ -1153,7 +1226,7 @@ function bindEvents() {
   });
   document.getElementById('retry-data-button').addEventListener('click', startRequestedExperience);
   document.getElementById('home-collections-input').addEventListener('change', (event) => useSelectedCollections(event.target.files));
-  document.getElementById('home-collections-button').addEventListener('click', () => document.getElementById('home-collections-input').click());
+  document.getElementById('home-collections-button').addEventListener('click', chooseHomeCollections);
   document.querySelectorAll('#continue-journey-link, #experience-detail-action').forEach((link) => link.addEventListener('click', (event) => {
     event.preventDefault();
     openHomeExperience(link);
@@ -1173,6 +1246,7 @@ function bindEvents() {
   document.getElementById('about-button').addEventListener('click', (event) => aboutDialog.open(event.currentTarget));
   document.querySelectorAll('[data-about]').forEach((button) => button.addEventListener('click', (event) => aboutDialog.open(event.currentTarget)));
   document.getElementById('language-button').addEventListener('click', () => openOverlay('language-overlay'));
+  document.getElementById('questions-button').addEventListener('click', toggleQuestions);
   document.getElementById('home-button').addEventListener('click', goHome);
   document.getElementById('journey-button').addEventListener('click', openJourneyDetails);
   document.getElementById('journey-details-button').addEventListener('click', openJourneyDetails);
@@ -1266,6 +1340,8 @@ function bindEvents() {
         event.preventDefault(); goHome();
       } else if (menuKey === 'j') {
         event.preventDefault(); openJourneyDetails();
+      } else if (menuKey === 'q' && state.renderer?.supportsQuestions) {
+        event.preventDefault(); toggleQuestions();
       } else if (menuKey === 'k') {
         event.preventDefault(); openOverlay('about-overlay');
       } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -1309,6 +1385,7 @@ function bindEvents() {
     else if (key === 'h') { event.preventDefault(); openOverlay('help-overlay'); }
     else if (key === 'k') { event.preventDefault(); openOverlay('about-overlay'); }
     else if (key === 'm') { event.preventDefault(); toggleMenu(); }
+    else if (key === 'q' && state.renderer?.supportsQuestions) { event.preventDefault(); toggleQuestions(); }
     else if (key === 'e') { event.preventDefault(); requestEditMode(); }
   });
 }

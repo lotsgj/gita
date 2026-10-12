@@ -35,7 +35,7 @@ Choosing an experience preserves the profile identifier and preferred content la
 
 ## Collection source
 
-Home establishes one collection source for the rest of the session. Under HTTP, HTTPS and installed-PWA use, Gitaverse automatically uses the deployed relative `data/collections` path. Under `file://`, Home shows a **Local collections** section at the bottom and asks the person to select the repository’s `data/collections` folder. Once ready, the section shows the active folder and offers **Change collections**.
+Home establishes one collection source for the rest of the session. Under HTTP, HTTPS and installed-PWA use, Gitaverse automatically uses the deployed relative `data/collections` path. Under `file://`, Home shows a **Local collections** section at the bottom. In browsers with writable-folder support, one selection supplies both reading and later editing permission for the session; Edit therefore does not ask for the same folder again. Gitaverse accepts the repository root, `data`, or `data/collections` and resolves the collection root. Browsers without that API fall back to a read-only folder upload and may require a later writable-folder selection for direct saves. Once ready, the section shows the active folder and offers **Change collections**.
 
 The selected local files, parsed experience datasets and media object URLs are reused by Your journey, Gita Yoga, Gita 700 and Gita Sara for the current browser session. Individual views do not show their own folder chooser. Changing the folder on Home releases local media URLs and invalidates parsed data before the replacement is validated. A direct file-mode experience URL retains its requested SID, routes through Home for the collection choice, and continues automatically afterward.
 

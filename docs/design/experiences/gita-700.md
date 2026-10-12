@@ -1,11 +1,13 @@
 # Gita 700
 
 **Status:** Current  
-**Last updated:** 29 September 2026
+**Last updated:** 12 October 2026
 
 ## Purpose
 
 Gita 700 is the current verse study and chanting experience. Its visual treatment is serene and text-first, using warm, restrained panel colors rather than changing background motifs.
+
+See the [Gita 700 catalog-to-player example](../system/catalog-to-player.md#gita-700) for how its complete sequence, chanting audio, and chapter icons become the four-panel experience.
 
 ## Four panels
 

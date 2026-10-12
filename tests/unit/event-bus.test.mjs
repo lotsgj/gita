@@ -43,6 +43,8 @@ test('event schema rejects unknown and incomplete events', () => {
   const bus = new EventBus();
   assert.throws(() => bus.emit('unknown_event'), /Unknown Gitaverse event/);
   assert.throws(() => bus.emit('location_changed', { profileId: 7, context: { experience: 'gita-700' } }), /requires experience and sid/);
+  assert.throws(() => bus.emit('gita_sara_view_changed', { details: { view: 'questions and private content' } }), /approved view/);
+  assert.equal(bus.emit('gita_sara_view_changed', { details: { view: 'two_panel' } }).details.view, 'two_panel');
 });
 
 test('Diksoochi records only meaningful engagement thresholds without storing an event queue', async () => {
@@ -94,6 +96,23 @@ test('Clarity receives only allowlisted analytics values', () => {
   assert.ok(calls.some((call) => call[0] === 'set' && call[1] === 'app_version' && call[2] === '1.test'));
   assert.equal(JSON.stringify(calls).includes('must-not-be-sent'), false);
   assert.equal(JSON.stringify(calls).includes('99'), false);
+});
+
+test('Clarity receives the Gita Sara view-change event without panel content', () => {
+  const target = {};
+  const clarity = new ClarityAdapter({
+    projectId: 'test123', target,
+    documentRef: { head: { appendChild() {} }, createElement: () => ({ dataset: {} }), querySelector: () => null }
+  });
+  clarity.handle({
+    event: 'gita_sara_view_changed',
+    context: { ageBand: '35-44', experience: 'gita-sara', appVersion: '1.test' },
+    details: { view: 'two_panel' }
+  });
+  const calls = target.clarity.q.map((args) => Array.from(args));
+  assert.ok(calls.some((call) => call[0] === 'event' && call[1] === 'gita_sara_view_changed'));
+  assert.ok(calls.some((call) => call[0] === 'set' && call[1] === 'gita_sara_view' && call[2] === 'two_panel'));
+  assert.equal(JSON.stringify(calls).includes('question'), false);
 });
 
 test('Clarity captures the privacy-safe PWA update lifecycle without a profile', () => {

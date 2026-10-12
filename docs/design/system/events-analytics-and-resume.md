@@ -1,7 +1,7 @@
 # Events, analytics and resume
 
 **Status:** Current  
-**Last updated:** 1 October 2026
+**Last updated:** 12 October 2026
 
 ## Event bus
 
@@ -25,6 +25,8 @@ Clarity receives age band, grouped gender, profile interface language, content l
 ## Engagement events
 
 Current mappings cover app/profile/experience actions, language and navigation, verse views and time thresholds, and audio start, resume, pause, seek, quartiles, completion, and failure.
+
+Gita Sara emits `gita_sara_view_changed` with only `two_panel` or `three_panel`. It measures use of the optional contemplation panel without transmitting questions, verse text, or a personal response.
 
 PWA mappings cover update available, accepted, dismissed, completed and failed. `app_version` and display mode are initialized as Clarity session tags even before a profile event. PWA lifecycle events may run without profile context and carry only applicable source/target versions plus completion result or failure stage. The same waiting version produces only one available event per page session.
 

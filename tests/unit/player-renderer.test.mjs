@@ -29,17 +29,19 @@ function rootFixture() {
       for (const match of value.matchAll(/data-sara-panel="([^"]+)"/g)) saraPanels.set(match[1], element());
       for (const match of value.matchAll(/data-deck-action="([^"]+)"/g)) actions.set(match[1], element());
       for (const match of value.matchAll(/data-(media-action|text-action)="([^"]+)"/g)) actions.set(`${match[1]}:${match[2]}`, element());
+      for (const match of value.matchAll(/data-sara-view-action="([^"]+)"/g)) actions.set(`sara-view-action:${match[1]}`, element());
       saraPanels.forEach((panel) => { panel.querySelector = (selector) => this.querySelector(selector); });
     },
     querySelector(selector) {
-      const match = selector.match(/^\[data-(role|panel|language-panel|sara-panel|deck-action|media-action|text-action)="([^"]+)"\]$/);
+      const match = selector.match(/^\[data-(role|panel|language-panel|sara-panel|deck-action|media-action|text-action|sara-view-action)="([^"]+)"\]$/);
       if (!match) return null;
-      if (match[1] === 'media-action' || match[1] === 'text-action') return actions.get(`${match[1]}:${match[2]}`);
+      if (match[1] === 'media-action' || match[1] === 'text-action' || match[1] === 'sara-view-action') return actions.get(`${match[1]}:${match[2]}`);
       return (match[1] === 'role' ? roles : match[1] === 'panel' ? panels : match[1] === 'language-panel' ? languagePanels : match[1] === 'sara-panel' ? saraPanels : actions).get(match[2]);
     },
     querySelectorAll(selector) {
       const values = Array.from(roles.values());
       if (selector === '[data-edit-field]') return values.filter((value) => value.dataset.editField);
+      if (selector === '[data-sara-view-action]') return Array.from(actions.entries()).filter(([key]) => key.startsWith('sara-view-action:')).map(([, value]) => value);
       return values;
     },
     get(role) { return roles.get(role); },
@@ -131,6 +133,10 @@ test('the Gita-Sara renderer uses one semantic text model and the preferred cont
   assert.equal(root.get('meaning').dataset.field, 'languages.kn.meaning');
   assert.equal(root.get('meaning').textContent, 'ಕನ್ನಡ ಅರ್ಥ');
   assert.equal(root.get('word').textContent, 'ಪದ — ಅರ್ಥ');
+  assert.equal(root.hasClass('gita-sara-questions-hidden'), false);
+  assert.equal(renderer.toggleQuestions(), true);
+  assert.equal(root.hasClass('gita-sara-questions-hidden'), true);
+  assert.equal(root.querySelector('[data-sara-panel="questions"]').hidden, true);
   renderer.setEditing(true);
   assert.equal(renderer.editableElements().length, 4);
 });

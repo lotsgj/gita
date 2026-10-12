@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">How Gitaverse catalogs become experiences</title>
+  <desc id="desc">Canonical verse masters join an authoritative experience sequence, experience compositions, and reusable media catalogs before the shared loader creates normalized datasets for Gita 700, Gita Yoga, and Gita Sara.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f6f0e5}.card{fill:#fffaf1;stroke:#d9cdb9;stroke-width:2}.sequence{fill:#fff1d2;stroke:#c46b32;stroke-width:3}.registry{fill:#e7efec;stroke:#6f8d83;stroke-width:2}.loader{fill:#294a72}.branch700{fill:#f3dfb6;stroke:#b66a32;stroke-width:2}.branchYoga{fill:#e0e9f2;stroke:#466a91;stroke-width:2}.branchSara{fill:#e1ebe4;stroke:#68816e;stroke-width:2}.title{font:700 32px 'Noto Sans',sans-serif;fill:#2c251e}.heading{font:700 22px 'Noto Sans',sans-serif;fill:#2c251e}.body{font:400 17px 'Noto Sans',sans-serif;fill:#51483e}.small{font:400 14px 'Noto Sans',sans-serif;fill:#6d6257}.white{fill:#fffaf1}.line{fill:none;stroke:#9a8874;stroke-width:3;marker-end:url(#arrow)}.join{fill:none;stroke:#c46b32;stroke-width:4;marker-end:url(#arrowAccent)}
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#9a8874"/></marker>
+    <marker id="arrowAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#c46b32"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="900" rx="32"/>
+  <text class="title" x="600" y="55" text-anchor="middle">How catalogs become experiences</text>
+
+  <rect class="card" x="50" y="95" width="330" height="155" rx="22"/>
+  <text class="heading" x="75" y="130">Canonical verse content</text>
+  <text class="body" x="75" y="164">master_sa.csv</text>
+  <text class="body" x="75" y="192">master_en.csv</text>
+  <text class="body" x="75" y="220">master_kn.csv</text>
+  <text class="small" x="350" y="230" text-anchor="end">All canonical SIDs</text>
+
+  <rect class="sequence" x="435" y="95" width="330" height="155" rx="22"/>
+  <text class="heading" x="460" y="130">sequence.csv</text>
+  <text class="body" x="460" y="164">Selects the experience’s SIDs</text>
+  <text class="body" x="460" y="192">Defines exact player order</text>
+  <text class="body" x="460" y="220">Drives counts, nav and resume</text>
+
+  <rect class="card" x="820" y="95" width="330" height="155" rx="22"/>
+  <text class="heading" x="845" y="130">Experience composition</text>
+  <text class="body" x="845" y="164">audio · illustrations · decks</text>
+  <text class="body" x="845" y="192">contemplations · media order</text>
+  <text class="small" x="845" y="222">References collection + SID + order</text>
+
+  <path class="join" d="M380 172h45"/>
+  <path class="join" d="M765 172h45"/>
+
+  <rect class="registry" x="150" y="310" width="900" height="150" rx="24"/>
+  <text class="heading" x="600" y="348" text-anchor="middle">Reusable collection hierarchy</text>
+  <text class="body" x="600" y="383" text-anchor="middle">&lt;type&gt;/collection.csv → &lt;collection&gt;/catalog.csv → physical asset</text>
+  <text class="body" x="600" y="417" text-anchor="middle">Localized metadata · cue-purpose.csv · cue.csv</text>
+  <text class="small" x="600" y="442" text-anchor="middle">SID + order uniquely identifies an asset</text>
+  <path class="line" d="M985 250v45H600v5"/>
+
+  <rect class="loader" x="325" y="520" width="550" height="100" rx="50"/>
+  <text class="heading white" x="600" y="560" text-anchor="middle">Shared collection data loader</text>
+  <text class="body white" x="600" y="590" text-anchor="middle">Validates and creates normalized experience rows</text>
+  <path class="line" d="M600 460v50"/>
+
+  <path class="line" d="M600 620v50H215v28"/>
+  <path class="line" d="M600 620v78"/>
+  <path class="line" d="M600 620v50h385v28"/>
+
+  <rect class="branch700" x="55" y="700" width="320" height="150" rx="22"/>
+  <text class="heading" x="215" y="738" text-anchor="middle">Gita 700</text>
+  <text class="body" x="215" y="772" text-anchor="middle">Complete 746-row sequence</text>
+  <text class="body" x="215" y="800" text-anchor="middle">Chanting + chapter icons</text>
+  <text class="small" x="215" y="828" text-anchor="middle">Four-panel renderer</text>
+
+  <rect class="branchYoga" x="440" y="700" width="320" height="150" rx="22"/>
+  <text class="heading" x="600" y="738" text-anchor="middle">Gita Yoga</text>
+  <text class="body" x="600" y="772" text-anchor="middle">Learning sequence</text>
+  <text class="body" x="600" y="800" text-anchor="middle">Composite audio + cue regions</text>
+  <text class="small" x="600" y="828" text-anchor="middle">Three-language learning renderer</text>
+
+  <rect class="branchSara" x="825" y="700" width="320" height="150" rx="22"/>
+  <text class="heading" x="985" y="738" text-anchor="middle">Gita Sara</text>
+  <text class="body" x="985" y="772" text-anchor="middle">Curated 135-SID sequence</text>
+  <text class="body" x="985" y="800" text-anchor="middle">Media + reflection compositions</text>
+  <text class="small" x="985" y="828" text-anchor="middle">Three-panel contemplative renderer</text>
+</svg>

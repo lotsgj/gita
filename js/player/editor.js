@@ -16,6 +16,7 @@ export class InlineEditor {
     this.savedRevision = 0;
     this.changedLanguages = new Set();
     this.changedDataFiles = new Map();
+    this.changedAssets = new Map();
     this.toolbar = this.createToolbar();
     this.handleInput = this.handleInput.bind(this);
     this.beforeUnload = this.beforeUnload.bind(this);
@@ -105,7 +106,7 @@ export class InlineEditor {
       }
       element.setAttribute('aria-invalid', 'false');
     });
-    let additional = { changes: [], files: [] };
+    let additional = { changes: [], files: [], assets: [] };
     try {
       additional = this.renderer.collectAdditionalEdits?.() || additional;
     } catch (error) {
@@ -126,9 +127,11 @@ export class InlineEditor {
     try {
       let savedFiles = [];
       if (this.workspace && languages.size) savedFiles.push(...await this.workspace.saveLanguageMasters(this.dataset, languages));
+      if (this.workspace && additional.assets?.length) savedFiles.push(...await this.workspace.saveAssets(additional.assets));
       if (this.workspace && additional.files.length) savedFiles.push(...await this.workspace.saveCollectionTables(additional.files));
       languages.forEach((language) => this.changedLanguages.add(language));
       additional.files.forEach((entry) => this.changedDataFiles.set(entry.url, entry.table));
+      (additional.assets || []).forEach((entry) => this.changedAssets.set(entry.url, entry.file));
       this.dirty = false;
       this.savedChanges = true;
       this.pendingDownload = !this.workspace;
@@ -185,6 +188,16 @@ export class InlineEditor {
       const parts = path.split('/');
       link.href = url;
       link.download = parts.slice(-2).join('-');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+    for (const [path, file] of this.changedAssets) {
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(file);
+      link.href = url;
+      link.download = path.split('/').pop();
       document.body.appendChild(link);
       link.click();
       link.remove();

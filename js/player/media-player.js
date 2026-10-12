@@ -3,6 +3,7 @@ export function createMediaPlayer({ translate = (_key, fallback) => fallback } =
   let items = [];
   let index = 0;
   let language = 'en';
+  let paintVersion = 0;
 
   function mount(container) {
     panel = container;
@@ -18,6 +19,7 @@ export function createMediaPlayer({ translate = (_key, fallback) => fallback } =
 
   function paint() {
     if (!panel) return;
+    const version = ++paintVersion;
     const stage = panel.querySelector('[data-role="media-stage"]');
     const caption = panel.querySelector('[data-role="media-caption"]');
     const previous = panel.querySelector('[data-media-action="previous"]');
@@ -29,20 +31,46 @@ export function createMediaPlayer({ translate = (_key, fallback) => fallback } =
     caption.hidden = true;
     caption.textContent = '';
     if (!item) return;
-    if (item.mediaType === 'image') {
+    if (item.mediaType === 'image' || item.mediaType === 'animated_image') {
       const image = document.createElement('img');
-      const localized = item.localized?.[language] || item.localized?.en || {};
       image.className = 'gita-sara-media-image';
-      image.src = item.resolvedUrl || item.imageUrl;
-      image.alt = localized.altText || '';
-      image.addEventListener('error', () => {
+      let activeItem = item;
+      const paintMetadata = () => {
+        const localized = activeItem.localized?.[language] || activeItem.localized?.en || {};
+        image.alt = localized.altText || '';
+        caption.textContent = localized.caption || '';
+        caption.hidden = !localized.caption;
+      };
+      const sourceFor = (candidate) => candidate?.resolvedUrl || candidate?.imageUrl || '';
+      const showFallback = () => {
+        if (version !== paintVersion) return;
+        if (activeItem === item && item.fallback) {
+          activeItem = item.fallback;
+          paintMetadata();
+          const fallbackSource = sourceFor(activeItem);
+          image.src = fallbackSource;
+          return;
+        }
         stage.innerHTML = `<p class="gita-sara-media-error">${translate('gitaSara.mediaUnavailable', 'Illustration unavailable')}</p>`;
-      }, { once: true });
+      };
+      image.addEventListener('error', () => {
+        showFallback();
+      });
       stage.appendChild(image);
-      if (localized.caption) {
-        caption.textContent = localized.caption;
-        caption.hidden = false;
-      }
+      if (!item.resolvedUrl && item.fallback) activeItem = item.fallback;
+      paintMetadata();
+      const source = sourceFor(activeItem);
+      const requiresAvailabilityCheck = activeItem === item && !item.isExternal && source && !/^(blob:|data:)/i.test(source);
+      if (requiresAvailabilityCheck) {
+        fetch(source, { method: 'HEAD' })
+          .then((response) => {
+            if (version !== paintVersion) return;
+            if (response.ok) image.src = source;
+            else showFallback();
+          })
+          .catch(showFallback);
+      } else if (source) image.src = source;
+      else showFallback();
     } else if (item.mediaType === 'google_deck') {
       const frame = document.createElement('iframe');
       frame.className = 'gita-sara-deck-frame';
@@ -52,6 +80,8 @@ export function createMediaPlayer({ translate = (_key, fallback) => fallback } =
       frame.allowFullscreen = true;
       frame.referrerPolicy = 'strict-origin-when-cross-origin';
       stage.appendChild(frame);
+    } else if (item.mediaType === 'video') {
+      stage.innerHTML = `<p class="gita-sara-media-error">${translate('gitaSara.videoComing', 'Video support is coming')}</p>`;
     }
   }
 

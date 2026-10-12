@@ -30,6 +30,7 @@ export const EVENT_NAMES = new Set([
   'audio_75',
   'audio_completed',
   'audio_failed',
+  'gita_sara_view_changed',
   'rachana_opened',
   'rachana_page_viewed',
   'rachana_navigation_opened',
@@ -54,6 +55,9 @@ export function validateEventInput(name, input = {}) {
   }
   if ((name === 'location_changed' || name === 'home_opened') && !Number.isInteger(Number(input.profileId))) {
     throw new Error(name + ' requires a profile ID.');
+  }
+  if (name === 'gita_sara_view_changed' && !['two_panel', 'three_panel'].includes(input.details?.view)) {
+    throw new Error('gita_sara_view_changed requires an approved view.');
   }
 }
 

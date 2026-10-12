@@ -59,6 +59,7 @@ export class ClarityAdapter {
       this.setTag('update_to_version', event.details.toVersion);
       this.setTag('update_result', event.details.result || event.details.stage);
     }
+    if (event.event === 'gita_sara_view_changed') this.setTag('gita_sara_view', event.details.view);
 
     const eventName = this.eventName(event);
     if (eventName) this.target.clarity('event', eventName);
@@ -76,6 +77,7 @@ export class ClarityAdapter {
       'verse_viewed', 'verse_engaged_10s', 'verse_engaged_30s', 'verse_engaged_60s',
       'audio_started', 'audio_resumed', 'audio_paused', 'audio_seeked', 'audio_25', 'audio_50',
       'audio_75', 'audio_completed', 'audio_failed',
+      'gita_sara_view_changed',
       'rachana_opened', 'rachana_page_viewed', 'rachana_navigation_opened', 'rachana_profile_selected',
       'rachana_about_opened', 'rachana_gitaverse_opened', 'rachana_document_failed'
     ]);

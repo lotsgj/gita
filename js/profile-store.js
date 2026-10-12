@@ -128,6 +128,7 @@ export class ProfileStore {
     const defaultPid = await requestResult(settings.get('defaultPid'));
     if (defaultPid && Number(defaultPid.value) === Number(pid)) settings.delete('defaultPid');
     settings.delete(`journeyView:${Number(pid)}`);
+    settings.delete(`gitaSaraView:${Number(pid)}`);
     transaction.objectStore(RESUME_STORE).delete(Number(pid));
     const engagement = transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid');
     const engagementCursor = engagement.openKeyCursor(IDBKeyRange.only(Number(pid)));
@@ -241,6 +242,22 @@ export class ProfileStore {
     if (!Number.isInteger(Number(pid)) || !['cards', 'table'].includes(view)) return;
     const transaction = this.database.transaction(SETTINGS_STORE, 'readwrite');
     transaction.objectStore(SETTINGS_STORE).put({ key: `journeyView:${Number(pid)}`, value: view });
+    await transactionDone(transaction);
+  }
+
+  async getGitaSaraView(pid) {
+    await this.open();
+    if (!Number.isInteger(Number(pid))) return null;
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readonly');
+    const setting = await requestResult(transaction.objectStore(SETTINGS_STORE).get(`gitaSaraView:${Number(pid)}`));
+    return ['two_panel', 'three_panel'].includes(setting?.value) ? setting.value : null;
+  }
+
+  async setGitaSaraView(pid, view) {
+    await this.open();
+    if (!Number.isInteger(Number(pid)) || !['two_panel', 'three_panel'].includes(view)) return;
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readwrite');
+    transaction.objectStore(SETTINGS_STORE).put({ key: `gitaSaraView:${Number(pid)}`, value: view });
     await transactionDone(transaction);
   }
 

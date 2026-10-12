@@ -74,6 +74,16 @@ async function run() {
     await page.getByRole('heading', { name: 'Rachana — Gitaverse design details', level: 1 }).waitFor();
     assert.equal(new URL(page.url()).searchParams.get('page'), 'rachana-design');
 
+    await page.getByLabel('Rachana navigation').getByRole('link', { name: 'How catalogs become experiences' }).click();
+    await page.getByRole('heading', { name: 'How catalogs become experiences', level: 1 }).waitFor();
+    assert.equal(new URL(page.url()).searchParams.get('page'), 'catalog-to-player');
+    const catalogDiagram = await page.getByAltText('Catalog hierarchy from canonical verses through experience sequence and reusable collections to the three renderers').evaluate((image) => ({
+      source: image.getAttribute('src'), resolvedSource: image.src, complete: image.complete, naturalWidth: image.naturalWidth
+    }));
+    assert.ok(catalogDiagram.complete && catalogDiagram.naturalWidth > 0, `catalog diagram failed to load: ${JSON.stringify(catalogDiagram)}`);
+    await page.goBack();
+    await page.getByRole('heading', { name: 'Rachana — Gitaverse design details', level: 1 }).waitFor();
+
     await page.getByLabel('Rachana navigation').getByRole('link', { name: 'Sampada' }).click();
     await page.getByRole('heading', { name: 'Sampada — Treasure trove of Gitaverse enhancements', level: 1 }).waitFor();
     assert.equal(new URL(page.url()).searchParams.get('page'), 'sampada');

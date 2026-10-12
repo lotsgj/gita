@@ -1,11 +1,13 @@
 # Gita Yoga
 
 **Status:** Current  
-**Last updated:** 9 October 2026
+**Last updated:** 12 October 2026
 
 ## Purpose
 
 Gita Yoga supports **Vak Shuddhi through guided Gita chanting**. It brings the Sanskrit verse, its word-by-word form, Kannada and English transliterations, meanings, and word meanings into one learning view. The experience is available from Diksoochi and appears above Gita 700 in **Choose an experience**.
+
+See the [Gita Yoga catalog-to-player example](../system/catalog-to-player.md#gita-yoga) for the relationship between its sequence, learning-audio catalog, and cue metadata.
 
 ## Layout
 

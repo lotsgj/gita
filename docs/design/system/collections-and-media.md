@@ -1,7 +1,7 @@
 # Collections and media
 
 **Status:** Current  
-**Last updated:** 10 October 2026
+**Last updated:** 12 October 2026
 
 ## Organization
 
@@ -15,6 +15,8 @@ data/collections/experiences/<experience>/...
 ```
 
 Current type registries include verses, audio, decks, images, text, video, and animations. Registries locate a collection catalog; catalogs locate individual content. Experience files compose those reusable records for an experience-specific purpose.
+
+See [How catalogs become experiences](catalog-to-player.md) for the complete hierarchy, the authoritative role of `sequence.csv`, and worked Gita 700, Gita Yoga, and Gita Sara examples.
 
 ## Verse masters
 
@@ -43,17 +45,17 @@ Gita 700’s image composition references its chapter icons through the same reu
 
 ## Gita Sara
 
-Gita Sara is a registered experience with 135 explicitly ordered SIDs: nine Dhyana verses followed by 126 selected Gita shlokas. Its `sequence.csv` owns this experience order independently of the 746-row canonical master order. The matching audio and deck compositions contain the same 135 identities in that order.
+Gita Sara is a registered experience with 135 explicitly ordered SIDs: nine Dhyana verses followed by 126 selected Gita shlokas. Its `sequence.csv` is the sole owner of experience membership and order independently of the 746-row canonical master order. Audio remains a complete purpose-specific manifest; optional media compositions are sparse.
 
 Gita Sara’s audio composition references the reusable Swami Brahmananda collection for all 126 numbered shlokas. The nine Dhyana rows remain present with blank audio references because that collection has no matching recordings.
 
-The reusable `deck` type has a Google-deck collection whose catalog uses `sid#order#language#deck_url#title`. It contains one explicit slot per Gita Sara SID, with approved sample deck associations for `1.1` and `2.47`; all other slots intentionally remain blank until their deck is authored. Experience composition uses `sid#order#deck_collection#deck_order`, allowing more than one explicitly ordered deck per SID.
+The reusable `deck` type has a Google-deck collection whose catalog uses `sid#order#language#deck_url#title` and contains only real deck assets. Experience composition uses `sid#order#deck_collection#deck_order`, allowing more than one explicitly ordered deck per SID. A SID without a deck has no composition row.
 
 The loader converts an approved Google Slides share URL to an HTTPS embed URL and adds `rm=minimal` together with non-autoplay parameters. A missing deck never blocks text or audio.
 
-The three-panel renderer uses reusable illustrations and contemplation lines. Illustration catalogs use `sid#order#image_url`; English and Kannada metadata use `sid#order#alt_text#caption`. Text catalogs use `sid#order#line_type`; localized masters use `sid#order#text`. Catalog and localized records must align exactly by SID plus order.
+The three-panel renderer uses reusable illustrations and contemplation lines. Illustration catalogs use `sid#order#image_url`; English and Kannada metadata use `sid#order#alt_text#caption`. A local catalog entry is valid only when its file exists, and files use `<sid>-<order>.webp`, for example `1.1-1.webp`. Text catalogs use `sid#order#line_type`; localized masters use `sid#order#text`. Catalog and localized records align exactly by SID plus order.
 
-Gita Sara composes source-specific assets through `illustrations.csv`, `decks.csv`, and `contemplations.csv`. Its unified `media.csv` supplies the cross-type order through `media_type`, collection, and asset order, allowing images and Google decks to appear in one stream. Every composition includes all 135 selected SIDs with blank placeholders where authored content is unavailable.
+Gita Sara composes source-specific assets through sparse `illustrations.csv`, `decks.csv`, and `contemplations.csv` files. Its sparse unified `media.csv` supplies cross-type order through `media_type`, collection, and asset order. Composition rows exist only for actual associations; their SIDs must belong to `sequence.csv` and remain in its relative order. Missing illustration or contemplation associations resolve to shared defaults.
 
 Image URLs may be app-relative or absolute HTTPS URLs. Unsafe schemes, protocol-relative URLs, and root-relative paths are rejected. Normalized media retains the catalog `sourceUrl`, renderer `resolvedUrl`, and `isExternal` state. Reusable image and question defaults are declared once in `experience.json` and applied only when no authored media or question exists. The normalized model exposes `media.items` and `contemplation.lines`, including localized content and `isFallback` markers.
 
@@ -76,4 +78,4 @@ The loader verifies required headers, unique/aligned SIDs, supported schema vers
 
 ## Runtime source
 
-A shared collection-source service owns runtime loading. Web and PWA sessions use the deployed relative collection root; file-mode sessions use the folder selected on Home. It caches normalized datasets by experience for the session so player and journey views reuse identical data. Replacing a local folder clears those datasets and revokes their media object URLs. Writable editing remains a separate permission layered over the same collection structure.
+A shared collection-source service owns runtime loading. Web and PWA sessions use the deployed relative collection root; file-mode sessions use the folder selected on Home. When the browser supports writable directory handles, the source retains that handle for the session and supplies the matching writable workspace to every loaded experience, eliminating a second Edit selection. Repository-root, `data`, and `data/collections` selections resolve to the same canonical root. It caches normalized datasets by experience for the session so player and journey views reuse identical data. Replacing a local folder clears those datasets and revokes their media object URLs. Read-only folder upload remains the compatibility fallback.

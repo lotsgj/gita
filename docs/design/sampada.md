@@ -1,7 +1,7 @@
 # Sampada — Treasure trove of Gitaverse enhancements
 
 **Status:** Current  
-**Last updated:** 10 October 2026
+**Last updated:** 12 October 2026
 
 Sampada keeps both future possibilities and completed enhancements. Items retain their number after completion so decisions and delivery history remain traceable.
 
@@ -167,13 +167,13 @@ Missing or invalid cue metadata must not block the full recording, verse text, o
 
 Expand Gita Sara beyond its initial Google-deck medium while preserving the canonical shloka and meaning as the complete foundational experience. Add reusable collections and player adapters for images, native video, GIF and other animation, and localized text-contemplation slides. Allow one SID to compose these types into a mixed, explicitly ordered media set without placing physical asset paths in the experience renderer.
 
-The first delivery is complete: reusable localized illustration and contemplation collections, a unified image/Google-deck sequence, safe relative or HTTPS image resolution, shared defaults, and the fixed three-panel renderer with media and question controls are in place. Native video, GIF, other media types, offline external-media packages, and collection editing remain deferred.
+The first delivery is complete: reusable localized illustration and contemplation collections, a unified media sequence, safe relative or HTTPS image resolution, shared defaults, and the fixed three-panel renderer with media and question controls are in place. Edit mode now manages images, animated GIFs, Google Decks, bilingual metadata and questions with preview, ordering, removal, writable-folder saves and download fallback. Native video, other media types, offline external-media packages, attribution editing, and choosing among multiple authoring collections remain deferred.
 
 Extend the media-set editor to add and preview compatible reusable assets, change URLs and metadata, reorder associations, remove an association without deleting its source asset, and maintain accessibility, attribution and licensing information. Media failures or unavailable items must not block verse text or navigation.
 
-#### Gita Sara media and question editing
+#### Gita Sara media and question editing — delivered foundation
 
-Extend row edit mode into the media and contemplation panels. The media editor should list the current mixed image/Google-deck sequence, preview each asset, add either supported type, edit its source fields and localized metadata, reorder items with up/down controls, and remove an association from the current shloka without silently deleting the reusable asset. Image editing covers a relative or HTTPS URL plus required English/Kannada alternative text and optional captions; Google-deck editing covers its source URL and title.
+Row edit mode now extends into the media and contemplation panels. The media editor lists the current mixed image/GIF/Google-deck sequence, previews each asset, adds a supported type, edits source fields and localized metadata, reorders items with up/down controls, and removes an association from the current shloka without silently deleting the reusable asset. Image editing covers a relative or HTTPS URL plus required English/Kannada alternative text and optional captions; Google-deck editing covers its source URL and title.
 
 The question editor should manage an explicitly ordered bilingual list with required English and Kannada text. It should add, edit, reorder, and remove questions. Removing every authored item remains valid: normal playback then receives the shared transformation image and Truth question. Playback navigation and the one/all question toggle remain hidden while editing.
 
@@ -182,6 +182,16 @@ The question editor should manage an explicitly ordered bilingual list with requ
 Add native and offline-capable deck alternatives, including exported slide-image sets or video, together with explicit **Make available offline** packages and storage estimates. Reuse the shared media resolver, cache identity, event model and editing lifecycle across Gita Sara and any later Gita Yoga or Gita 700 media enhancements. Google-deck support remains the deliberately narrow first Gita Sara delivery; this item begins only after that experience is implemented and verified.
 
 ## Done
+
+### 15. Gita Sara focused two-panel view
+
+**Status:** Done
+
+**Tag:** Minor
+
+**Completed:** 12 October 2026
+
+Gita Sara can hide or restore its contemplation questions with `Q` or the shared-menu **Questions (On/Off)** item. The menu item is capability-driven so Gita 700 and Gita Yoga can adopt it when their question experience is designed; unsupported renderers hide it. Desktop preserves the media panel’s exact one-third dimensions and gives the removed panel space to the verse. Bounded larger targets emphasize Sanskrit and meaning while also allowing transliteration and word-by-word meaning to use the available space; fit logic protects long content. Invariant media dimensions preserve image, animation and deck framing without per-asset treatments. Mobile retains full-width vertical stacking and its established type scale. The preference persists per profile, remains stable through navigation and fullscreen, and emits only the privacy-safe selected view to analytics.
 
 ### 12. Gita Yoga foundation
 

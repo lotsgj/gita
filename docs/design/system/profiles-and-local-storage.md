@@ -1,11 +1,13 @@
 # Profiles and local storage
 
 **Status:** Current  
-**Last updated:** 9 October 2026
+**Last updated:** 12 October 2026
 
 ## Storage model
 
 Profiles and resume locations are stored in the browser’s IndexedDB for the Gitaverse origin. The store supports multiple profiles, incremental numeric IDs, a default profile, profile editing, deletion/management, the current screen, and one resume point per profile and experience.
+
+Small presentation preferences also live in the settings store under profile-specific keys. These include Your journey card/table view and Gita Sara’s `two_panel`/`three_panel` view. They are presentation state rather than content and are removed with the profile.
 
 Diksoochi keeps one aggregate engagement record per profile, experience and SID in `diksoochiEngagement`. It stores chapter identity, first and latest meaningful engagement times, meaningful visit count, and the highest observed engagement threshold. This is bounded summary state, not an analytics event queue. Deleting a profile deletes its Diksoochi records.
 

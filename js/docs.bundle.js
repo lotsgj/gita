@@ -288,6 +288,7 @@ class ProfileStore {
     const defaultPid = await requestResult(settings.get('defaultPid'));
     if (defaultPid && Number(defaultPid.value) === Number(pid)) settings.delete('defaultPid');
     settings.delete(`journeyView:${Number(pid)}`);
+    settings.delete(`gitaSaraView:${Number(pid)}`);
     transaction.objectStore(RESUME_STORE).delete(Number(pid));
     const engagement = transaction.objectStore(DIKSOOCHI_ENGAGEMENT_STORE).index('pid');
     const engagementCursor = engagement.openKeyCursor(IDBKeyRange.only(Number(pid)));
@@ -401,6 +402,22 @@ class ProfileStore {
     if (!Number.isInteger(Number(pid)) || !['cards', 'table'].includes(view)) return;
     const transaction = this.database.transaction(SETTINGS_STORE, 'readwrite');
     transaction.objectStore(SETTINGS_STORE).put({ key: `journeyView:${Number(pid)}`, value: view });
+    await transactionDone(transaction);
+  }
+
+  async getGitaSaraView(pid) {
+    await this.open();
+    if (!Number.isInteger(Number(pid))) return null;
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readonly');
+    const setting = await requestResult(transaction.objectStore(SETTINGS_STORE).get(`gitaSaraView:${Number(pid)}`));
+    return ['two_panel', 'three_panel'].includes(setting?.value) ? setting.value : null;
+  }
+
+  async setGitaSaraView(pid, view) {
+    await this.open();
+    if (!Number.isInteger(Number(pid)) || !['two_panel', 'three_panel'].includes(view)) return;
+    const transaction = this.database.transaction(SETTINGS_STORE, 'readwrite');
+    transaction.objectStore(SETTINGS_STORE).put({ key: `gitaSaraView:${Number(pid)}`, value: view });
     await transactionDone(transaction);
   }
 
@@ -705,6 +722,7 @@ const EVENT_NAMES = new Set([
   'audio_75',
   'audio_completed',
   'audio_failed',
+  'gita_sara_view_changed',
   'rachana_opened',
   'rachana_page_viewed',
   'rachana_navigation_opened',
@@ -729,6 +747,9 @@ function validateEventInput(name, input = {}) {
   }
   if ((name === 'location_changed' || name === 'home_opened') && !Number.isInteger(Number(input.profileId))) {
     throw new Error(name + ' requires a profile ID.');
+  }
+  if (name === 'gita_sara_view_changed' && !['two_panel', 'three_panel'].includes(input.details?.view)) {
+    throw new Error('gita_sara_view_changed requires an approved view.');
   }
 }
 
@@ -902,6 +923,7 @@ class ClarityAdapter {
       this.setTag('update_to_version', event.details.toVersion);
       this.setTag('update_result', event.details.result || event.details.stage);
     }
+    if (event.event === 'gita_sara_view_changed') this.setTag('gita_sara_view', event.details.view);
 
     const eventName = this.eventName(event);
     if (eventName) this.target.clarity('event', eventName);
@@ -919,6 +941,7 @@ class ClarityAdapter {
       'verse_viewed', 'verse_engaged_10s', 'verse_engaged_30s', 'verse_engaged_60s',
       'audio_started', 'audio_resumed', 'audio_paused', 'audio_seeked', 'audio_25', 'audio_50',
       'audio_75', 'audio_completed', 'audio_failed',
+      'gita_sara_view_changed',
       'rachana_opened', 'rachana_page_viewed', 'rachana_navigation_opened', 'rachana_profile_selected',
       'rachana_about_opened', 'rachana_gitaverse_opened', 'rachana_document_failed'
     ]);

@@ -31,7 +31,12 @@ export function createTextPlayer({ translate = (_key, fallback) => fallback } = 
     const visible = showAll ? lines : lines.slice(index, index + 1);
     stage.replaceChildren(...visible.map((line) => {
       const item = document.createElement('p');
-      item.textContent = line.localized?.[language] || line.localized?.en || '';
+      const number = document.createElement('span');
+      number.className = 'gita-sara-question-number';
+      number.textContent = String(lines.indexOf(line) + 1) + '. ';
+      const text = document.createElement('span');
+      text.textContent = line.localized?.[language] || line.localized?.en || '';
+      item.append(number, text);
       return item;
     }));
     stage.classList.toggle('show-all', showAll);

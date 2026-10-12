@@ -44,6 +44,7 @@
       "pages": [
         { "title": "Architecture overview", "route": "architecture-overview", "path": "design/system/architecture-overview.md" },
         { "title": "Collections and media", "route": "collections-and-media", "path": "design/system/collections-and-media.md" },
+        { "title": "How catalogs become experiences", "route": "catalog-to-player", "path": "design/system/catalog-to-player.md" },
         { "title": "Profiles and local storage", "route": "profiles-and-local-storage", "path": "design/system/profiles-and-local-storage.md" },
         { "title": "Events, analytics and resume", "route": "events-analytics-and-resume", "path": "design/system/events-analytics-and-resume.md" },
         { "title": "PWA cache and updates", "route": "pwa-cache-and-updates", "path": "design/system/pwa-cache-and-updates.md" },

@@ -161,14 +161,20 @@ function selectedSourceRows(sa, sequence) {
   });
 }
 
-function verifyOrderedComposition(referenceRows, composition, label, { multiple = false } = {}) {
+function verifyOrderedComposition(referenceRows, composition, label, { multiple = false, sparse = false } = {}) {
   if (!multiple) return verifyIdentity({ rows: referenceRows }, composition, label);
+  const referenceBySid = new Map(referenceRows.map((row, index) => [row.sid, { row, index }]));
   const groups = new Map();
+  let previousReferenceIndex = -1;
   composition.rows.forEach((row) => {
+    const reference = referenceBySid.get(row.sid);
+    if (!reference || row.cid !== reference.row.cid || row.snum !== reference.row.snum) throw new Error(label + ' contains an invalid identity at ' + row.sid + '.');
+    if (reference.index < previousReferenceIndex) throw new Error(label + ' is not in selected SID order at ' + row.sid + '.');
+    previousReferenceIndex = reference.index;
     if (!groups.has(row.sid)) groups.set(row.sid, []);
     groups.get(row.sid).push(row);
   });
-  if (groups.size !== referenceRows.length) throw new Error(label + ' does not contain every selected SID.');
+  if (!sparse && groups.size !== referenceRows.length) throw new Error(label + ' does not contain every selected SID.');
   referenceRows.forEach((row) => {
     const entries = groups.get(row.sid) || [];
     entries.sort((left, right) => Number(left.order) - Number(right.order));
@@ -282,16 +288,25 @@ export function normalizeCollectionData({ sa, en, kn, sequence = null, audioComp
   verifyIdentity(sa, imageComposition, 'Experience image composition');
   const sourceRows = selectedSourceRows(sa, sequence);
   verifyOrderedComposition(sourceRows, audioComposition, 'Experience audio composition');
-  if (deckComposition) verifyOrderedComposition(sourceRows, deckComposition, 'Experience deck composition', { multiple: true });
-  if (illustrationComposition) verifyOrderedComposition(sourceRows, illustrationComposition, 'Experience illustration composition', { multiple: true });
-  if (contemplationComposition) verifyOrderedComposition(sourceRows, contemplationComposition, 'Experience contemplation composition', { multiple: true });
-  if (mediaComposition) verifyOrderedComposition(sourceRows, mediaComposition, 'Experience media composition', { multiple: true });
+  if (deckComposition) verifyOrderedComposition(sourceRows, deckComposition, 'Experience deck composition', { multiple: true, sparse: true });
+  if (illustrationComposition) verifyOrderedComposition(sourceRows, illustrationComposition, 'Experience illustration composition', { multiple: true, sparse: true });
+  if (contemplationComposition) verifyOrderedComposition(sourceRows, contemplationComposition, 'Experience contemplation composition', { multiple: true, sparse: true });
+  if (mediaComposition) verifyOrderedComposition(sourceRows, mediaComposition, 'Experience media composition', { multiple: true, sparse: true });
   const binding = audioBinding(experience);
   const bySid = (table) => new Map(table.rows.map((row) => [row.sid, row]));
   const enBySid = bySid(en);
   const knBySid = bySid(kn);
   const audioBySid = bySid(audioComposition);
   const imageBySid = bySid(imageComposition);
+  const chapterIcons = new Map();
+  for (const imageRef of imageComposition.rows) {
+    if ((!imageRef.chapter_icon_collection && !imageRef.chapter_icon_order) || chapterIcons.has(imageRef.cid)) continue;
+    if (!imageRef.chapter_icon_collection || !imageRef.chapter_icon_order) throw new Error('Incomplete image reference at ' + imageRef.sid + '.');
+    const catalog = imageCatalogs.get(imageRef.chapter_icon_collection);
+    const asset = catalog?.rows.find((row) => mediaKey(row.sid, row.order) === mediaKey(imageRef.sid, imageRef.chapter_icon_order));
+    if (!asset) throw new Error('Image reference does not resolve at ' + imageRef.sid + '.');
+    chapterIcons.set(imageRef.cid, resolveMediaUrl(asset.image_url));
+  }
   const deckRefsBySid = new Map();
   for (const row of deckComposition?.rows || []) {
     if (!deckRefsBySid.has(row.sid)) deckRefsBySid.set(row.sid, []);
@@ -326,8 +341,16 @@ export function normalizeCollectionData({ sa, en, kn, sequence = null, audioComp
     if (!asset?.image_url) throw new Error('Illustration reference does not resolve at ' + sourceSid + '.');
     const enMetadata = localizedRow(bundle, assetSid, assetOrder, 'en', 'Illustration collection ' + collectionId);
     const knMetadata = localizedRow(bundle, assetSid, assetOrder, 'kn', 'Illustration collection ' + collectionId);
-    if (!enMetadata.alt_text || !knMetadata.alt_text) throw new Error('Illustration alternative text is required at ' + sourceSid + '.');
-    const imageLocation = normalizeImageUrl(asset.image_url, resolveMediaUrl);
+    let imageLocation;
+    try {
+      imageLocation = normalizeImageUrl(asset.image_url, resolveMediaUrl);
+      if (!isFallback && imageLocation.resolvedUrl instanceof Promise) {
+        imageLocation = { ...imageLocation, resolvedUrl: imageLocation.resolvedUrl.catch(() => '') };
+      }
+    } catch (error) {
+      if (isFallback) throw error;
+      imageLocation = { sourceUrl: asset.image_url, resolvedUrl: '', isExternal: false };
+    }
     return {
       mediaType: 'image',
       collectionId,
@@ -341,6 +364,14 @@ export function normalizeCollectionData({ sa, en, kn, sequence = null, audioComp
         en: Object.freeze({ altText: enMetadata.alt_text, caption: enMetadata.caption }),
         kn: Object.freeze({ altText: knMetadata.alt_text, caption: knMetadata.caption })
       }),
+      authoring: {
+        catalogRow: asset,
+        catalog: bundle.catalog,
+        catalogUrl: bundle.catalog.url || '',
+        localizedRows: { en: enMetadata, kn: knMetadata },
+        localizedTables: bundle.localized,
+        localizedUrls: bundle.localizedUrls || {}
+      },
       isFallback
     };
   }
@@ -353,18 +384,28 @@ export function normalizeCollectionData({ sa, en, kn, sequence = null, audioComp
     const bundle = contemplationCatalogs.get(collectionId);
     const asset = bundle?.catalog.rows.find((candidate) => mediaKey(candidate.sid, candidate.order) === mediaKey(assetSid, assetOrder));
     if (!asset) throw new Error('Contemplation reference does not resolve at ' + sourceSid + '.');
-    const enText = localizedRow(bundle, assetSid, assetOrder, 'en', 'Contemplation collection ' + collectionId).text;
-    const knText = localizedRow(bundle, assetSid, assetOrder, 'kn', 'Contemplation collection ' + collectionId).text;
-    if (!enText || !knText) throw new Error('Contemplation text is required at ' + sourceSid + '.');
+    const enRow = localizedRow(bundle, assetSid, assetOrder, 'en', 'Contemplation collection ' + collectionId);
+    const knRow = localizedRow(bundle, assetSid, assetOrder, 'kn', 'Contemplation collection ' + collectionId);
+    const enText = enRow.text;
+    const knText = knRow.text;
     return Object.freeze({
       collectionId,
       assetSid,
       assetOrder,
       type: asset.line_type,
       localized: Object.freeze({ en: enText, kn: knText }),
+      authoring: {
+        catalogRow: asset,
+        catalog: bundle.catalog,
+        catalogUrl: bundle.catalog.url || '',
+        localizedRows: { en: enRow, kn: knRow },
+        localizedTables: bundle.localized,
+        localizedUrls: bundle.localizedUrls || {}
+      },
       isFallback
     });
   }
+  const sequenceIndexBySid = new Map(sourceRows.map((row, index) => [row.sid, index]));
   const rows = sourceRows.map((sourceRow) => {
     const enRow = enBySid.get(sourceRow.sid);
     const knRow = knBySid.get(sourceRow.sid);
@@ -426,22 +467,27 @@ export function normalizeCollectionData({ sa, en, kn, sequence = null, audioComp
       });
     }
     deckSlots.sort((left, right) => left.order - right.order);
+    const fallbackIllustration = experience?.fallbacks?.illustration
+      ? illustrationFromReference(experience.fallbacks.illustration, sourceRow.sid, true)
+      : null;
+    const withIllustrationFallback = (illustration) => illustration.isFallback || !fallbackIllustration
+      ? illustration
+      : { ...illustration, fallback: fallbackIllustration };
     const illustrationReferences = (illustrationRefsBySid.get(sourceRow.sid) || []).filter((reference) => reference.image_collection || reference.image_order);
-    const illustrations = illustrationReferences.map((reference) => illustrationFromReference(reference, sourceRow.sid));
-    if (!illustrations.length && experience?.fallbacks?.illustration) {
-      illustrations.push(illustrationFromReference(experience.fallbacks.illustration, sourceRow.sid, true));
-    }
+    const illustrations = illustrationReferences.map((reference) => withIllustrationFallback(illustrationFromReference(reference, sourceRow.sid)));
+    if (!illustrations.length && fallbackIllustration) illustrations.push(fallbackIllustration);
     const contemplationReferences = (contemplationRefsBySid.get(sourceRow.sid) || []).filter((reference) => reference.text_collection || reference.text_order);
     const contemplationLines = contemplationReferences.map((reference) => contemplationFromReference(reference, sourceRow.sid));
-    if (!contemplationLines.length && experience?.fallbacks?.contemplation) {
-      contemplationLines.push(contemplationFromReference(experience.fallbacks.contemplation, sourceRow.sid, true));
-    }
+    const fallbackContemplation = experience?.fallbacks?.contemplation
+      ? contemplationFromReference(experience.fallbacks.contemplation, sourceRow.sid, true)
+      : null;
+    if (!contemplationLines.length && fallbackContemplation) contemplationLines.push(fallbackContemplation);
     const mediaItems = [];
     for (const reference of (mediaRefsBySid.get(sourceRow.sid) || []).filter((entry) => entry.media_type || entry.collection || entry.asset_order)) {
       if (!reference.media_type || !reference.collection || !reference.asset_order) throw new Error('Incomplete media reference at ' + sourceRow.sid + '.');
-      if (reference.media_type === 'image') {
-        const item = illustrationFromReference({ image_collection: reference.collection, image_order: reference.asset_order, sid: sourceRow.sid }, sourceRow.sid);
-        mediaItems.push({ ...item, order: Number(reference.order) });
+      if (reference.media_type === 'image' || reference.media_type === 'animated_image') {
+        const item = withIllustrationFallback(illustrationFromReference({ image_collection: reference.collection, image_order: reference.asset_order, sid: sourceRow.sid }, sourceRow.sid));
+        mediaItems.push({ ...item, mediaType: reference.media_type, order: Number(reference.order), compositionRow: reference });
       } else if (reference.media_type === 'google_deck') {
         const deck = deckSlots.find((item) => item.collectionId === reference.collection && item.catalogOrder === reference.asset_order);
         if (!deck?.sourceUrl) throw new Error('Google deck media reference does not resolve at ' + sourceRow.sid + '.');
@@ -450,13 +496,14 @@ export function normalizeCollectionData({ sa, en, kn, sequence = null, audioComp
           assetSid: sourceRow.sid, assetOrder: deck.catalogOrder, sourceUrl: deck.sourceUrl,
           resolvedUrl: deck.embedUrl, embedUrl: deck.embedUrl, title: deck.title,
           localized: Object.freeze({ en: Object.freeze({ altText: deck.title || '', caption: '' }), kn: Object.freeze({ altText: deck.title || '', caption: '' }) }),
-          isExternal: true, isFallback: false
+          isExternal: true, isFallback: false, compositionRow: reference,
+          authoring: { catalogRow: deck.catalogRow, catalog: deck.catalog, catalogUrl: deck.catalogUrl }
         });
+      } else if (reference.media_type === 'video') {
+        mediaItems.push({ mediaType: 'video', order: Number(reference.order), collectionId: reference.collection, assetOrder: reference.asset_order, compositionRow: reference, reserved: true });
       } else throw new Error('Unsupported media type at ' + sourceRow.sid + ': ' + reference.media_type + '.');
     }
-    if (!mediaItems.length && experience?.fallbacks?.illustration) {
-      mediaItems.push({ ...illustrationFromReference(experience.fallbacks.illustration, sourceRow.sid, true), order: 1 });
-    }
+    if (!mediaItems.length && fallbackIllustration) mediaItems.push({ ...fallbackIllustration, order: 1 });
     mediaItems.sort((left, right) => left.order - right.order);
     return {
       cid: sourceRow.cid,
@@ -487,19 +534,32 @@ export function normalizeCollectionData({ sa, en, kn, sequence = null, audioComp
         decks: deckSlots.filter((deck) => deck.sourceUrl),
         deckSlots
       },
-      contemplation: { lines: Object.freeze(contemplationLines) }
+      contemplation: { lines: Object.freeze(contemplationLines), fallback: fallbackContemplation }
+      ,authoring: {
+        sequenceIndexBySid,
+        deckComposition: deckComposition && { url: resourceUrls.decks, table: deckComposition },
+        illustrationComposition: illustrationComposition && { url: resourceUrls.illustrations, table: illustrationComposition },
+        mediaComposition: mediaComposition && { url: resourceUrls.media, table: mediaComposition },
+        contemplationComposition: contemplationComposition && { url: resourceUrls.contemplations, table: contemplationComposition },
+        illustrationCatalogs,
+        contemplationCatalogs,
+        deckCatalogs: new Map([...deckCatalogs].map(([id, table]) => [id, { url: table.url || '', table }]))
+      }
     };
   });
   return {
     schemaVersion: 3,
     experience,
     rows,
+    chapterIcons,
     authoring: {
       deckComposition: deckComposition && { url: resourceUrls.decks, table: deckComposition },
       illustrationComposition: illustrationComposition && { url: resourceUrls.illustrations, table: illustrationComposition },
       contemplationComposition: contemplationComposition && { url: resourceUrls.contemplations, table: contemplationComposition },
       mediaComposition: mediaComposition && { url: resourceUrls.media, table: mediaComposition },
-      deckCatalogs: new Map([...deckCatalogs].map(([id, table]) => [id, { url: table.url || '', table }]))
+      deckCatalogs: new Map([...deckCatalogs].map(([id, table]) => [id, { url: table.url || '', table }])),
+      illustrationCatalogs,
+      contemplationCatalogs
     },
     diagnostics: { audioCues: Object.fromEntries(audioCueErrors) }
   };
@@ -525,6 +585,7 @@ async function loadLocalizedCatalogs({ type, composition, collectionField, catal
   for (const id of collectionIds) {
     const entry = registryEntry(registry, id, type);
     const catalog = await fetchTable(entry.catalog_url, catalogHeaders, version);
+    catalog.url = entry.catalog_url;
     const localized = {};
     for (const language of ['en', 'kn']) {
       const url = entry[localizedFields[language]];
@@ -532,7 +593,7 @@ async function loadLocalizedCatalogs({ type, composition, collectionField, catal
       localized[language] = await fetchTable(url, localizedHeaders, version);
       verifyOrderedAssetIdentity(catalog, localized[language], type + ' collection ' + id + ' ' + language);
     }
-    catalogs.set(id, { catalog, localized });
+    catalogs.set(id, { catalog, localized, localizedUrls: { en: entry[localizedFields.en], kn: entry[localizedFields.kn] } });
   }
   return catalogs;
 }
@@ -713,6 +774,7 @@ async function loadCollectionExperienceWithReader(experienceId, { text, resolveM
     for (const id of new Set([...declaredIds, ...composition.rows.map((row) => row[collectionField]).filter(Boolean)])) {
       const entry = registryEntry(registry, id, type);
       const catalog = await table(entry.catalog_url, catalogHeaders);
+      catalog.url = entry.catalog_url;
       const localized = {};
       for (const language of ['en', 'kn']) {
         const url = entry[localizedFields[language]];
@@ -720,7 +782,7 @@ async function loadCollectionExperienceWithReader(experienceId, { text, resolveM
         localized[language] = await table(url, localizedHeaders);
         verifyOrderedAssetIdentity(catalog, localized[language], type + ' collection ' + id + ' ' + language);
       }
-      catalogs.set(id, { catalog, localized });
+      catalogs.set(id, { catalog, localized, localizedUrls: { en: entry[localizedFields.en], kn: entry[localizedFields.kn] } });
     }
     return catalogs;
   }
@@ -793,6 +855,39 @@ async function fileHandleAt(rootHandle, url) {
   return directory.getFileHandle(filename);
 }
 
+async function hasCollectionMarker(handle) {
+  try {
+    const experiences = await handle.getDirectoryHandle('experiences');
+    await experiences.getFileHandle('collection.csv');
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+export async function resolveCollectionsDirectoryHandle(directoryHandle) {
+  if (!directoryHandle || directoryHandle.kind !== 'directory') throw new Error('Choose the data/collections folder.');
+  if (await hasCollectionMarker(directoryHandle)) return directoryHandle;
+  try {
+    const collections = await directoryHandle.getDirectoryHandle('collections');
+    if (await hasCollectionMarker(collections)) return collections;
+  } catch (_) {}
+  try {
+    const data = await directoryHandle.getDirectoryHandle('data');
+    const collections = await data.getDirectoryHandle('collections');
+    if (await hasCollectionMarker(collections)) return collections;
+  } catch (_) {}
+  throw new Error('The selected folder does not contain data/collections/experiences/collection.csv. Choose the repository root, data, or data/collections folder.');
+}
+
+async function writableFileHandleAt(rootHandle, url) {
+  const parts = relativeCollectionPath(url).split('/').filter(Boolean);
+  const filename = parts.pop();
+  let directory = rootHandle;
+  for (const part of parts) directory = await directory.getDirectoryHandle(part, { create: true });
+  return directory.getFileHandle(filename, { create: true });
+}
+
 export class WritableCollectionWorkspace {
   constructor(rootHandle) {
     this.rootHandle = rootHandle;
@@ -831,16 +926,24 @@ export class WritableCollectionWorkspace {
         return this.objectUrls.get(url);
       }
     });
+    for (const [cid, iconUrl] of dataset.chapterIcons || []) {
+      if (iconUrl instanceof Promise) dataset.chapterIcons.set(cid, await iconUrl);
+    }
     for (const row of dataset.rows) {
       for (const field of ['primaryAudioUrl', 'chantFullSaUrl', 'chapterIconUrl']) {
         if (row.media[field] instanceof Promise) row.media[field] = await row.media[field];
       }
-      for (const illustration of row.media.illustrations || []) {
+      const resolveIllustration = async (illustration) => {
+        if (!illustration) return;
+        if (illustration.resolvedUrl instanceof Promise) illustration.resolvedUrl = await illustration.resolvedUrl;
         if (illustration.imageUrl instanceof Promise) illustration.imageUrl = await illustration.imageUrl;
-      }
+        await resolveIllustration(illustration.fallback);
+      };
+      for (const illustration of row.media.illustrations || []) await resolveIllustration(illustration);
       for (const item of row.media.items || []) {
         if (item.resolvedUrl instanceof Promise) item.resolvedUrl = await item.resolvedUrl;
         if (item.imageUrl instanceof Promise) item.imageUrl = await item.imageUrl;
+        await resolveIllustration(item.fallback);
       }
     }
     return dataset;
@@ -894,11 +997,26 @@ export class WritableCollectionWorkspace {
     }
     return pending.map((entry) => entry.url.split('/').pop());
   }
+
+  async saveAssets(entries) {
+    const saved = [];
+    for (const entry of entries) {
+      if (!entry?.url || !entry.file) throw new Error('Media asset save target is incomplete.');
+      const handle = await writableFileHandleAt(this.rootHandle, entry.url);
+      const writable = await handle.createWritable();
+      await writable.write(entry.file);
+      await writable.close();
+      const verified = await handle.getFile();
+      if (verified.size !== entry.file.size) throw new Error('Could not verify the saved ' + entry.url.split('/').pop() + '.');
+      saved.push(entry.url.split('/').pop());
+    }
+    return saved;
+  }
 }
 
 export async function openWritableCollectionWorkspace(experienceId, directoryHandle) {
-  if (!directoryHandle || directoryHandle.kind !== 'directory') throw new Error('Choose the data/collections folder.');
-  const workspace = new WritableCollectionWorkspace(directoryHandle);
+  const collectionsHandle = await resolveCollectionsDirectoryHandle(directoryHandle);
+  const workspace = new WritableCollectionWorkspace(collectionsHandle);
   const dataset = await workspace.load(experienceId);
   return { dataset, workspace };
 }
