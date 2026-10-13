@@ -87,7 +87,7 @@ test('the player builds its normalized model from collection data', () => {
   assert.equal(verse.source.shloka.includes('\n'), true);
   assert.ok(verse.languages.en.transliteration);
   assert.ok(verse.languages.kn.meaning);
-  assert.equal(verse.media.chantFullSaUrl, 'data/collections/audio/chanting-swami-brahmananda/sa/chapter-06/06-007.mp3');
+  assert.equal(verse.media.chantFullSaUrl, 'https://media.gitajyoti.org/audio/chanting-swami-brahmananda/sa/chapter-06/06-007.mp3');
   assert.deepEqual(verse.media.chantFullSaCues, []);
   const chapter = dataset.rows.find((row) => row.sid === '6.B');
   assert.equal(chapter.media.chapterIconUrl, 'data/collections/images/gita-chapter-icons/chapter-06.svg');
@@ -240,7 +240,7 @@ test('the player can load the selected collections folder for file-system use', 
     const localDataset = await loadCollectionExperienceFromFiles('gita-700', files);
     assert.equal(localDataset.rows.length, 746);
     assert.equal(localDataset.rows.find((row) => row.sid === '6.7').media.chantFullSaUrl,
-      'blob:collection-test/audio/chanting-swami-brahmananda/sa/chapter-06/06-007.mp3');
+      'https://media.gitajyoti.org/audio/chanting-swami-brahmananda/sa/chapter-06/06-007.mp3');
   } finally {
     URL.createObjectURL = originalCreateObjectUrl;
   }

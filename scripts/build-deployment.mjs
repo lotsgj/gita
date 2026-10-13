@@ -63,6 +63,10 @@ function isDocumentationAsset(relative) {
     || relative.startsWith('js/vendor/');
 }
 
+function isAudioBinary(relative) {
+  return /\.(mp3|m4a|ogg|opus|wav)$/i.test(relative);
+}
+
 const major = (await readFile(path.join(root, 'APP_MAJOR_VERSION'), 'utf8')).trim();
 if (!/^[1-9]\d*$/.test(major)) throw new Error('APP_MAJOR_VERSION must contain one positive whole number.');
 
@@ -143,7 +147,7 @@ await mkdir(path.join(output, 'js/vendor'), { recursive: true });
 await cp(path.join(root, 'js/vendor/MARKED-LICENSE.md'), path.join(output, 'js/vendor/MARKED-LICENSE.md'));
 await copyDirectory(path.join(root, 'docs'), path.join(output, 'docs'), (relative) => !relative.endsWith('.DS_Store'));
 await copyDirectory(path.join(root, 'data'), path.join(output, 'data'), (relative) => {
-  return !relative.endsWith('.DS_Store') && relative !== 'app-version.json';
+  return !relative.endsWith('.DS_Store') && relative !== 'app-version.json' && !isAudioBinary(relative);
 });
 
 const versionMetadata = { version, major, build, commit, runId, builtAt, timeZone };
@@ -152,10 +156,15 @@ await writeFile(path.join(output, 'data/version-history.json'), JSON.stringify(v
 
 await assertAbsent(path.join(output, 'x'), 'The archived x/ prototypes');
 
+const deployedAudioBinaries = (await walk(output)).filter((absolute) => isAudioBinary(path.relative(output, absolute)));
+if (deployedAudioBinaries.length) {
+  throw new Error(`Audio binaries must not be included in deployment output: ${deployedAudioBinaries[0]}`);
+}
+
 const assets = {};
 for (const absolute of await walk(output)) {
   const relative = path.relative(output, absolute).split(path.sep).join('/');
-  if (relative === 'asset-manifest.json' || relative === 'CNAME' || /\.(mp3|m4a|ogg|wav)$/i.test(relative)) continue;
+  if (relative === 'asset-manifest.json' || relative === 'CNAME' || isAudioBinary(relative)) continue;
   const contents = await readFile(absolute);
   assets[relative] = {
     sha256: createHash('sha256').update(contents).digest('hex'),

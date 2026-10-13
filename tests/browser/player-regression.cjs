@@ -151,7 +151,7 @@ async function run() {
     assert.equal(await page.locator('[data-language-panel="en"]').evaluate((element) => element.getBoundingClientRect().left < document.querySelector('[data-language-panel="kn"]').getBoundingClientRect().left), true, 'English must be the primary desktop panel for English content');
     await assertYogaTopColumnsDoNotOverlap(page);
     assert.notEqual(await page.locator('[data-role="shloka"]').innerText(), '—');
-    assert.match(await page.locator('#audio').getAttribute('src'), /chanting-aj-padma-aj-vijay-learn-mode/);
+    assert.match(await page.locator('#audio').getAttribute('src'), /^https:\/\/media\.gitajyoti\.org\/audio\/chanting-aj-padma-aj-vijay-learn-mode\/.*\.ogg$/);
     await page.keyboard.press('l');
     await page.getByRole('button', { name: 'ಕನ್ನಡ' }).click();
     assert.equal(await page.locator('[data-language-panel="kn"]').evaluate((element) => element.getBoundingClientRect().left < document.querySelector('[data-language-panel="en"]').getBoundingClientRect().left), true, 'Kannada must move to the primary desktop panel when content language changes');
@@ -197,7 +197,7 @@ async function run() {
     const questionLeftEdges = await page.locator('[data-role="question-stage"] p').evaluateAll((questions) => questions.map((question) => question.getBoundingClientRect().left));
     assert.ok(Math.max(...questionLeftEdges) - Math.min(...questionLeftEdges) < 2, 'all-question mode must give every question the same left edge');
     assert.equal(await page.locator('[data-role="meaning"]').getAttribute('lang'), 'en');
-    assert.match(await page.locator('#audio').getAttribute('src'), /chanting-swami-brahmananda/);
+    assert.match(await page.locator('#audio').getAttribute('src'), /^https:\/\/media\.gitajyoti\.org\/audio\/chanting-swami-brahmananda\/.*\.mp3$/);
     const saraWidths = await page.locator('[data-sara-panel]').evaluateAll((panels) => panels.map((panel) => panel.getBoundingClientRect().width));
     const threePanelWordSize = Number.parseFloat(await page.locator('[data-role="word"]').evaluate((element) => getComputedStyle(element).fontSize));
     assert.ok(Math.max(...saraWidths) - Math.min(...saraWidths) < 3, 'all three desktop panels must have equal width');
@@ -305,7 +305,7 @@ async function run() {
       return text.scrollHeight <= panel.clientHeight + 1 && text.scrollWidth <= panel.clientWidth + 1;
     })), true, 'Noto Sans content must fit every desktop panel');
     assert.equal(await page.locator('#play-button').isEnabled(), true);
-    assert.match(await page.locator('#audio').getAttribute('src'), /data\/collections\/audio\/chanting-swami-brahmananda\/sa\/chapter-06\/06-007\.mp3/);
+    assert.equal(await page.locator('#audio').getAttribute('src'), 'https://media.gitajyoti.org/audio/chanting-swami-brahmananda/sa/chapter-06/06-007.mp3');
     await page.locator('#play-button').click();
     await page.locator('#play-button[aria-label="Pause audio"]').waitFor();
     await page.locator('#play-button').click();
@@ -692,7 +692,7 @@ async function run() {
     await filePage.locator('#sid-label').waitFor();
     assert.equal(await filePage.locator('#sid-label').innerText(), '6.7', 'file-mode direct destination must continue after selecting collections');
     await filePage.keyboard.press('ArrowRight');
-    assert.match(await filePage.locator('#audio').getAttribute('src'), /^blob:/);
+    assert.match(await filePage.locator('#audio').getAttribute('src'), /^https:\/\/media\.gitajyoti\.org\/audio\/chanting-swami-brahmananda\/.*\.mp3$/);
     const originalLocalAudio = await filePage.locator('#audio').getAttribute('src');
     await filePage.evaluate(() => new Promise((resolve, reject) => {
       const request = indexedDB.open('gitaverse-profiles');
@@ -720,7 +720,7 @@ async function run() {
     await filePage.locator('#gita-700-link').click();
     await filePage.locator('#experience-detail-action').click();
     await filePage.locator('#sid-label').waitFor();
-    assert.notEqual(await filePage.locator('#audio').getAttribute('src'), originalLocalAudio, 'changing collections must replace cached local media URLs');
+    assert.equal(await filePage.locator('#audio').getAttribute('src'), originalLocalAudio, 'reselecting collections must preserve canonical remote media URLs');
     await filePage.keyboard.press('e');
     assert.equal(await filePage.locator('#workspace-overlay').isVisible(), true);
     await fileContext.close();

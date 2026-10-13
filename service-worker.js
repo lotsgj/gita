@@ -1,8 +1,9 @@
 const BUILD_VERSION = '__GITAVERSE_VERSION__';
 const SHELL_CACHE = `gitaverse-shell-${BUILD_VERSION}`;
-const AUDIO_CACHE = 'gitaverse-audio-v2';
+const AUDIO_CACHE = 'gitaverse-audio-v3';
 const AUDIO_PREFIX = 'gitaverse-audio-';
 const SHELL_PREFIX = 'gitaverse-shell-';
+const MEDIA_ORIGIN = 'https://media.gitajyoti.org';
 
 function scopedUrl(path) {
   return new URL(path, self.registration.scope).href;
@@ -72,7 +73,7 @@ async function audioResponse(request) {
   let response = await cache.match(cacheKey);
   if (!response) {
     try {
-      const network = await fetch(request.url, { cache: 'no-store', credentials: 'same-origin' });
+      const network = await fetch(request.url, { cache: 'no-store', credentials: 'omit', mode: 'cors' });
       if (!network.ok || network.status !== 200) return network;
       await cache.put(cacheKey, network.clone());
       response = network;
@@ -100,8 +101,13 @@ self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
+  const isAudio = /\.(mp3|m4a|ogg|wav)$/i.test(url.pathname);
+  if (url.origin === MEDIA_ORIGIN && isAudio) {
+    event.respondWith(audioResponse(request));
+    return;
+  }
   if (url.origin !== self.location.origin) return;
   if (isDocumentationRequest(url)) return;
-  if (/\.(mp3|m4a|ogg|wav)$/i.test(url.pathname)) event.respondWith(audioResponse(request));
+  if (isAudio) event.respondWith(audioResponse(request));
   else event.respondWith(shellResponse(request));
 });

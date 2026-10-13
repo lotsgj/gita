@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { access } from 'node:fs/promises';
+import { access, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { assertIdentitySequence, parseTable, projectRoot } from '../helpers/collection-data.mjs';
@@ -22,6 +22,16 @@ const deckRegistry = await parseTable('data/collections/deck/collection.csv');
 const saraDeckCatalog = await parseTable('data/collections/deck/gita-sara-google-decks/catalog.csv');
 const imageRegistry = await parseTable('data/collections/images/collection.csv');
 const textRegistry = await parseTable('data/collections/text/collection.csv');
+
+async function collectFiles(directory) {
+  const files = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...await collectFiles(absolute));
+    else if (entry.isFile()) files.push(absolute);
+  }
+  return files;
+}
 
 test('the Sanskrit master declares raw and display shloka fields in the collection contract order', () => {
   assert.deepEqual(sa.headers, ['cid', 'snum', 'sid', 'chapter_name', 'shloka_raw', 'shloka', 'word_by_word', 'meaning', 'word_by_word_meaning']);
@@ -64,25 +74,40 @@ test('English and Kannada masters provide one consistent chapter name for every 
   }
 });
 
-test('all media catalog keys are unique and resolve to files', async () => {
+test('all media catalog keys are unique and resolve to approved sources', async () => {
   const audioCatalog = await parseTable('data/collections/audio/chanting-swami-brahmananda/catalog.csv');
   const learningModeCatalog = await parseTable('data/collections/audio/chanting-aj-padma-aj-vijay-learn-mode/catalog.csv');
   const imageCatalog = await parseTable('data/collections/images/gita-chapter-icons/catalog.csv');
   assert.equal(audioCatalog.rows.length, 700);
   assert.equal(learningModeCatalog.rows.length, 314);
   assert.equal(imageCatalog.rows.length, 19);
-  for (const [label, catalog, urlField] of [
-    ['audio', audioCatalog, 'audio_url'],
-    ['learning-mode audio', learningModeCatalog, 'audio_url'],
-    ['images', imageCatalog, 'image_url']
+  for (const [label, catalog, urlField, remoteExtension] of [
+    ['audio', audioCatalog, 'audio_url', '.mp3'],
+    ['learning-mode audio', learningModeCatalog, 'audio_url', '.ogg'],
+    ['images', imageCatalog, 'image_url', '']
   ]) {
     const keys = catalog.rows.map((row) => `${row.sid}:${row.order}`);
     assert.equal(new Set(keys).size, keys.length, `${label} sid+order keys must be unique`);
     for (const row of catalog.rows) {
       assert.match(row.order, /^[1-9]\d*$/);
-      await access(path.join(projectRoot, row[urlField]));
+      if (remoteExtension) {
+        const url = new URL(row[urlField]);
+        assert.equal(url.protocol, 'https:');
+        assert.equal(url.hostname, 'media.gitajyoti.org');
+        assert.ok(url.pathname.startsWith('/audio/'));
+        assert.ok(url.pathname.endsWith(remoteExtension), `${label} must use ${remoteExtension}`);
+        assert.equal(decodeURIComponent(url.pathname).includes('../'), false, `${label} must not traverse media paths`);
+      } else {
+        await access(path.join(projectRoot, row[urlField]));
+      }
     }
   }
+});
+
+test('the Gitaverse repository contains audio metadata but no production audio binaries', async () => {
+  const audioRoot = path.join(projectRoot, 'data/collections/audio');
+  const binaries = (await collectFiles(audioRoot)).filter((file) => /\.(mp3|m4a|ogg|opus|wav)$/i.test(file));
+  assert.deepEqual(binaries, [], 'production audio belongs on media.gitajyoti.org');
 });
 
 test('every registered audio collection has a readable catalog', async () => {

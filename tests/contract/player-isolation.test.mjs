@@ -14,6 +14,7 @@ const rendererStyles = await readFile(new URL('../../css/renderers/gita-700.css'
 const yogaRendererStyles = await readFile(new URL('../../css/renderers/gita-yoga.css', import.meta.url), 'utf8');
 const saraRendererStyles = await readFile(new URL('../../css/renderers/gita-sara.css', import.meta.url), 'utf8');
 const fontBuilder = await readFile(new URL('../../scripts/build-font-css.mjs', import.meta.url), 'utf8');
+const serviceWorker = await readFile(new URL('../../service-worker.js', import.meta.url), 'utf8');
 
 test('the collection player is isolated from the legacy master and legacy media paths', () => {
   const combined = player + '\n' + core;
@@ -35,9 +36,25 @@ test('the public entry point resolves to the collection player', () => {
   assert.match(index, /player\.html/);
 });
 
+test('the shared player uses canonical cross-origin media with progressive PWA caching', () => {
+  assert.match(player, /<audio[^>]+crossorigin="anonymous"/);
+  assert.match(data, /function remoteMediaUrl\(value\)/);
+  assert.match(data, /url\.protocol === 'https:'/);
+  assert.match(serviceWorker, /MEDIA_ORIGIN = 'https:\/\/media\.gitajyoti\.org'/);
+  assert.match(serviceWorker, /url\.origin === MEDIA_ORIGIN && isAudio/);
+  assert.match(serviceWorker, /credentials: 'omit', mode: 'cors'/);
+});
+
 test('archived prototypes are guarded from deployment output and its asset manifest', () => {
   assert.match(deployment, /assertAbsent\(path\.join\(output, 'x'\)/);
   assert.match(deployment, /relative\.startsWith\('x\/'\)/);
+});
+
+test('deployment explicitly excludes every supported audio binary format', () => {
+  assert.match(deployment, /function isAudioBinary\(relative\)/);
+  assert.match(deployment, /mp3\|m4a\|ogg\|opus\|wav/);
+  assert.match(deployment, /!isAudioBinary\(relative\)/);
+  assert.match(deployment, /Audio binaries must not be included in deployment output/);
 });
 
 test('the player uses the bundled Noto Sans family for every supported script', async () => {

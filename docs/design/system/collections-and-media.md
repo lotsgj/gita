@@ -1,7 +1,7 @@
 # Collections and media
 
 **Status:** Current  
-**Last updated:** 12 October 2026
+**Last updated:** 13 October 2026
 
 ## Organization
 
@@ -40,6 +40,12 @@ collection_id#title#contributor#language#catalog_url#cue_purpose_url#cue_url#att
 ```
 
 Each audio catalog uses `sid#order#language#audio_url`. Gita 700’s composition uses the purpose-specific fields `chant_full_sa_collection` and `chant_full_sa_order`. Gita Yoga uses `audio_collection` and `audio_order`; its `experience.json` declares those names through `audioBinding.collectionField` and `audioBinding.orderField`. This generic binding lets future experiences define their own composition vocabulary without placing provider paths in a renderer.
+
+`audio_url` is the complete HTTPS address of the playable asset. Production audio is served from `media.gitajyoti.org`, keeping the catalog as the single authority without splitting a URL across registry and catalog fields. The Swami Brahmananda collection uses MP3; the AJ Padma and AJ Vijay learning collection uses OGG. HTTP, `file://`, and writable-workspace modes all retain the same canonical remote URL.
+
+Gitaverse stores audio metadata only: collection registry rows, catalogs, cue-purpose definitions, and cue timings. Production audio binaries do not belong in this repository or its deployment artifact. The build excludes MP3, M4A, OGG, Opus, and WAV files as a defensive boundary, while contract tests fail if a production audio binary is added under `data/collections/audio`.
+
+The PWA does not precache the media library. Its service worker recognizes only the approved media origin, fetches recordings with anonymous CORS, and caches recordings progressively when they are used. Cached responses retain byte-range behavior for seeking. Media-host failure does not prevent canonical verse content or navigation from loading.
 
 Gita 700’s image composition references its chapter icons through the same reusable-collection principle.
 

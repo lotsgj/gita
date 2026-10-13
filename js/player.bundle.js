@@ -1512,6 +1512,15 @@ function mediaKey(sid, order) {
   return sid + ':' + order;
 }
 
+function remoteMediaUrl(value) {
+  try {
+    const url = new URL(String(value || ''));
+    return url.protocol === 'https:' ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
 function normalizeGoogleDeckUrl(value) {
   const raw = String(value || '').trim();
   if (!raw) return '';
@@ -2215,6 +2224,8 @@ async function loadCollectionExperienceFromFiles(experienceId, fileList) {
   };
   const objectUrls = new Map();
   const resolveMediaUrl = (url) => {
+    const remote = remoteMediaUrl(url);
+    if (remote) return remote;
     const file = files.get(url);
     if (!file) throw new Error('The selected folder is missing media file ' + url + '.');
     if (!objectUrls.has(url)) objectUrls.set(url, URL.createObjectURL(file));
@@ -2311,6 +2322,8 @@ class WritableCollectionWorkspace {
       },
       onLanguageFile: (language, url) => this.languageFiles.set(language, url),
       resolveMediaUrl: (url) => {
+        const remote = remoteMediaUrl(url);
+        if (remote) return remote;
         if (!this.objectUrls.has(url)) {
           const promise = this.readFile(url).then((file) => URL.createObjectURL(file));
           this.objectUrls.set(url, promise);
