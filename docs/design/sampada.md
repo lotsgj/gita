@@ -1,7 +1,7 @@
 # Sampada — Treasure trove of Gitaverse enhancements
 
 **Status:** Current  
-**Last updated:** 12 October 2026
+**Last updated:** 13 October 2026
 
 Sampada keeps both future possibilities and completed enhancements. Items retain their number after completion so decisions and delivery history remain traceable.
 
@@ -180,6 +180,20 @@ The question editor should manage an explicitly ordered bilingual list with requ
 `media.csv` should be the single authority for cross-type association and order. `contemplations.csv` remains authoritative for question association and order. New image and deck assets initially belong to the existing Gita Sara collections; collection selection can follow when multiple authoring collections exist. Saving must validate the complete draft before writing the smallest affected set of composition, catalog, and localized-master files. Writable-folder and download-only modes must produce equivalent changes, retain conflict detection, and preserve unrelated rows and columns.
 
 Add native and offline-capable deck alternatives, including exported slide-image sets or video, together with explicit **Make available offline** packages and storage estimates. Reuse the shared media resolver, cache identity, event model and editing lifecycle across Gita Sara and any later Gita Yoga or Gita 700 media enhancements. Google-deck support remains the deliberately narrow first Gita Sara delivery; this item begins only after that experience is implemented and verified.
+
+### 16. My Notes — shloka questions, comments and voice reflections
+
+**Status:** To unfold
+
+**Tag:** Major
+
+Create one profile-specific Notes capability shared by every experience. Pressing `N` in Gita 700, Gita Yoga, Gita Sara or a future renderer should open a focused editor already associated with the current SID. A note may be a question or comment and may contain text, a voice recording, or both. Notes belong to the profile and shloka rather than the originating renderer, while retaining the source experience as useful context.
+
+Make **My Notes** available from the landing experience. Direct navigation should open a dedicated Notes experience for reviewing notes across shlokas, initially supporting search and simple question, comment, text and voice filters. Contextual navigation should open the composer over the current shloka and surface earlier notes for that SID without disrupting the underlying experience.
+
+Persist note metadata and voice blobs locally in IndexedDB, separately from canonical collections and temporary content edits. Provide a recoverable export/import path before treating Notes as complete, because clearing browser storage or uninstalling the PWA can otherwise remove personal work. Never transmit note text, audio or other private reflection content to Clarity; analytics should contain operational events only and note-entry surfaces must remain masked from session recording.
+
+The reviewed visual direction is retained in `x/notes/`: it demonstrates both direct Notes-library navigation and the contextual `N` editor, including responsive mobile treatment. Revisit storage limits, recording formats, export packaging, accessibility, localization and optional future synchronization when implementation is scheduled.
 
 ## Done
 

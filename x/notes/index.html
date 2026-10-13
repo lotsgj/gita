@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gitaverse Notes visual prototype</title>
+  <link rel="stylesheet" href="../../css/fonts.css">
+  <link rel="stylesheet" href="notes.css">
+</head>
+<body>
+  <div class="prototype-switch" role="group" aria-label="Preview entry point">
+    <span>Preview</span>
+    <button class="active" type="button" data-view="library">Direct to Notes</button>
+    <button type="button" data-view="context">From shloka · N</button>
+  </div>
+
+  <section id="library-view" class="view notes-view">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Gitaverse home">
+        <span class="flute"><img src="../../assets/images/krishna-flute.svg" alt=""></span>
+        <span>Gitaverse</span>
+      </a>
+      <button class="profile" type="button"><span>VJ</span><strong>Vijay</strong></button>
+    </header>
+
+    <main class="notes-shell">
+      <header class="notes-heading">
+        <div><p class="eyebrow">Your reflections, kept close</p><h1>My Notes</h1></div>
+        <button class="new-note" type="button"><b>＋</b> New note</button>
+      </header>
+
+      <div class="notes-tools">
+        <label class="search"><span>⌕</span><input type="search" placeholder="Search a shloka or note" aria-label="Search notes"></label>
+        <div class="filters" role="group" aria-label="Filter notes">
+          <button class="active" type="button" data-filter="all">All</button>
+          <button type="button" data-filter="question">Questions</button>
+          <button type="button" data-filter="comment">Comments</button>
+          <button type="button" data-filter="voice">Voice</button>
+        </div>
+      </div>
+
+      <section class="note-grid" aria-label="Notes">
+        <article class="note-card question" data-kind="question">
+          <header><span class="sid">6.7</span><span class="kind">Question</span><button aria-label="More options">•••</button></header>
+          <p>What does it mean to raise oneself by one’s own mind in an ordinary difficult moment?</p>
+          <footer><span>Gita Yoga</span><time>Today · 8:42 PM</time></footer>
+        </article>
+        <article class="note-card voice" data-kind="voice comment">
+          <header><span class="sid">2.47</span><span class="kind">Comment · Voice</span><button aria-label="More options">•••</button></header>
+          <p>I noticed that acting without attachment does not mean acting without care.</p>
+          <div class="voice-player"><button type="button" aria-label="Play voice note">▶</button><span><i></i></span><time>00:42</time></div>
+          <footer><span>Gita Sara</span><time>Yesterday</time></footer>
+        </article>
+        <article class="note-card comment" data-kind="comment">
+          <header><span class="sid">1.1</span><span class="kind">Comment</span><button aria-label="More options">•••</button></header>
+          <p>Kurukshetra can also be the place where my duty and attachment pull in different directions.</p>
+          <footer><span>Gita 700</span><time>9 October</time></footer>
+        </article>
+        <article class="note-card question voice" data-kind="question voice">
+          <header><span class="sid">2.14</span><span class="kind">Question · Voice</span><button aria-label="More options">•••</button></header>
+          <p>Can equanimity be practised before discomfort arrives?</p>
+          <div class="voice-player"><button type="button" aria-label="Play voice note">▶</button><span><i></i></span><time>01:08</time></div>
+          <footer><span>Gita Yoga</span><time>4 October</time></footer>
+        </article>
+      </section>
+    </main>
+  </section>
+
+  <section id="context-view" class="view context-view" hidden>
+    <div class="player-preview" aria-hidden="true">
+      <header class="player-top"><span>6 — Dhyana Yoga</span><strong>6.7</strong><span>☰ &nbsp; VJ</span></header>
+      <small>252 / 746</small>
+      <div class="verse-panels">
+        <article><p>उद्धरेदात्मनात्मानं<br>नात्मानमवसादयेत् ।<br>आत्मैव ह्यात्मनो बन्धुर्<br>आत्मैव रिपुरात्मनः ॥</p></article>
+        <article><p>ಒಬ್ಬನು ತನ್ನ ಮನಸ್ಸಿನಿಂದ ತನ್ನನ್ನು ಮೇಲಕ್ಕೆತ್ತಿಕೊಳ್ಳಬೇಕು; ತನ್ನನ್ನು ತಾನು ಕೆಳಗಿಳಿಸಬಾರದು.</p></article>
+        <article><p>One must elevate oneself by one’s own mind, not degrade oneself. The mind can be one’s friend or one’s enemy.</p></article>
+      </div>
+      <footer class="audio-preview">◉　　▶ ━━━━━━━━━━━━━　00:00 / 00:31　　⛶</footer>
+    </div>
+
+    <div class="scrim"></div>
+    <section class="composer" role="dialog" aria-modal="true" aria-labelledby="composer-title">
+      <header class="composer-titlebar">
+        <div><span class="context-mark">6.7</span><div><p>Note for shloka</p><h2 id="composer-title">Hold this thought</h2></div></div>
+        <button class="close-composer" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="composer-body">
+        <div class="note-types" role="group" aria-label="Note type">
+          <button class="active" type="button">Question</button><button type="button">Comment</button>
+        </div>
+        <label class="note-field"><span class="visually-hidden">Your note</span><textarea placeholder="What are you wondering or noticing?"></textarea></label>
+        <section class="recording">
+          <button class="record-button" type="button" aria-label="Start voice recording"><span>●</span></button>
+          <div><strong>Add a voice note</strong><small>Tap to record your reflection</small></div>
+          <time hidden>00:00</time>
+        </section>
+        <aside class="existing-note">
+          <span>1 earlier note on this shloka</span>
+          <p>“The mind becomes a friend through patient practice, not through force.”</p>
+        </aside>
+      </div>
+      <footer class="composer-actions"><button class="quiet" type="button">Cancel</button><button class="save" type="button">Save note</button></footer>
+    </section>
+  </section>
+
+  <script src="notes.js"></script>
+</body>
+</html>
