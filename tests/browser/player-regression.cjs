@@ -33,6 +33,25 @@ function staticServer() {
   });
 }
 
+function silentWav(durationSeconds = 1, sampleRate = 8000) {
+  const sampleCount = durationSeconds * sampleRate;
+  const dataBytes = sampleCount * 2;
+  const buffer = Buffer.alloc(44 + dataBytes);
+  buffer.write('RIFF', 0);
+  buffer.writeUInt32LE(36 + dataBytes, 4);
+  buffer.write('WAVEfmt ', 8);
+  buffer.writeUInt32LE(16, 16);
+  buffer.writeUInt16LE(1, 20);
+  buffer.writeUInt16LE(1, 22);
+  buffer.writeUInt32LE(sampleRate, 24);
+  buffer.writeUInt32LE(sampleRate * 2, 28);
+  buffer.writeUInt16LE(2, 32);
+  buffer.writeUInt16LE(16, 34);
+  buffer.write('data', 36);
+  buffer.writeUInt32LE(dataBytes, 40);
+  return buffer;
+}
+
 async function createProfile(page, name = 'Regression Profile') {
   await page.getByLabel('Name', { exact: true }).fill(name);
   await page.getByLabel('Date of birth', { exact: true }).fill('1990-01-01');
@@ -63,6 +82,17 @@ async function run() {
   if (fs.existsSync(chromePath)) launchOptions.executablePath = chromePath;
   const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext({ acceptDownloads: true });
+  let mockedAudioRequests = 0;
+  const audioFixture = silentWav();
+  await context.route('https://media.gitajyoti.org/audio/**', (route) => {
+    mockedAudioRequests += 1;
+    return route.fulfill({
+      status: 200,
+      contentType: 'audio/wav',
+      headers: { 'Access-Control-Allow-Origin': '*', 'Accept-Ranges': 'bytes' },
+      body: audioFixture
+    });
+  });
   await context.route('https://docs.google.com/**', (route) => route.fulfill({
     status: 200,
     contentType: 'text/html',
@@ -725,6 +755,7 @@ async function run() {
     assert.equal(await filePage.locator('#workspace-overlay').isVisible(), true);
     await fileContext.close();
 
+    assert.ok(mockedAudioRequests > 0, 'browser regression must exercise canonical remote audio URLs through its deterministic fixture');
     assert.deepEqual(errors, [], 'browser console/page errors');
     assert.equal(missingResourceMessages.length, missingIllustrationResponses.length, 'only planned missing illustrations may produce handled 404 responses');
     await page.goto(`${base}/player.html?play=gita-700&sid=6.7&pid=1`, { waitUntil: 'networkidle' });
